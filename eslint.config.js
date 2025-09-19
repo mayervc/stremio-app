@@ -1,11 +1,10 @@
-// https://docs.expo.dev/guides/using-eslint/
-const { defineConfig } = require('eslint/config');
-const expoConfig = require('eslint-config-expo/flat');
-const tseslint = require('@typescript-eslint/eslint-plugin');
-const tsparser = require('@typescript-eslint/parser');
-const react = require('eslint-plugin-react');
-const reactHooks = require('eslint-plugin-react-hooks');
-const reactNative = require('eslint-plugin-react-native');
+const { defineConfig } = require('eslint/config')
+const expoConfig = require('eslint-config-expo/flat')
+const tseslint = require('@typescript-eslint/eslint-plugin')
+const tsparser = require('@typescript-eslint/parser')
+const react = require('eslint-plugin-react')
+const reactHooks = require('eslint-plugin-react-hooks')
+const reactNative = require('eslint-plugin-react-native')
 
 module.exports = defineConfig([
   expoConfig,
@@ -55,4 +54,4 @@ module.exports = defineConfig([
     },
     ignores: ['dist/*', 'node_modules/*', '.expo/*'],
   },
-]);
+])
