@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosResponse } from 'axios'
+import axios, { AxiosInstance } from 'axios'
 
 // Base configuration for Stremio API
 const STREMIO_API_BASE_URL =
@@ -14,29 +14,5 @@ export const apiClient: AxiosInstance = axios.create({
     Accept: 'application/json',
   },
 })
-
-// Response interceptor
-apiClient.interceptors.response.use(
-  (response: AxiosResponse) => {
-    return response
-  },
-  error => {
-    // Handle common errors
-    if (error.response) {
-      // Server responded with error status
-      console.error(
-        `❌ API Error: ${error.response.status} - ${error.response.data?.message || 'Unknown error'}`
-      )
-    } else if (error.request) {
-      // Request was made but no response received
-      console.error('❌ Network Error: No response received')
-    } else {
-      // Something else happened
-      console.error('❌ Request Setup Error:', error.message)
-    }
-
-    return Promise.reject(error)
-  }
-)
 
 export default apiClient
