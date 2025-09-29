@@ -25,7 +25,7 @@ export const unstable_settings = {
 export default function RootLayout() {
   const colorScheme = useColorScheme()
 
-  // Cargar fuentes Poppins globalmente
+  // Load Poppins fonts globally
   const [fontsLoaded] = useFonts({
     Poppins_400Regular,
     Poppins_500Medium,
@@ -34,7 +34,7 @@ export default function RootLayout() {
   })
 
   if (!fontsLoaded) {
-    return null // O un componente de carga
+    return null
   }
 
   return (

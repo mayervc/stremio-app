@@ -39,7 +39,7 @@ export default function LoginScreen() {
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true)
     try {
-      // Aquí iría la lógica de autenticación
+      // TODO: Wire up with login endpoint
       console.log('Login data:', data)
       Alert.alert('Success', 'Login successful!')
       // router.replace('/(tabs)')
