@@ -1,10 +1,5 @@
-import {
-  Poppins_400Regular,
-  Poppins_500Medium,
-  Poppins_600SemiBold,
-  Poppins_700Bold,
-  useFonts,
-} from '@expo-google-fonts/poppins'
+import { SocialButton } from '@/components/social-button'
+import { Colors } from '@/constants/colors'
 import { Ionicons } from '@expo/vector-icons'
 import { zodResolver } from '@hookform/resolvers/zod'
 import React, { useState } from 'react'
@@ -33,14 +28,6 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
-  // Cargar fuentes Poppins
-  const [fontsLoaded] = useFonts({
-    Poppins_400Regular,
-    Poppins_500Medium,
-    Poppins_600SemiBold,
-    Poppins_700Bold,
-  })
-
   const {
     control,
     handleSubmit,
@@ -48,10 +35,6 @@ export default function LoginScreen() {
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   })
-
-  if (!fontsLoaded) {
-    return null // O un componente de carga
-  }
 
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true)
@@ -65,21 +48,6 @@ export default function LoginScreen() {
     } finally {
       setIsLoading(false)
     }
-  }
-
-  const handleSocialLogin = (provider: 'facebook' | 'google' | 'apple') => {
-    Alert.alert('Social Login', `${provider} login would be implemented here`)
-  }
-
-  const handleForgotPassword = () => {
-    Alert.alert(
-      'Forgot Password',
-      'Password reset functionality would be implemented here'
-    )
-  }
-
-  const handleSignUp = () => {
-    Alert.alert('Sign Up', 'Sign up screen would be implemented here')
   }
 
   return (
@@ -101,7 +69,7 @@ export default function LoginScreen() {
                 <TextInput
                   style={styles.input}
                   placeholder='E-mail'
-                  placeholderTextColor='#8E8E93'
+                  placeholderTextColor={Colors.placeholder}
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
@@ -126,7 +94,7 @@ export default function LoginScreen() {
                   <TextInput
                     style={styles.input}
                     placeholder='Password'
-                    placeholderTextColor='#8E8E93'
+                    placeholderTextColor={Colors.placeholder}
                     value={value}
                     onChangeText={onChange}
                     onBlur={onBlur}
@@ -143,7 +111,7 @@ export default function LoginScreen() {
                 <Ionicons
                   name={showPassword ? 'eye-off' : 'eye'}
                   size={20}
-                  color='#8E8E93'
+                  color={Colors.icon.primary}
                 />
               </Pressable>
             </View>
@@ -153,10 +121,7 @@ export default function LoginScreen() {
           </View>
 
           {/* Forgot Password */}
-          <Pressable
-            style={styles.forgotPasswordContainer}
-            onPress={handleForgotPassword}
-          >
+          <Pressable style={styles.forgotPasswordContainer} disabled={true}>
             <Text style={styles.forgotPasswordText}>Forgot password?</Text>
           </Pressable>
 
@@ -183,33 +148,16 @@ export default function LoginScreen() {
 
           {/* Social Login Buttons */}
           <View style={styles.socialButtonsContainer}>
-            <TouchableOpacity
-              style={styles.socialButton}
-              onPress={() => handleSocialLogin('facebook')}
-            >
-              <Ionicons name='logo-facebook' size={20} color='white' />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.socialButton}
-              onPress={() => handleSocialLogin('google')}
-            >
-              <Ionicons name='logo-google' size={20} color='white' />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.socialButton}
-              onPress={() => handleSocialLogin('apple')}
-            >
-              <Ionicons name='logo-apple' size={20} color='white' />
-            </TouchableOpacity>
+            <SocialButton iconName='logo-facebook' />
+            <SocialButton iconName='logo-google' />
+            <SocialButton iconName='logo-apple' />
           </View>
         </View>
 
         {/* Sign Up Link */}
         <View style={styles.signUpContainer}>
           <Text style={styles.signUpText}>Don't you have an account? </Text>
-          <Pressable onPress={handleSignUp}>
+          <Pressable disabled={true}>
             <Text style={styles.signUpLink}>Sign Up</Text>
           </Pressable>
         </View>
@@ -221,7 +169,7 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#121011',
+    backgroundColor: Colors.background.primary,
     paddingHorizontal: 20,
     paddingTop: 20,
     paddingBottom: 20,
@@ -235,7 +183,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontFamily: 'Poppins_700Bold',
-    color: 'white',
+    color: Colors.text.primary,
     marginBottom: 8,
   },
   formContainer: {
@@ -249,14 +197,14 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   input: {
-    backgroundColor: '#121011',
+    backgroundColor: Colors.background.input,
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 16,
     fontSize: 16,
-    color: 'white',
+    color: Colors.text.primary,
     borderWidth: 1,
-    borderColor: '#3A3A3C',
+    borderColor: Colors.border.primary,
   },
   passwordContainer: {
     position: 'relative',
@@ -268,7 +216,7 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   errorText: {
-    color: '#FF3B30',
+    color: Colors.text.error,
     fontSize: 14,
     fontFamily: 'Poppins_400Regular',
     marginTop: 8,
@@ -279,23 +227,23 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   forgotPasswordText: {
-    color: '#8E8E93',
+    color: Colors.text.secondary,
     fontSize: 16,
     fontFamily: 'Poppins_500Medium',
   },
   signInButton: {
-    backgroundColor: '#FF3B30',
+    backgroundColor: Colors.button.primary,
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: 'center',
     marginBottom: 30,
   },
   signInButtonDisabled: {
-    backgroundColor: '#FF3B30',
+    backgroundColor: Colors.button.primary,
     opacity: 0.6,
   },
   signInButtonText: {
-    color: 'white',
+    color: Colors.text.primary,
     fontSize: 18,
     fontFamily: 'Poppins_700Bold',
   },
@@ -307,10 +255,10 @@ const styles = StyleSheet.create({
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: '#3A3A3C',
+    backgroundColor: Colors.border.primary,
   },
   dividerText: {
-    color: '#8E8E93',
+    color: Colors.text.secondary,
     fontSize: 16,
     fontFamily: 'Poppins_500Medium',
     marginHorizontal: 16,
@@ -320,28 +268,18 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     marginBottom: 20,
   },
-  socialButton: {
-    backgroundColor: '#2C2C2E',
-    borderRadius: 12,
-    width: 105,
-    height: 51,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: '#3A3A3C',
-  },
   signUpContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
   },
   signUpText: {
-    color: '#8E8E93',
+    color: Colors.text.secondary,
     fontSize: 16,
     fontFamily: 'Poppins_400Regular',
   },
   signUpLink: {
-    color: 'white',
+    color: Colors.text.primary,
     fontSize: 16,
     fontFamily: 'Poppins_600SemiBold',
   },

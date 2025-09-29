@@ -1,4 +1,11 @@
 import {
+  Poppins_400Regular,
+  Poppins_500Medium,
+  Poppins_600SemiBold,
+  Poppins_700Bold,
+  useFonts,
+} from '@expo-google-fonts/poppins'
+import {
   DarkTheme,
   DefaultTheme,
   ThemeProvider,
@@ -17,6 +24,18 @@ export const unstable_settings = {
 
 export default function RootLayout() {
   const colorScheme = useColorScheme()
+
+  // Cargar fuentes Poppins globalmente
+  const [fontsLoaded] = useFonts({
+    Poppins_400Regular,
+    Poppins_500Medium,
+    Poppins_600SemiBold,
+    Poppins_700Bold,
+  })
+
+  if (!fontsLoaded) {
+    return null // O un componente de carga
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
