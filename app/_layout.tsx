@@ -12,7 +12,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme'
 import { queryClient } from '@/lib/query-client'
 
 export const unstable_settings = {
-  anchor: '(tabs)',
+  anchor: 'login',
 }
 
 export default function RootLayout() {
@@ -22,6 +22,7 @@ export default function RootLayout() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <Stack>
+          <Stack.Screen name='login' options={{ headerShown: false }} />
           <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
           <Stack.Screen
             name='modal'
