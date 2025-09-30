@@ -14,9 +14,12 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import { Stack } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import 'react-native-reanimated'
+import Toast from 'react-native-toast-message'
 
 import { useColorScheme } from '@/hooks/use-color-scheme'
+import { AuthInitializer } from '@/lib/auth-initializer'
 import { queryClient } from '@/lib/query-client'
+import { useAuthStore } from '@/store/authStore'
 
 export const unstable_settings = {
   anchor: 'login',
@@ -24,6 +27,7 @@ export const unstable_settings = {
 
 export default function RootLayout() {
   const colorScheme = useColorScheme()
+  const { isAuthenticated, isLoading } = useAuthStore()
 
   // Load Poppins fonts globally
   const [fontsLoaded] = useFonts({
@@ -33,22 +37,26 @@ export default function RootLayout() {
     Poppins_700Bold,
   })
 
-  if (!fontsLoaded) {
+  if (!fontsLoaded || isLoading) {
     return null
   }
 
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <AuthInitializer />
         <Stack>
           <Stack.Screen name='login' options={{ headerShown: false }} />
-          <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
-          <Stack.Screen
-            name='modal'
-            options={{ presentation: 'modal', title: 'Modal' }}
-          />
+          <Stack.Protected guard={isAuthenticated}>
+            <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
+            <Stack.Screen
+              name='modal'
+              options={{ presentation: 'modal', title: 'Modal' }}
+            />
+          </Stack.Protected>
         </Stack>
         <StatusBar style='auto' />
+        <Toast />
       </ThemeProvider>
     </QueryClientProvider>
   )

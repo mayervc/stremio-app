@@ -39,7 +39,14 @@
           }
         }
       ],
-      "expo-font"
+      "expo-font",
+      [
+        "expo-secure-store",
+        {
+          "configureAndroidBackup": true,
+          "faceIDPermission": "Allow stremio-app to access your Face ID biometric data."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
