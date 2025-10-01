@@ -1,34 +1,21 @@
-import { authApi } from '@/lib/api/auth'
+import { useCurrentUser } from '@/hooks/use-auth-mutations'
 import { useAuthStore } from '@/store/authStore'
 import { useEffect } from 'react'
 
 export function AuthInitializer() {
-  const { setUser, setToken, setLoading, setError } = useAuthStore()
+  const { setUser, setLoading } = useAuthStore()
+  const { data: user, isLoading, isError } = useCurrentUser()
 
   useEffect(() => {
-    const initializeAuth = async () => {
-      try {
-        setLoading(true)
+    setLoading(isLoading)
 
-        // Try to get current user with stored token
-        const user = await authApi.getCurrentUser()
-
-        if (user) {
-          setUser(user)
-          setToken('stored') // Token is already stored and working
-        }
-      } catch (error) {
-        // User not authenticated or token expired
-        console.log('No valid authentication found')
-        setUser(null)
-        setToken(null)
-      } finally {
-        setLoading(false)
-      }
+    if (user) {
+      setUser(user)
+    } else if (isError) {
+      // User not authenticated or token expired
+      setUser(null)
     }
-
-    initializeAuth()
-  }, [setUser, setToken, setLoading, setError])
+  }, [user, isLoading, isError, setUser, setLoading])
 
   return null
 }

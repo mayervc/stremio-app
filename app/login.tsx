@@ -1,10 +1,8 @@
 import { SocialButton } from '@/components/social-button'
 import { Colors } from '@/constants/colors'
-import { authApi, type LoginCredentials } from '@/lib/api/auth'
-import { useAuthStore } from '@/store/authStore'
+import { useLogin } from '@/hooks/use-auth-mutations'
 import { Ionicons } from '@expo/vector-icons'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { router } from 'expo-router'
 import React, { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import {
@@ -16,7 +14,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
-import Toast from 'react-native-toast-message'
 import { z } from 'zod'
 
 // Schema de validación
@@ -29,7 +26,7 @@ type LoginFormData = z.infer<typeof loginSchema>
 
 export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false)
-  const { login, setLoading, setError, isLoading } = useAuthStore()
+  const loginMutation = useLogin()
 
   const {
     control,
@@ -45,51 +42,11 @@ export default function LoginScreen() {
   const watchedValues = watch()
   const isFormValid = isValid && watchedValues.email && watchedValues.password
 
-  const onSubmit = async (data: LoginFormData) => {
-    setLoading(true)
-    setError(null)
-
-    try {
-      const credentials: LoginCredentials = {
-        email: data.email,
-        password: data.password,
-      }
-
-      // Login API call
-      const response = await authApi.login(credentials)
-
-      // Get user data after successful login
-      const user = await authApi.getCurrentUser()
-
-      // Store user and token in Zustand store
-      login(user, response.token)
-
-      // Show success toast
-      Toast.show({
-        type: 'success',
-        text1: 'Login Successful',
-        text2: `Welcome back, ${user.firstName} ${user.lastName}!`,
-      })
-
-      // Navigate to protected routes
-      router.replace('/(tabs)')
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : 'Login failed. Please try again.'
-
-      setError(errorMessage)
-
-      // Show error toast
-      Toast.show({
-        type: 'error',
-        text1: 'Login Failed',
-        text2: errorMessage,
-      })
-    } finally {
-      setLoading(false)
-    }
+  const onSubmit = (data: LoginFormData) => {
+    loginMutation.mutate({
+      email: data.email,
+      password: data.password,
+    })
   }
 
   return (
@@ -171,13 +128,14 @@ export default function LoginScreen() {
           <TouchableOpacity
             style={[
               styles.signInButton,
-              isLoading && styles.signInButtonDisabled,
+              (!isFormValid || loginMutation.isPending) &&
+                styles.signInButtonDisabled,
             ]}
             onPress={handleSubmit(onSubmit)}
-            disabled={isLoading}
+            disabled={!isFormValid || loginMutation.isPending}
           >
             <Text style={styles.signInButtonText}>
-              {isLoading ? 'Signing in...' : 'Sign in'}
+              {loginMutation.isPending ? 'Signing in...' : 'Sign in'}
             </Text>
           </TouchableOpacity>
 

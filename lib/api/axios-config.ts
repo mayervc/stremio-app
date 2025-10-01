@@ -1,7 +1,5 @@
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import { tokenStorage } from '@/lib/secure-store'
 import axios, { AxiosInstance } from 'axios'
-import * as SecureStore from 'expo-secure-store'
-import { Platform } from 'react-native'
 
 // Base configuration for Stremio API
 const API_BASE_URL =
@@ -22,13 +20,7 @@ export const apiClient: AxiosInstance = axios.create({
 apiClient.interceptors.request.use(
   async config => {
     try {
-      let token: string | null = null
-
-      if (Platform.OS === 'web') {
-        token = await AsyncStorage.getItem('auth_token')
-      } else {
-        token = await SecureStore.getItemAsync('auth_token')
-      }
+      const token = await tokenStorage.getToken()
 
       if (token) {
         config.headers.Authorization = `Bearer ${token}`
@@ -51,11 +43,7 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401) {
       // Token expired or invalid, clear it
       try {
-        if (Platform.OS === 'web') {
-          await AsyncStorage.removeItem('auth_token')
-        } else {
-          await SecureStore.deleteItemAsync('auth_token')
-        }
+        await tokenStorage.removeToken()
       } catch (clearError) {
         console.warn('Failed to clear auth token:', clearError)
       }

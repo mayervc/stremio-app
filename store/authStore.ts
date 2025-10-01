@@ -36,7 +36,6 @@ type AuthState = {
   setError: (error: string | null) => void
   login: (user: User, token: string) => void
   logout: () => void
-  clearError: () => void
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -68,15 +67,12 @@ export const useAuthStore = create<AuthState>()(
           isAuthenticated: false,
           error: null,
         }),
-
-      clearError: () => set({ error: null }),
     }),
     {
       name: 'auth-store',
       storage: createJSONStorage(() => AsyncStorage),
       partialize: state => ({
         user: state.user,
-        token: state.token,
         isAuthenticated: state.isAuthenticated,
       }),
     }

@@ -25,15 +25,9 @@ export default function HomeScreen() {
       <ThemedView style={styles.titleContainer}>
         <ThemedText type='title'>Welcome!</ThemedText>
         <HelloWave />
-        {user ? (
-          <ThemedText type='subtitle' style={styles.userInfo}>
-            Hello, {user.firstName} {user.lastName}!
-          </ThemedText>
-        ) : (
-          <ThemedText type='subtitle' style={styles.userInfo}>
-            Loading user information...
-          </ThemedText>
-        )}
+        <ThemedText type='subtitle' style={styles.userInfo}>
+          Hello{user ? `, ${user.firstName}` : ''}!
+        </ThemedText>
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
         <ThemedText type='subtitle'>Step 1: Try it</ThemedText>
@@ -98,11 +92,6 @@ export default function HomeScreen() {
       </ThemedView>
 
       <ThemedView style={styles.stepContainer}>
-        <ThemedText type='subtitle'>Authentication Test</ThemedText>
-        <ThemedText>
-          You are now in a protected route! This means you are successfully
-          logged in.
-        </ThemedText>
         <LogoutButton />
       </ThemedView>
     </ParallaxScrollView>

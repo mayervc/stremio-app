@@ -45,8 +45,8 @@ export default function RootLayout() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <AuthInitializer />
+        <StatusBar style='auto' />
         <Stack>
-          <Stack.Screen name='login' options={{ headerShown: false }} />
           <Stack.Protected guard={isAuthenticated}>
             <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
             <Stack.Screen
@@ -54,8 +54,11 @@ export default function RootLayout() {
               options={{ presentation: 'modal', title: 'Modal' }}
             />
           </Stack.Protected>
+
+          <Stack.Protected guard={!isAuthenticated}>
+            <Stack.Screen name='login' options={{ headerShown: false }} />
+          </Stack.Protected>
         </Stack>
-        <StatusBar style='auto' />
         <Toast />
       </ThemeProvider>
     </QueryClientProvider>
