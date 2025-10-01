@@ -1,6 +1,6 @@
 import { SocialButton } from '@/components/social-button'
 import { Colors } from '@/constants/colors'
-import { useLogin } from '@/hooks/use-auth-mutations'
+import { useLogin } from '@/hooks/useAuth'
 import { Ionicons } from '@expo/vector-icons'
 import { zodResolver } from '@hookform/resolvers/zod'
 import React, { useState } from 'react'

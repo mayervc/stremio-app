@@ -27,7 +27,7 @@ export const unstable_settings = {
 
 export default function RootLayout() {
   const colorScheme = useColorScheme()
-  const { isAuthenticated, isLoading } = useAuthStore()
+  const { isAuthenticated } = useAuthStore()
 
   // Load Poppins fonts globally
   const [fontsLoaded] = useFonts({
@@ -37,7 +37,7 @@ export default function RootLayout() {
     Poppins_700Bold,
   })
 
-  if (!fontsLoaded || isLoading) {
+  if (!fontsLoaded) {
     return null
   }
 
