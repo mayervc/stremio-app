@@ -19,20 +19,17 @@ export function useLogin() {
       // Login API call
       const response = await authApi.login(credentials)
 
+      return response
+    },
+    onSuccess: async response => {
       // Get user data after successful login
       const user = await authApi.getCurrentUser()
 
-      return response
-    },
-    onSuccess: response => {
-      // Get user data after successful login
-      authApi.getCurrentUser().then(user => {
-        // Store user and token in Zustand store
-        login(user, response.token)
+      // Store user and token in Zustand store
+      login(user, response.token)
 
-        // Navigate to protected routes
-        router.replace('/(tabs)')
-      })
+      // Navigate to protected routes
+      router.replace('/(tabs)')
     },
     onError: (error: Error) => {
       const errorMessage = getApiError(error)

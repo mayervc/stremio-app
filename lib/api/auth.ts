@@ -1,4 +1,5 @@
 import { tokenStorage } from '@/lib/secure-store'
+import { getApiError } from '@/lib/utils/getApiError'
 import { User } from '@/store/authStore'
 import { apiClient } from './axios-config'
 
@@ -29,11 +30,7 @@ export const authApi = {
 
       return response.data
     } catch (error: any) {
-      const errorMessage =
-        error.response?.data?.errors?.[0]?.message ||
-        error.response?.data?.message ||
-        error.message ||
-        'Login failed'
+      const errorMessage = getApiError(error)
       throw new Error(errorMessage)
     }
   },
@@ -43,11 +40,7 @@ export const authApi = {
       const response = await apiClient.get('/api/users/me')
       return response.data
     } catch (error: any) {
-      const errorMessage =
-        error.response?.data?.errors?.[0]?.message ||
-        error.response?.data?.message ||
-        error.message ||
-        'Failed to fetch user data'
+      const errorMessage = getApiError(error)
       throw new Error(errorMessage)
     }
   },
