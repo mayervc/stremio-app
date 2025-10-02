@@ -1,11 +1,11 @@
 import { SocialButton } from '@/components/social-button'
 import { Colors } from '@/constants/colors'
+import { useLogin } from '@/hooks/useAuth'
 import { Ionicons } from '@expo/vector-icons'
 import { zodResolver } from '@hookform/resolvers/zod'
 import React, { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import {
-  Alert,
   Pressable,
   SafeAreaView,
   StyleSheet,
@@ -26,28 +26,27 @@ type LoginFormData = z.infer<typeof loginSchema>
 
 export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  const loginMutation = useLogin()
 
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    watch,
+    formState: { errors, isValid },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
+    mode: 'onChange',
   })
 
-  const onSubmit = async (data: LoginFormData) => {
-    setIsLoading(true)
-    try {
-      // TODO: Wire up with login endpoint
-      console.log('Login data:', data)
-      Alert.alert('Success', 'Login successful!')
-      // router.replace('/(tabs)')
-    } catch (error) {
-      Alert.alert('Error', 'Login failed. Please try again.')
-    } finally {
-      setIsLoading(false)
-    }
+  // Watch form values to determine if login button should be enabled
+  const watchedValues = watch()
+  const isFormValid = isValid && watchedValues.email && watchedValues.password
+
+  const onSubmit = (data: LoginFormData) => {
+    loginMutation.mutate({
+      email: data.email,
+      password: data.password,
+    })
   }
 
   return (
@@ -129,13 +128,14 @@ export default function LoginScreen() {
           <TouchableOpacity
             style={[
               styles.signInButton,
-              isLoading && styles.signInButtonDisabled,
+              (!isFormValid || loginMutation.isPending) &&
+                styles.signInButtonDisabled,
             ]}
             onPress={handleSubmit(onSubmit)}
-            disabled={isLoading}
+            disabled={!isFormValid || loginMutation.isPending}
           >
             <Text style={styles.signInButtonText}>
-              {isLoading ? 'Signing in...' : 'Sign in'}
+              {loginMutation.isPending ? 'Signing in...' : 'Sign in'}
             </Text>
           </TouchableOpacity>
 

@@ -2,12 +2,16 @@ import { Image } from 'expo-image'
 import { Platform, StyleSheet } from 'react-native'
 
 import { HelloWave } from '@/components/hello-wave'
+import { LogoutButton } from '@/components/logout-button'
 import ParallaxScrollView from '@/components/parallax-scroll-view'
 import { ThemedText } from '@/components/themed-text'
 import { ThemedView } from '@/components/themed-view'
+import { useAuthStore } from '@/store/authStore'
 import { Link } from 'expo-router'
 
 export default function HomeScreen() {
+  const { user } = useAuthStore()
+
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
@@ -21,6 +25,9 @@ export default function HomeScreen() {
       <ThemedView style={styles.titleContainer}>
         <ThemedText type='title'>Welcome!</ThemedText>
         <HelloWave />
+        <ThemedText type='subtitle' style={styles.userInfo}>
+          Hello{user ? `, ${user.firstName}` : ''}!
+        </ThemedText>
       </ThemedView>
       <ThemedView style={styles.stepContainer}>
         <ThemedText type='subtitle'>Step 1: Try it</ThemedText>
@@ -83,6 +90,10 @@ export default function HomeScreen() {
           <ThemedText type='defaultSemiBold'>app-example</ThemedText>.
         </ThemedText>
       </ThemedView>
+
+      <ThemedView style={styles.stepContainer}>
+        <LogoutButton />
+      </ThemedView>
     </ParallaxScrollView>
   )
 }
@@ -103,5 +114,9 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     position: 'absolute',
+  },
+  userInfo: {
+    marginTop: 8,
+    fontStyle: 'italic',
   },
 })
