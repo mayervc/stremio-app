@@ -3,6 +3,7 @@ import { Colors } from '@/constants/colors'
 import { useLogin } from '@/hooks/useAuth'
 import { Ionicons } from '@expo/vector-icons'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { router } from 'expo-router'
 import React, { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import {
@@ -47,6 +48,10 @@ export default function LoginScreen() {
       email: data.email,
       password: data.password,
     })
+  }
+
+  const handleSignUpPress = () => {
+    router.push('/onboarding-start')
   }
 
   return (
@@ -157,7 +162,7 @@ export default function LoginScreen() {
         {/* Sign Up Link */}
         <View style={styles.signUpContainer}>
           <Text style={styles.signUpText}>Don't you have an account? </Text>
-          <Pressable disabled={true}>
+          <Pressable onPress={handleSignUpPress}>
             <Text style={styles.signUpLink}>Sign Up</Text>
           </Pressable>
         </View>
