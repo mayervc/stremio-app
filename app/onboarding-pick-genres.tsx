@@ -2,7 +2,7 @@ import { Colors } from '@/constants/colors'
 import { genres } from '@/lib/data/movie-genres'
 import { useOnboardingStore } from '@/store/onboardingStore'
 import { router } from 'expo-router'
-import React from 'react'
+import React, { useEffect } from 'react'
 import {
   Pressable,
   SafeAreaView,
@@ -16,11 +16,16 @@ import {
 const MIN_GENRES_TO_SELECT = 3
 
 export default function OnboardingPickGenresScreen() {
-  const { selectedGenres, setSelectedGenres, setCompleted } =
+  const { selectedGenres, setSelectedGenres, setCompleted, setCurrentStep } =
     useOnboardingStore()
 
   // Computed values
   const disableNextButton = selectedGenres.length < MIN_GENRES_TO_SELECT
+
+  // Set current step when component mounts
+  useEffect(() => {
+    setCurrentStep(2)
+  }, [setCurrentStep])
 
   const toggleGenre = (genreId: number) => {
     const newSelection = selectedGenres.includes(genreId)
@@ -32,7 +37,12 @@ export default function OnboardingPickGenresScreen() {
   const handleNext = () => {
     if (selectedGenres.length >= MIN_GENRES_TO_SELECT) {
       setCompleted(true)
-      router.replace('/(tabs)')
+      // For now, just show a placeholder message
+      // In the future, this will navigate to signup or complete the flow
+      alert(
+        'Onboarding completed! Selected genres: ' + selectedGenres.join(', ')
+      )
+      router.replace('/login')
     }
   }
 
