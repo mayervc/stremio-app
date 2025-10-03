@@ -50,6 +50,10 @@ export default function LoginScreen() {
     })
   }
 
+  const handleSignUpPress = () => {
+    router.push('/onboarding-start')
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Title */}
@@ -158,7 +162,7 @@ export default function LoginScreen() {
         {/* Sign Up Link */}
         <View style={styles.signUpContainer}>
           <Text style={styles.signUpText}>Don't you have an account? </Text>
-          <Pressable onPress={() => router.push('/onboarding-start')}>
+          <Pressable onPress={handleSignUpPress}>
             <Text style={styles.signUpLink}>Sign Up</Text>
           </Pressable>
         </View>

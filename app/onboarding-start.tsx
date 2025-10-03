@@ -14,14 +14,18 @@ import {
 } from 'react-native'
 
 export default function OnboardingStartScreen() {
-  // Dividir películas en 2 filas
+  // Split movies into 2 rows
   const firstRow = movies.slice(0, 4)
   const secondRow = movies.slice(4, 8)
 
-  const itemWidth = (width - 80) / 4 // 4 columnas con padding
+  const itemWidth = (width - 80) / 4 // 4 columns with padding
 
   const handleNext = () => {
     router.push('/onboarding-pick-genres')
+  }
+
+  const handleLoginPress = () => {
+    router.push('/login')
   }
 
   const renderMovie = ({ item }: { item: (typeof movies)[0] }) => {
@@ -36,7 +40,7 @@ export default function OnboardingStartScreen() {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Pressable onPress={() => router.push('/login')}>
+        <Pressable onPress={handleLoginPress}>
           <Text style={styles.loginLink}>Already have an account? Log in</Text>
         </Pressable>
       </View>

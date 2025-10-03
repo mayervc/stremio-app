@@ -12,9 +12,15 @@ import {
   View,
 } from 'react-native'
 
+// Constants
+const MIN_GENRES_TO_SELECT = 3
+
 export default function OnboardingPickGenresScreen() {
   const { selectedGenres, setSelectedGenres, setCompleted } =
     useOnboardingStore()
+
+  // Computed values
+  const disableNextButton = selectedGenres.length < MIN_GENRES_TO_SELECT
 
   const toggleGenre = (genreId: number) => {
     const newSelection = selectedGenres.includes(genreId)
@@ -24,10 +30,14 @@ export default function OnboardingPickGenresScreen() {
   }
 
   const handleNext = () => {
-    if (selectedGenres.length >= 3) {
+    if (selectedGenres.length >= MIN_GENRES_TO_SELECT) {
       setCompleted(true)
       router.replace('/(tabs)')
     }
+  }
+
+  const handleLoginPress = () => {
+    router.push('/login')
   }
 
   const renderGenre = ({ item }: { item: (typeof genres)[0] }) => {
@@ -51,7 +61,7 @@ export default function OnboardingPickGenresScreen() {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Pressable onPress={() => router.push('/login')}>
+        <Pressable onPress={handleLoginPress}>
           <Text style={styles.loginLink}>Already have an account? Log in</Text>
         </Pressable>
       </View>
@@ -59,7 +69,7 @@ export default function OnboardingPickGenresScreen() {
       {/* Content */}
       <View style={styles.content}>
         <Text style={styles.subtitle}>
-          Select at least 3 genres to continue
+          Select at least {MIN_GENRES_TO_SELECT} genres to continue
         </Text>
 
         {/* Genres Grid */}
@@ -79,10 +89,10 @@ export default function OnboardingPickGenresScreen() {
         <TouchableOpacity
           style={[
             styles.nextButton,
-            selectedGenres.length < 3 && styles.nextButtonDisabled,
+            disableNextButton && styles.nextButtonDisabled,
           ]}
           onPress={handleNext}
-          disabled={selectedGenres.length < 3}
+          disabled={disableNextButton}
         >
           <Text style={styles.nextButtonText}>Next</Text>
         </TouchableOpacity>
