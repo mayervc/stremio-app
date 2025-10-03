@@ -7,18 +7,16 @@ import { useOnboardingStore } from '@/store/onboardingStore'
  * when the user completes registration
  */
 export function useOnboardingData() {
-  const { selectedGenres, selectedMovies, isCompleted, reset } =
-    useOnboardingStore()
+  const { selectedGenres, isCompleted, reset } = useOnboardingStore()
   const { user } = useAuthStore()
 
   /**
    * Get the onboarding data that should be sent to the backend
-   * This includes selected genres and movies
+   * This includes selected genres
    */
   const getOnboardingData = () => {
     return {
       selectedGenres,
-      selectedMovies,
       isCompleted,
     }
   }
@@ -35,11 +33,7 @@ export function useOnboardingData() {
    * Check if user has completed onboarding but hasn't registered yet
    */
   const hasPendingOnboardingData = () => {
-    return (
-      isCompleted &&
-      !user &&
-      (selectedGenres.length > 0 || selectedMovies.length > 0)
-    )
+    return isCompleted && !user && selectedGenres.length > 0
   }
 
   return {
@@ -47,7 +41,6 @@ export function useOnboardingData() {
     clearOnboardingData,
     hasPendingOnboardingData,
     selectedGenres,
-    selectedMovies,
     isCompleted,
   }
 }
