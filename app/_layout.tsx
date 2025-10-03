@@ -22,7 +22,7 @@ import { queryClient } from '@/lib/query-client'
 import { useAuthStore } from '@/store/authStore'
 
 export const unstable_settings = {
-  anchor: 'onboarding-1',
+  anchor: 'onboarding-start',
 }
 
 export default function RootLayout() {
@@ -58,11 +58,11 @@ export default function RootLayout() {
           <Stack.Protected guard={!isAuthenticated}>
             <Stack.Screen name='login' options={{ headerShown: false }} />
             <Stack.Screen
-              name='onboarding-1'
+              name='onboarding-start'
               options={{ headerShown: false }}
             />
             <Stack.Screen
-              name='onboarding-2'
+              name='onboarding-pick-genres'
               options={{ headerShown: false }}
             />
           </Stack.Protected>

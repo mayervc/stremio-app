@@ -3,6 +3,7 @@ import { Colors } from '@/constants/colors'
 import { useLogin } from '@/hooks/useAuth'
 import { Ionicons } from '@expo/vector-icons'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { router } from 'expo-router'
 import React, { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import {
@@ -157,19 +158,9 @@ export default function LoginScreen() {
         {/* Sign Up Link */}
         <View style={styles.signUpContainer}>
           <Text style={styles.signUpText}>Don't you have an account? </Text>
-          <Pressable disabled={true}>
+          <Pressable onPress={() => router.push('/onboarding-start')}>
             <Text style={styles.signUpLink}>Sign Up</Text>
           </Pressable>
-        </View>
-
-        {/* Test Onboarding Button */}
-        <View style={styles.testContainer}>
-          <TouchableOpacity
-            style={styles.testButton}
-            onPress={() => router.push('/onboarding-1')}
-          >
-            <Text style={styles.testButtonText}>Test Onboarding</Text>
-          </TouchableOpacity>
         </View>
       </View>
     </SafeAreaView>
@@ -292,22 +283,5 @@ const styles = StyleSheet.create({
     color: Colors.text.primary,
     fontSize: 16,
     fontFamily: 'Poppins_600SemiBold',
-  },
-  testContainer: {
-    marginTop: 20,
-    alignItems: 'center',
-  },
-  testButton: {
-    backgroundColor: Colors.button.social,
-    borderRadius: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderWidth: 1,
-    borderColor: Colors.border.primary,
-  },
-  testButtonText: {
-    color: Colors.text.primary,
-    fontSize: 14,
-    fontFamily: 'Poppins_500Medium',
   },
 })

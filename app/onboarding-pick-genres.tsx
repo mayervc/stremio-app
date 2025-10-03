@@ -1,9 +1,9 @@
 import { Colors } from '@/constants/colors'
+import { genres } from '@/lib/data/movie-genres'
 import { useOnboardingStore } from '@/store/onboardingStore'
 import { router } from 'expo-router'
 import React from 'react'
 import {
-  Dimensions,
   Pressable,
   SafeAreaView,
   StyleSheet,
@@ -12,31 +12,9 @@ import {
   View,
 } from 'react-native'
 
-const { width } = Dimensions.get('window')
-
-// Datos de los géneros
-const genres = [
-  { id: 1, name: 'Action' },
-  { id: 2, name: 'Adventure' },
-  { id: 3, name: 'Comedy' },
-  { id: 4, name: 'Drama' },
-  { id: 5, name: 'Horror' },
-  { id: 6, name: 'Sci-Fi' },
-  { id: 7, name: 'Thriller' },
-  { id: 8, name: 'Romance' },
-  { id: 9, name: 'Animation' },
-  { id: 10, name: 'Documentary' },
-  { id: 11, name: 'Fantasy' },
-  { id: 12, name: 'Mystery' },
-]
-
-export default function Onboarding2Screen() {
+export default function OnboardingPickGenresScreen() {
   const { selectedGenres, setSelectedGenres, setCompleted } =
     useOnboardingStore()
-
-  // Layout flexible para géneros
-  const containerPadding = 40 // 20px * 2 (izquierda y derecha)
-  const availableWidth = width - containerPadding
 
   const toggleGenre = (genreId: number) => {
     const newSelection = selectedGenres.includes(genreId)
@@ -73,7 +51,7 @@ export default function Onboarding2Screen() {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Pressable onPress={() => router.back()}>
+        <Pressable onPress={() => router.push('/login')}>
           <Text style={styles.loginLink}>Already have an account? Log in</Text>
         </Pressable>
       </View>
@@ -139,13 +117,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 40,
   },
-  title: {
-    fontSize: 28,
-    fontFamily: 'Poppins_700Bold',
-    color: Colors.text.primary,
-    textAlign: 'center',
-    marginBottom: 12,
-  },
   subtitle: {
     fontSize: 16,
     fontFamily: 'Poppins_400Regular',
@@ -172,7 +143,6 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   genreButtonSelected: {
-    backgroundColor: Colors.button.primary,
     borderColor: Colors.button.primary,
   },
   genreText: {
@@ -182,7 +152,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   genreTextSelected: {
-    color: Colors.text.primary,
+    color: Colors.button.primary,
     fontFamily: 'Poppins_600SemiBold',
   },
   footer: {
