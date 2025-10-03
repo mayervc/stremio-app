@@ -1,7 +1,8 @@
 import { Colors } from '@/constants/colors'
 import { movies, width } from '@/lib/data/onboarding-placeholder-images'
+import { useOnboardingStore } from '@/store/onboardingStore'
 import { router } from 'expo-router'
-import React from 'react'
+import React, { useEffect } from 'react'
 import {
   FlatList,
   Image,
@@ -14,17 +15,28 @@ import {
 } from 'react-native'
 
 export default function OnboardingStartScreen() {
+  const { setHasSeenOnboarding, setCurrentStep } = useOnboardingStore()
+
   // Split movies into 2 rows
   const firstRow = movies.slice(0, 4)
   const secondRow = movies.slice(4, 8)
 
   const itemWidth = (width - 80) / 4 // 4 columns with padding
 
+  // Mark that user has seen onboarding and set current step
+  useEffect(() => {
+    setHasSeenOnboarding(true)
+    setCurrentStep(1)
+  }, [setHasSeenOnboarding, setCurrentStep])
+
   const handleNext = () => {
+    setCurrentStep(2)
     router.push('/onboarding-pick-genres')
   }
 
   const handleLoginPress = () => {
+    // If user clicks login, mark onboarding as completed to skip it next time
+    setHasSeenOnboarding(true)
     router.push('/login')
   }
 
