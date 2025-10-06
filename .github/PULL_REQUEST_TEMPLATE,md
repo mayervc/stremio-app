@@ -1,0 +1,23 @@
+## 🧾 Description
+
+Briefly describe the changes introduced in this pull request.
+
+## 🎫 Jira Ticket
+
+[JIRA-123](https://yourcompany.atlassian.net/browse/JIRA-123)
+
+## 🧪 How to Test
+
+1. Steps to reproduce or test the changes.
+2. Expected results.
+
+## 📸 Screenshots (if applicable)
+
+_Add screenshots or GIFs showing before/after or visual updates._
+
+## ✅ Checklist
+
+- [ ] I have tested the changes locally
+- [ ] Documentation has been updated if necessary
+- [ ] Code meets project standards
+- [ ] All tests pass successfully
