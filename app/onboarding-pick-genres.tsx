@@ -37,12 +37,8 @@ export default function OnboardingPickGenresScreen() {
   const handleNext = () => {
     if (selectedGenres.length >= MIN_GENRES_TO_SELECT) {
       setCompleted(true)
-      // For now, just show a placeholder message
-      // In the future, this will navigate to signup or complete the flow
-      alert(
-        'Onboarding completed! Selected genres: ' + selectedGenres.join(', ')
-      )
-      router.replace('/login')
+      // Navigate to signup after completing onboarding
+      router.replace('/signup')
     }
   }
 

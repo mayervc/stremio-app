@@ -1,6 +1,5 @@
 import { SocialButton } from '@/components/social-button'
 import { Colors } from '@/constants/colors'
-import { useLogin } from '@/hooks/useAuth'
 import { Ionicons } from '@expo/vector-icons'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { router } from 'expo-router'
@@ -17,48 +16,70 @@ import {
 } from 'react-native'
 import { z } from 'zod'
 
-// Schema de validación
-const loginSchema = z.object({
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-})
+// Validation schema
+const signupSchema = z
+  .object({
+    email: z.string().email('Invalid email address'),
+    password: z.string().min(6, 'Password must be at least 6 characters'),
+    confirmPassword: z
+      .string()
+      .min(6, 'Password must be at least 6 characters'),
+  })
+  .refine(data => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ['confirmPassword'],
+  })
 
-type LoginFormData = z.infer<typeof loginSchema>
+type SignupFormData = z.infer<typeof signupSchema>
 
-export default function LoginScreen() {
+export default function SignupScreen() {
   const [showPassword, setShowPassword] = useState(false)
-  const loginMutation = useLogin()
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const {
     control,
     handleSubmit,
     watch,
     formState: { errors, isValid },
-  } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
+  } = useForm<SignupFormData>({
+    resolver: zodResolver(signupSchema),
     mode: 'onChange',
   })
 
-  // Watch form values to determine if login button should be enabled
+  // Watch form values to determine if signup button should be enabled
   const watchedValues = watch()
-  const isFormValid = isValid && watchedValues.email && watchedValues.password
+  const isFormValid =
+    isValid &&
+    watchedValues.email &&
+    watchedValues.password &&
+    watchedValues.confirmPassword
 
-  const onSubmit = (data: LoginFormData) => {
-    loginMutation.mutate({
-      email: data.email,
-      password: data.password,
-    })
+  const onSubmit = (data: SignupFormData) => {
+    console.log('Signup data:', data)
+    // TODO: Implement signup functionality
   }
 
-  const handleSignUpPress = () => {
-    router.push('/signup')
+  const handleLoginPress = () => {
+    router.push('/login')
+  }
+
+  const handlePrivacyPolicyPress = () => {
+    // TODO: Navigate to privacy policy
+    console.log('Privacy Policy pressed')
   }
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Header - Already have account link */}
+      <View style={styles.header}>
+        <Pressable onPress={handleLoginPress}>
+          <Text style={styles.headerLink}>Already have an account? Log in</Text>
+        </Pressable>
+      </View>
+
       {/* Title */}
       <View style={styles.titleContainer}>
-        <Text style={styles.title}>Sign In</Text>
+        <Text style={styles.title}>Sign Up</Text>
       </View>
 
       {/* Form */}
@@ -124,25 +145,65 @@ export default function LoginScreen() {
             )}
           </View>
 
-          {/* Forgot Password */}
-          <Pressable style={styles.forgotPasswordContainer} disabled={true}>
-            <Text style={styles.forgotPasswordText}>Forgot password?</Text>
-          </Pressable>
+          {/* Confirm Password Input */}
+          <View style={styles.inputContainer}>
+            <View style={styles.passwordContainer}>
+              <Controller
+                control={control}
+                name='confirmPassword'
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <TextInput
+                    style={styles.input}
+                    placeholder='Confirm Password'
+                    placeholderTextColor={Colors.placeholder}
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    secureTextEntry={!showConfirmPassword}
+                    autoCapitalize='none'
+                    autoCorrect={false}
+                  />
+                )}
+              />
+              <Pressable
+                style={styles.eyeButton}
+                onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                <Ionicons
+                  name={showConfirmPassword ? 'eye-off' : 'eye'}
+                  size={20}
+                  color={Colors.icon.primary}
+                />
+              </Pressable>
+            </View>
+            {errors.confirmPassword && (
+              <Text style={styles.errorText}>
+                {errors.confirmPassword.message}
+              </Text>
+            )}
+          </View>
 
-          {/* Sign In Button */}
+          {/* Sign Up Button */}
           <TouchableOpacity
             style={[
-              styles.signInButton,
-              (!isFormValid || loginMutation.isPending) &&
-                styles.signInButtonDisabled,
+              styles.signUpButton,
+              !isFormValid && styles.signUpButtonDisabled,
             ]}
             onPress={handleSubmit(onSubmit)}
-            disabled={!isFormValid || loginMutation.isPending}
+            disabled={!isFormValid}
           >
-            <Text style={styles.signInButtonText}>
-              {loginMutation.isPending ? 'Signing in...' : 'Sign in'}
-            </Text>
+            <Text style={styles.signUpButtonText}>Sign up</Text>
           </TouchableOpacity>
+
+          {/* Terms and Privacy Policy */}
+          <View style={styles.termsContainer}>
+            <Text style={styles.termsText}>
+              By clicking the "sign up" button, you accept the terms of the{' '}
+              <Pressable onPress={handlePrivacyPolicyPress}>
+                <Text style={styles.privacyLink}>Privacy Policy</Text>
+              </Pressable>
+            </Text>
+          </View>
 
           {/* Or Divider */}
           <View style={styles.dividerContainer}>
@@ -159,11 +220,11 @@ export default function LoginScreen() {
           </View>
         </View>
 
-        {/* Sign Up Link */}
-        <View style={styles.signUpContainer}>
-          <Text style={styles.signUpText}>Don't you have an account? </Text>
-          <Pressable onPress={handleSignUpPress}>
-            <Text style={styles.signUpLink}>Sign Up</Text>
+        {/* Footer - Already have account link */}
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>Already have an account? </Text>
+          <Pressable onPress={handleLoginPress}>
+            <Text style={styles.footerLink}>Sign In</Text>
           </Pressable>
         </View>
       </View>
@@ -178,18 +239,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 20,
     paddingBottom: 20,
-    paddingLeft: 20,
-    paddingRight: 20,
+  },
+  header: {
+    alignItems: 'flex-end',
+    marginTop: 20,
+    marginBottom: 20,
+  },
+  headerLink: {
+    color: Colors.text.secondary,
+    fontSize: 16,
+    fontFamily: 'Poppins_400Regular',
   },
   titleContainer: {
-    marginTop: 60,
     marginBottom: 40,
   },
   title: {
     fontSize: 32,
     fontFamily: 'Poppins_700Bold',
     color: Colors.text.primary,
-    marginBottom: 8,
   },
   formContainer: {
     flex: 1,
@@ -227,30 +294,36 @@ const styles = StyleSheet.create({
     marginTop: 8,
     marginLeft: 4,
   },
-  forgotPasswordContainer: {
-    alignSelf: 'flex-end',
-    marginBottom: 30,
-  },
-  forgotPasswordText: {
-    color: Colors.text.secondary,
-    fontSize: 16,
-    fontFamily: 'Poppins_500Medium',
-  },
-  signInButton: {
+  signUpButton: {
     backgroundColor: Colors.button.primary,
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: 'center',
-    marginBottom: 30,
+    marginBottom: 20,
   },
-  signInButtonDisabled: {
+  signUpButtonDisabled: {
     backgroundColor: Colors.button.primary,
     opacity: 0.6,
   },
-  signInButtonText: {
+  signUpButtonText: {
     color: Colors.text.primary,
     fontSize: 18,
     fontFamily: 'Poppins_700Bold',
+  },
+  termsContainer: {
+    marginBottom: 30,
+  },
+  termsText: {
+    color: Colors.text.secondary,
+    fontSize: 14,
+    fontFamily: 'Poppins_400Regular',
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  privacyLink: {
+    color: Colors.text.primary,
+    fontSize: 14,
+    fontFamily: 'Poppins_600SemiBold',
   },
   dividerContainer: {
     flexDirection: 'row',
@@ -273,17 +346,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     marginBottom: 20,
   },
-  signUpContainer: {
+  footer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  signUpText: {
+  footerText: {
     color: Colors.text.secondary,
     fontSize: 16,
     fontFamily: 'Poppins_400Regular',
   },
-  signUpLink: {
+  footerLink: {
     color: Colors.text.primary,
     fontSize: 16,
     fontFamily: 'Poppins_600SemiBold',
