@@ -1,23 +1,43 @@
-## 🧾 Description
+## 🧾 Jira Ticket
 
-Briefly describe the changes introduced in this pull request.
+<!-- Replace with your Jira link -->
 
-## 🎫 Jira Ticket
+[JIRA-XXXX](https://your-jira-instance.atlassian.net/browse/JIRA-XXXX)
 
-[JIRA-123](https://yourcompany.atlassian.net/browse/JIRA-123)
+---
+
+## 🧠 Brief Description
+
+## <!-- Concise summary of what this PR does -->
+
+---
+
+## 💡 Context / Background
+
+## <!-- Explain why this change was made and any relevant background for reviewers -->
+
+---
 
 ## 🧪 How to Test
 
-1. Steps to reproduce or test the changes.
-2. Expected results.
+<!-- Step-by-step instructions for testing this PR -->
 
-## 📸 Screenshots (if applicable)
+1.
+2.
+3.
 
-_Add screenshots or GIFs showing before/after or visual updates._
+---
 
-## ✅ Checklist
+## 🖼️ Screenshots / Recordings
 
-- [ ] I have tested the changes locally
-- [ ] Documentation has been updated if necessary
-- [ ] Code meets project standards
-- [ ] All tests pass successfully
+| Before | After |
+| ------ | ----- |
+|        |       |
+
+> Include screenshots or screen recordings if applicable (especially for UI or visual changes).
+
+---
+
+## 🧑‍💻 Additional Notes
+
+## <!-- Anything else reviewers should know — e.g., dependencies, related PRs, known limitations, rollout considerations -->
