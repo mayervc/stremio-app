@@ -15,7 +15,8 @@ import {
 } from 'react-native'
 
 export default function OnboardingStartScreen() {
-  const { setHasSeenOnboarding, setCurrentStep } = useOnboardingStore()
+  const { setHasSeenOnboarding, setCurrentStep, setCompleted } =
+    useOnboardingStore()
 
   // Split movies into 2 rows
   const firstRow = movies.slice(0, 4)
@@ -23,11 +24,12 @@ export default function OnboardingStartScreen() {
 
   const itemWidth = (width - 80) / 4 // 4 columns with padding
 
-  // Mark that user has seen onboarding and set current step
+  // Reset onboarding state and mark that user has seen onboarding
   useEffect(() => {
+    setCompleted(false) // Reset completion status
     setHasSeenOnboarding(true)
     setCurrentStep(1)
-  }, [setHasSeenOnboarding, setCurrentStep])
+  }, [setHasSeenOnboarding, setCurrentStep, setCompleted])
 
   const handleNext = () => {
     setCurrentStep(2)
