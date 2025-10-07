@@ -1,5 +1,7 @@
 import { SocialButton } from '@/components/social-button'
 import { Colors } from '@/constants/colors'
+import { useSignup } from '@/hooks/useAuth'
+import { useOnboardingData } from '@/hooks/useOnboardingData'
 import { Ionicons } from '@expo/vector-icons'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { router } from 'expo-router'
@@ -36,6 +38,9 @@ export default function SignupScreen() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
+  const signupMutation = useSignup()
+  const { selectedGenres } = useOnboardingData()
+
   const {
     control,
     handleSubmit,
@@ -55,8 +60,14 @@ export default function SignupScreen() {
     watchedValues.confirmPassword
 
   const onSubmit = (data: SignupFormData) => {
-    console.log('Signup data:', data)
-    // TODO: Implement signup functionality
+    const signupData = {
+      email: data.email,
+      password: data.password,
+      confirmPassword: data.confirmPassword,
+      selectedGenres: selectedGenres,
+    }
+    console.log('Sending signup data:', signupData)
+    signupMutation.mutate(signupData)
   }
 
   const handleLoginPress = () => {
@@ -187,12 +198,15 @@ export default function SignupScreen() {
           <TouchableOpacity
             style={[
               styles.signUpButton,
-              !isFormValid && styles.signUpButtonDisabled,
+              (!isFormValid || signupMutation.isPending) &&
+                styles.signUpButtonDisabled,
             ]}
             onPress={handleSubmit(onSubmit)}
-            disabled={!isFormValid}
+            disabled={!isFormValid || signupMutation.isPending}
           >
-            <Text style={styles.signUpButtonText}>Sign up</Text>
+            <Text style={styles.signUpButtonText}>
+              {signupMutation.isPending ? 'Signing up...' : 'Sign up'}
+            </Text>
           </TouchableOpacity>
 
           {/* Terms and Privacy Policy */}
