@@ -11,7 +11,6 @@ export type LoginCredentials = {
 export type SignupCredentials = {
   email: string
   password: string
-  selectedGenres?: number[]
 }
 
 export type LoginResponse = {

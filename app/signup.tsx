@@ -1,7 +1,6 @@
 import { SocialButton } from '@/components/social-button'
 import { Colors } from '@/constants/colors'
 import { useSignup } from '@/hooks/useAuth'
-import { useOnboardingData } from '@/hooks/useOnboardingData'
 import { Ionicons } from '@expo/vector-icons'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { router } from 'expo-router'
@@ -39,7 +38,6 @@ export default function SignupScreen() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const signupMutation = useSignup()
-  const { selectedGenres } = useOnboardingData()
 
   const {
     control,
@@ -66,7 +64,6 @@ export default function SignupScreen() {
     signupMutation.mutate({
       email: data.email,
       password: data.password,
-      selectedGenres: selectedGenres,
     })
   }
 
