@@ -59,15 +59,15 @@ export default function SignupScreen() {
     watchedValues.password &&
     watchedValues.confirmPassword
 
+  // Condition to disable the signup button
+  const isSignupDisabled = !isFormValid || signupMutation.isPending
+
   const onSubmit = (data: SignupFormData) => {
-    const signupData = {
+    signupMutation.mutate({
       email: data.email,
       password: data.password,
-      confirmPassword: data.confirmPassword,
       selectedGenres: selectedGenres,
-    }
-    console.log('Sending signup data:', signupData)
-    signupMutation.mutate(signupData)
+    })
   }
 
   const handleLoginPress = () => {
@@ -198,11 +198,10 @@ export default function SignupScreen() {
           <TouchableOpacity
             style={[
               styles.signUpButton,
-              (!isFormValid || signupMutation.isPending) &&
-                styles.signUpButtonDisabled,
+              isSignupDisabled && styles.signUpButtonDisabled,
             ]}
             onPress={handleSubmit(onSubmit)}
-            disabled={!isFormValid || signupMutation.isPending}
+            disabled={isSignupDisabled}
           >
             <Text style={styles.signUpButtonText}>
               {signupMutation.isPending ? 'Signing up...' : 'Sign up'}
