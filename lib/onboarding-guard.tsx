@@ -12,7 +12,7 @@ export function OnboardingGuard() {
     const timeoutId = setTimeout(() => {
       // If user is authenticated but onboarding is not completed, go to signup success
       if (isAuthenticated && !isCompleted) {
-        router.replace('signup-success' as any)
+        router.replace('/signup-success')
         return
       }
 

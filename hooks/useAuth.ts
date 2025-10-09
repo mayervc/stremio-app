@@ -71,7 +71,7 @@ export function useSignup() {
       clearOnboardingData()
 
       // Navigate to signup success screen
-      router.replace('signup-success' as any)
+      router.replace('/signup-success')
     },
     onError: (error: Error) => {
       const errorMessage = getApiError(error)
