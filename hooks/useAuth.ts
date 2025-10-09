@@ -8,6 +8,7 @@ import {
 } from '@/lib/api/auth'
 import { getApiError } from '@/lib/utils/getApiError'
 import { useAuthStore, type User } from '@/store/authStore'
+import { useOnboardingStore } from '@/store/onboardingStore'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { router } from 'expo-router'
 import Toast from 'react-native-toast-message'
@@ -50,6 +51,7 @@ export function useLogin() {
 export function useSignup() {
   const { login } = useAuthStore()
   const { clearOnboardingData } = useOnboardingData()
+  const { setCompleted } = useOnboardingStore()
 
   return useMutation({
     mutationFn: async (
@@ -64,11 +66,12 @@ export function useSignup() {
       // Store user and token in Zustand store
       login(response.user, response.token)
 
-      // Clear onboarding data since user is now registered
+      // Clear onboarding data but don't mark as completed yet
+      // We'll mark it as completed after user finishes signup success screen
       clearOnboardingData()
 
-      // Navigate to profile form screen (placeholder for now)
-      router.replace('/(tabs)')
+      // Navigate to signup success screen
+      router.replace('signup-success' as any)
     },
     onError: (error: Error) => {
       const errorMessage = getApiError(error)
@@ -76,7 +79,7 @@ export function useSignup() {
       // Show error toast
       Toast.show({
         type: 'error',
-        text1: 'Signup Failed',
+        text1: 'Sign up Failed',
         text2: errorMessage,
       })
     },

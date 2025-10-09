@@ -45,6 +45,20 @@ export const authApi = {
     }
   },
 
+  async signup(credentials: SignupCredentials): Promise<SignupResponse> {
+    try {
+      const response = await apiClient.post('/api/auth/register', credentials)
+
+      // Store token securely
+      await tokenStorage.setToken(response.data.token)
+
+      return response.data
+    } catch (error: any) {
+      const errorMessage = getApiError(error)
+      throw new Error(errorMessage)
+    }
+  },
+
   async getCurrentUser(): Promise<User> {
     try {
       const response = await apiClient.get('/api/users/me')

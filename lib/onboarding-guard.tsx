@@ -10,8 +10,14 @@ export function OnboardingGuard() {
   useEffect(() => {
     // Add a small delay to prevent immediate navigation conflicts
     const timeoutId = setTimeout(() => {
-      // If user is authenticated, they shouldn't see onboarding
-      if (isAuthenticated) {
+      // If user is authenticated but onboarding is not completed, go to signup success
+      if (isAuthenticated && !isCompleted) {
+        router.replace('signup-success' as any)
+        return
+      }
+
+      // If user is authenticated and onboarding is completed, let them go to tabs
+      if (isAuthenticated && isCompleted) {
         return
       }
 
