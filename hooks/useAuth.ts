@@ -1,7 +1,10 @@
+import { useOnboardingData } from '@/hooks/useOnboardingData'
 import {
   authApi,
   type LoginCredentials,
   type LoginResponse,
+  type SignupCredentials,
+  type SignupResponse,
 } from '@/lib/api/auth'
 import { getApiError } from '@/lib/utils/getApiError'
 import { useAuthStore, type User } from '@/store/authStore'
@@ -38,6 +41,42 @@ export function useLogin() {
       Toast.show({
         type: 'error',
         text1: 'Login Failed',
+        text2: errorMessage,
+      })
+    },
+  })
+}
+
+export function useSignup() {
+  const { login } = useAuthStore()
+  const { clearOnboardingData } = useOnboardingData()
+
+  return useMutation({
+    mutationFn: async (
+      credentials: SignupCredentials
+    ): Promise<SignupResponse> => {
+      // Signup API call
+      const response = await authApi.signup(credentials)
+
+      return response
+    },
+    onSuccess: async response => {
+      // Store user and token in Zustand store
+      login(response.user, response.token)
+
+      // Clear onboarding data since user is now registered
+      clearOnboardingData()
+
+      // Navigate to profile form screen (placeholder for now)
+      router.replace('/(tabs)')
+    },
+    onError: (error: Error) => {
+      const errorMessage = getApiError(error)
+
+      // Show error toast
+      Toast.show({
+        type: 'error',
+        text1: 'Signup Failed',
         text2: errorMessage,
       })
     },
