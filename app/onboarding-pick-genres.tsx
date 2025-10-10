@@ -36,7 +36,7 @@ export default function OnboardingPickGenresScreen() {
 
   const handleNext = () => {
     if (selectedGenres.length >= MIN_GENRES_TO_SELECT) {
-      setCompleted(true)
+      // Don't mark as completed yet - will be done after signup success
       // Navigate to signup after completing onboarding
       router.replace('/signup')
     }

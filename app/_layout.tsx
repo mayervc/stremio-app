@@ -52,6 +52,10 @@ export default function RootLayout() {
           <Stack.Protected guard={isAuthenticated}>
             <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
             <Stack.Screen
+              name='signup-success'
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
               name='modal'
               options={{ presentation: 'modal', title: 'Modal' }}
             />
