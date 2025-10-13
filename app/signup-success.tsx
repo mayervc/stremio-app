@@ -16,7 +16,7 @@ import { z } from 'zod'
 
 // Validation schema
 const userInfoSchema = z.object({
-  firstName: z.string().min(1, 'Name is required'),
+  name: z.string().min(1, 'Name is required'),
   phoneNumber: z.string().min(1, 'Phone number is required'),
   city: z.string().min(1, 'City is required'),
 })
@@ -41,7 +41,7 @@ export default function SignupSuccessScreen() {
   const watchedValues = watch()
   const isFormValid =
     isValid &&
-    watchedValues.firstName &&
+    watchedValues.name &&
     watchedValues.phoneNumber &&
     watchedValues.city
 
@@ -49,9 +49,15 @@ export default function SignupSuccessScreen() {
   const isContinueDisabled = !isFormValid || updateProfileMutation.isPending
 
   const onSubmit = (data: UserInfoFormData) => {
+    // Split name into firstName and lastName
+    const nameParts = data.name.trim().split(' ')
+    const firstName = nameParts[0] || ''
+    const lastName = nameParts.slice(1).join(' ') || ''
+
     // Update user profile with form data and selected genres
     updateProfileMutation.mutate({
-      firstName: data.firstName,
+      firstName,
+      lastName,
       phoneNumber: data.phoneNumber,
       city: data.city,
       genres: selectedGenres,
@@ -72,7 +78,7 @@ export default function SignupSuccessScreen() {
         <View style={styles.inputContainer}>
           <Controller
             control={control}
-            name='firstName'
+            name='name'
             render={({ field: { onChange, onBlur, value } }) => (
               <TextInput
                 style={styles.input}
@@ -86,8 +92,8 @@ export default function SignupSuccessScreen() {
               />
             )}
           />
-          {errors.firstName && (
-            <Text style={styles.errorText}>{errors.firstName.message}</Text>
+          {errors.name && (
+            <Text style={styles.errorText}>{errors.name.message}</Text>
           )}
         </View>
 

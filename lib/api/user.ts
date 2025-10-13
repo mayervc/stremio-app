@@ -3,10 +3,11 @@ import { User } from '@/store/authStore'
 import { apiClient } from './axios-config'
 
 export type UpdateUserProfileData = {
-  firstName: string
-  phoneNumber: string
-  city: string
-  genres: number[]
+  firstName?: string
+  lastName?: string
+  phoneNumber?: string
+  city?: string
+  genres?: number[]
 }
 
 export type UpdateUserProfileResponse = {
