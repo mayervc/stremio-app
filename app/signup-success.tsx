@@ -1,7 +1,7 @@
 import { Colors } from '@/constants/colors'
+import { useUpdateProfile } from '@/hooks/useUser'
 import { useOnboardingStore } from '@/store/onboardingStore'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { router } from 'expo-router'
 import React from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import {
@@ -24,7 +24,8 @@ const userInfoSchema = z.object({
 type UserInfoFormData = z.infer<typeof userInfoSchema>
 
 export default function SignupSuccessScreen() {
-  const { setCompleted } = useOnboardingStore()
+  const { selectedGenres } = useOnboardingStore()
+  const updateProfileMutation = useUpdateProfile()
 
   const {
     control,
@@ -44,14 +45,23 @@ export default function SignupSuccessScreen() {
     watchedValues.phoneNumber &&
     watchedValues.city
 
+  // Condition to disable the continue button
+  const isContinueDisabled = !isFormValid || updateProfileMutation.isPending
+
   const onSubmit = (data: UserInfoFormData) => {
-    // Mark onboarding as completed
-    setCompleted(true)
+    // Split name into firstName and lastName
+    const nameParts = data.name.trim().split(' ')
+    const firstName = nameParts[0] || ''
+    const lastName = nameParts.slice(1).join(' ') || ''
 
-    // Navigate to main app (tabs)
-    router.replace('/(tabs)')
-
-    // TODO: Implement user info update functionality with API
+    // Update user profile with form data and selected genres
+    updateProfileMutation.mutate({
+      firstName,
+      lastName,
+      phoneNumber: data.phoneNumber,
+      city: data.city,
+      genres: selectedGenres,
+    })
   }
 
   return (
@@ -139,12 +149,14 @@ export default function SignupSuccessScreen() {
         <TouchableOpacity
           style={[
             styles.continueButton,
-            !isFormValid && styles.continueButtonDisabled,
+            isContinueDisabled && styles.continueButtonDisabled,
           ]}
           onPress={handleSubmit(onSubmit)}
-          disabled={!isFormValid}
+          disabled={isContinueDisabled}
         >
-          <Text style={styles.continueButtonText}>Continue</Text>
+          <Text style={styles.continueButtonText}>
+            {updateProfileMutation.isPending ? 'Saving...' : 'Continue'}
+          </Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
