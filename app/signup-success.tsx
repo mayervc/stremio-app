@@ -5,13 +5,13 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import React from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import {
-  SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { z } from 'zod'
 
 // Validation schema
@@ -26,6 +26,7 @@ type UserInfoFormData = z.infer<typeof userInfoSchema>
 export default function SignupSuccessScreen() {
   const { selectedGenres } = useOnboardingStore()
   const updateProfileMutation = useUpdateProfile()
+  const insets = useSafeAreaInsets()
 
   const {
     control,
@@ -65,7 +66,16 @@ export default function SignupSuccessScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        {
+          paddingTop: insets.top + 40,
+          paddingBottom: 24,
+          paddingHorizontal: 24,
+        },
+      ]}
+    >
       {/* Title Section */}
       <View style={styles.titleContainer}>
         <Text style={styles.title}>Sign up successfully!</Text>
@@ -159,7 +169,7 @@ export default function SignupSuccessScreen() {
           </Text>
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </View>
   )
 }
 
@@ -167,8 +177,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background.primary,
-    paddingHorizontal: 20,
-    paddingTop: 60,
   },
   titleContainer: {
     marginTop: 40,

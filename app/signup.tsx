@@ -8,13 +8,13 @@ import React, { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import {
   Pressable,
-  SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { z } from 'zod'
 
 // Validation schema
@@ -38,6 +38,7 @@ export default function SignupScreen() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const signupMutation = useSignup()
+  const insets = useSafeAreaInsets()
 
   const {
     control,
@@ -77,7 +78,16 @@ export default function SignupScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        {
+          paddingTop: insets.top + 24,
+          paddingBottom: 24,
+          paddingHorizontal: 24,
+        },
+      ]}
+    >
       {/* Header - Already have account link */}
       <View style={styles.header}>
         <Pressable onPress={handleLoginPress}>
@@ -209,9 +219,12 @@ export default function SignupScreen() {
           <View style={styles.termsContainer}>
             <Text style={styles.termsText}>
               By clicking the "sign up" button, you accept the terms of the{' '}
-              <Pressable onPress={handlePrivacyPolicyPress}>
-                <Text style={styles.privacyLink}>Privacy Policy</Text>
-              </Pressable>
+              <Text
+                style={styles.privacyLink}
+                onPress={handlePrivacyPolicyPress}
+              >
+                Privacy Policy
+              </Text>
             </Text>
           </View>
 
@@ -238,7 +251,7 @@ export default function SignupScreen() {
           </Pressable>
         </View>
       </View>
-    </SafeAreaView>
+    </View>
   )
 }
 
@@ -246,9 +259,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background.primary,
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 20,
   },
   header: {
     alignItems: 'flex-end',
@@ -321,14 +331,18 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins_700Bold',
   },
   termsContainer: {
-    marginBottom: 30,
+    marginBottom: 32,
+    alignSelf: 'stretch',
+    alignItems: 'flex-start',
   },
   termsText: {
     color: Colors.text.secondary,
     fontSize: 14,
     fontFamily: 'Poppins_400Regular',
-    textAlign: 'center',
+    textAlign: 'left',
     lineHeight: 20,
+    marginLeft: 0,
+    paddingLeft: 0,
   },
   privacyLink: {
     color: Colors.text.primary,
@@ -360,6 +374,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: 32, // Move up from bottom
   },
   footerText: {
     color: Colors.text.secondary,
