@@ -1,5 +1,7 @@
 import { SocialButton } from '@/components/social-button'
+import { ThemedSafeAreaView } from '@/components/themed-safe-area-view'
 import { Colors } from '@/constants/colors'
+import { commonStyles } from '@/constants/common-styles'
 import { useLogin } from '@/hooks/useAuth'
 import { Ionicons } from '@expo/vector-icons'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -14,7 +16,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { z } from 'zod'
 
 // Schema de validación
@@ -28,7 +29,7 @@ type LoginFormData = z.infer<typeof loginSchema>
 export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false)
   const loginMutation = useLogin()
-  const insets = useSafeAreaInsets()
+  // const insets = useSafeAreaInsets()
 
   const {
     control,
@@ -56,16 +57,7 @@ export default function LoginScreen() {
   }
 
   return (
-    <View
-      style={[
-        styles.container,
-        {
-          paddingTop: insets.top + 24,
-          paddingBottom: 24,
-          paddingHorizontal: 24,
-        },
-      ]}
-    >
+    <ThemedSafeAreaView style={commonStyles.screenContainer}>
       {/* Title */}
       <View style={styles.titleContainer}>
         <Text style={styles.title}>Sign In</Text>
@@ -177,15 +169,11 @@ export default function LoginScreen() {
           </Pressable>
         </View>
       </View>
-    </View>
+    </ThemedSafeAreaView>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background.primary,
-  },
   titleContainer: {
     marginTop: 60,
     marginBottom: 40,
