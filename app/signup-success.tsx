@@ -1,4 +1,6 @@
+import { ThemedSafeAreaView } from '@/components/themed-safe-area-view'
 import { Colors } from '@/constants/colors'
+import { commonStyles } from '@/constants/common-styles'
 import { useUpdateProfile } from '@/hooks/useUser'
 import { useOnboardingStore } from '@/store/onboardingStore'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -11,7 +13,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { z } from 'zod'
 
 // Validation schema
@@ -26,7 +27,6 @@ type UserInfoFormData = z.infer<typeof userInfoSchema>
 export default function SignupSuccessScreen() {
   const { selectedGenres } = useOnboardingStore()
   const updateProfileMutation = useUpdateProfile()
-  const insets = useSafeAreaInsets()
 
   const {
     control,
@@ -66,16 +66,7 @@ export default function SignupSuccessScreen() {
   }
 
   return (
-    <View
-      style={[
-        styles.container,
-        {
-          paddingTop: insets.top + 40,
-          paddingBottom: 24,
-          paddingHorizontal: 24,
-        },
-      ]}
-    >
+    <ThemedSafeAreaView style={commonStyles.screenContainer}>
       {/* Title Section */}
       <View style={styles.titleContainer}>
         <Text style={styles.title}>Sign up successfully!</Text>
@@ -169,15 +160,11 @@ export default function SignupSuccessScreen() {
           </Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ThemedSafeAreaView>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background.primary,
-  },
   titleContainer: {
     marginTop: 40,
     marginBottom: 50,
