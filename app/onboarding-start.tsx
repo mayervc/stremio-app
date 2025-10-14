@@ -1,5 +1,5 @@
 import { Colors } from '@/constants/colors'
-import { movies, width } from '@/lib/data/onboarding-placeholder-images'
+import { movies } from '@/lib/data/onboarding-placeholder-images'
 import { useOnboardingStore } from '@/store/onboardingStore'
 import { router } from 'expo-router'
 import React, { useEffect } from 'react'
@@ -22,7 +22,7 @@ export default function OnboardingStartScreen() {
   const firstRow = movies.slice(0, 4)
   const secondRow = movies.slice(4, 8)
 
-  const itemWidth = (width - 80) / 4 // 4 columns with padding
+  const itemWidth = 132 // Exact width as specified
 
   // Reset onboarding state and mark that user has seen onboarding
   useEffect(() => {
@@ -51,57 +51,61 @@ export default function OnboardingStartScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Pressable onPress={handleLoginPress}>
-          <Text style={styles.loginLink}>Already have an account? Log in</Text>
-        </Pressable>
-      </View>
-
-      {/* Content */}
-      <View style={styles.content}>
-        {/* Movies Grid - 2 Rows with Horizontal Scroll */}
-        <View style={styles.moviesContainer}>
-          {/* First Row */}
-          <FlatList
-            data={firstRow}
-            renderItem={renderMovie}
-            keyExtractor={item => item.id.toString()}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.moviesRow}
-          />
-
-          {/* Second Row */}
-          <FlatList
-            data={secondRow}
-            renderItem={renderMovie}
-            keyExtractor={item => item.id.toString()}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.moviesRow}
-          />
+    <View style={styles.container}>
+      <SafeAreaView style={styles.safeArea}>
+        {/* Header */}
+        <View style={styles.header}>
+          <Pressable onPress={handleLoginPress}>
+            <Text style={styles.loginLink}>
+              Already have an account? Log in
+            </Text>
+          </Pressable>
         </View>
-      </View>
 
-      {/* Footer */}
-      <View style={styles.footer}>
-        <Text style={styles.footerText}>
-          Tell us about your favorite movie genres
-        </Text>
+        {/* Content */}
+        <View style={styles.content}>
+          {/* Movies Grid - 2 Rows with Horizontal Scroll */}
+          <View style={styles.moviesContainer}>
+            {/* First Row */}
+            <FlatList
+              data={firstRow}
+              renderItem={renderMovie}
+              keyExtractor={item => item.id.toString()}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.moviesRow}
+            />
 
-        <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
-          <Text style={styles.nextButtonText}>Next</Text>
-        </TouchableOpacity>
-
-        {/* Progress Indicator */}
-        <View style={styles.progressContainer}>
-          <View style={[styles.progressDot, styles.progressDotActive]} />
-          <View style={styles.progressDot} />
+            {/* Second Row */}
+            <FlatList
+              data={secondRow}
+              renderItem={renderMovie}
+              keyExtractor={item => item.id.toString()}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.moviesRow}
+            />
+          </View>
         </View>
-      </View>
-    </SafeAreaView>
+
+        {/* Footer */}
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>
+            Tell us about your favorite movie genres
+          </Text>
+
+          <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
+            <Text style={styles.nextButtonText}>Next</Text>
+          </TouchableOpacity>
+
+          {/* Progress Indicator */}
+          <View style={styles.progressContainer}>
+            <View style={[styles.progressDot, styles.progressDotActive]} />
+            <View style={styles.progressDot} />
+          </View>
+        </View>
+      </SafeAreaView>
+    </View>
   )
 }
 
@@ -110,10 +114,15 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.background.primary,
   },
+  safeArea: {
+    flex: 1,
+    paddingHorizontal: 32,
+    paddingTop: 32,
+    paddingBottom: 32,
+  },
   header: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
     alignItems: 'flex-end',
+    marginBottom: 20,
   },
   loginLink: {
     color: Colors.text.primary,
@@ -122,7 +131,6 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingHorizontal: 20,
     paddingTop: 40,
   },
   moviesContainer: {
@@ -132,6 +140,7 @@ const styles = StyleSheet.create({
   moviesRow: {
     paddingHorizontal: 10,
     paddingVertical: 0,
+    marginBottom: 8, // Reduced space between rows
   },
   movieContainer: {
     marginHorizontal: 8,
@@ -147,8 +156,6 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
   footer: {
-    paddingHorizontal: 20,
-    paddingBottom: 40,
     alignItems: 'center',
   },
   footerText: {

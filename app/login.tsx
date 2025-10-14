@@ -1,5 +1,7 @@
 import { SocialButton } from '@/components/social-button'
+import { ThemedSafeAreaView } from '@/components/themed-safe-area-view'
 import { Colors } from '@/constants/colors'
+import { commonStyles } from '@/constants/common-styles'
 import { useLogin } from '@/hooks/useAuth'
 import { Ionicons } from '@expo/vector-icons'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -8,7 +10,6 @@ import React, { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import {
   Pressable,
-  SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
@@ -28,6 +29,7 @@ type LoginFormData = z.infer<typeof loginSchema>
 export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false)
   const loginMutation = useLogin()
+  // const insets = useSafeAreaInsets()
 
   const {
     control,
@@ -55,7 +57,7 @@ export default function LoginScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ThemedSafeAreaView style={commonStyles.screenContainer}>
       {/* Title */}
       <View style={styles.titleContainer}>
         <Text style={styles.title}>Sign In</Text>
@@ -167,20 +169,11 @@ export default function LoginScreen() {
           </Pressable>
         </View>
       </View>
-    </SafeAreaView>
+    </ThemedSafeAreaView>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background.primary,
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 20,
-    paddingLeft: 20,
-    paddingRight: 20,
-  },
   titleContainer: {
     marginTop: 60,
     marginBottom: 40,
@@ -277,6 +270,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: 100, // Move up from bottom
   },
   signUpText: {
     color: Colors.text.secondary,
