@@ -1,4 +1,5 @@
 import { ThemedSafeAreaView } from '@/components/themed-safe-area-view'
+import { ThemedView } from '@/components/themed-view'
 import { Colors } from '@/constants/colors'
 import { commonStyles } from '@/constants/common-styles'
 import { movies } from '@/lib/data/onboarding-placeholder-images'
@@ -45,9 +46,9 @@ export default function OnboardingStartScreen() {
 
   const renderMovie = ({ item }: { item: (typeof movies)[0] }) => {
     return (
-      <View style={[styles.movieContainer, { width: itemWidth }]}>
+      <ThemedView style={[styles.movieContainer, { width: itemWidth }]}>
         <Image source={item.image} style={styles.movieImage} />
-      </View>
+      </ThemedView>
     )
   }
 
@@ -134,7 +135,6 @@ const styles = StyleSheet.create({
     marginVertical: 2,
     borderRadius: 12,
     overflow: 'hidden',
-    backgroundColor: Colors.background.secondary,
     height: 180,
   },
   movieImage: {
