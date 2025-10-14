@@ -1,4 +1,5 @@
 import { ThemedSafeAreaView } from '@/components/themed-safe-area-view'
+import { ThemedText } from '@/components/themed-text'
 import { Colors } from '@/constants/colors'
 import { commonStyles } from '@/constants/common-styles'
 import { useUpdateProfile } from '@/hooks/useUser'
@@ -6,13 +7,7 @@ import { useOnboardingStore } from '@/store/onboardingStore'
 import { zodResolver } from '@hookform/resolvers/zod'
 import React from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import {
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native'
+import { StyleSheet, TextInput, TouchableOpacity, View } from 'react-native'
 import { z } from 'zod'
 
 // Validation schema
@@ -69,8 +64,8 @@ export default function SignupSuccessScreen() {
     <ThemedSafeAreaView style={commonStyles.screenContainer}>
       {/* Title Section */}
       <View style={styles.titleContainer}>
-        <Text style={styles.title}>Sign up successfully!</Text>
-        <Text style={styles.subtitle}>Tell us more about you</Text>
+        <ThemedText style={styles.title}>Sign up successfully!</ThemedText>
+        <ThemedText style={styles.subtitle}>Tell us more about you</ThemedText>
       </View>
 
       {/* Form */}
@@ -94,7 +89,9 @@ export default function SignupSuccessScreen() {
             )}
           />
           {errors.name && (
-            <Text style={styles.errorText}>{errors.name.message}</Text>
+            <ThemedText style={styles.errorText}>
+              {errors.name.message}
+            </ThemedText>
           )}
         </View>
 
@@ -117,7 +114,9 @@ export default function SignupSuccessScreen() {
             )}
           />
           {errors.phoneNumber && (
-            <Text style={styles.errorText}>{errors.phoneNumber.message}</Text>
+            <ThemedText style={styles.errorText}>
+              {errors.phoneNumber.message}
+            </ThemedText>
           )}
         </View>
 
@@ -140,7 +139,9 @@ export default function SignupSuccessScreen() {
             )}
           />
           {errors.city && (
-            <Text style={styles.errorText}>{errors.city.message}</Text>
+            <ThemedText style={styles.errorText}>
+              {errors.city.message}
+            </ThemedText>
           )}
         </View>
       </View>
@@ -155,9 +156,9 @@ export default function SignupSuccessScreen() {
           onPress={handleSubmit(onSubmit)}
           disabled={isContinueDisabled}
         >
-          <Text style={styles.continueButtonText}>
+          <ThemedText style={styles.continueButtonText}>
             {updateProfileMutation.isPending ? 'Saving...' : 'Continue'}
-          </Text>
+          </ThemedText>
         </TouchableOpacity>
       </View>
     </ThemedSafeAreaView>
@@ -172,13 +173,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontFamily: 'Poppins_700Bold',
-    color: Colors.text.primary,
     marginBottom: 12,
   },
   subtitle: {
     fontSize: 18,
     fontFamily: 'Poppins_400Regular',
-    color: Colors.text.secondary,
   },
   formContainer: {
     flex: 1,
@@ -187,7 +186,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   input: {
-    backgroundColor: Colors.background.input,
+    backgroundColor: 'transparent',
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 16,
@@ -198,7 +197,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins_400Regular',
   },
   errorText: {
-    color: Colors.text.error,
     fontSize: 14,
     fontFamily: 'Poppins_400Regular',
     marginTop: 8,
@@ -218,7 +216,6 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   continueButtonText: {
-    color: Colors.text.primary,
     fontSize: 18,
     fontFamily: 'Poppins_700Bold',
   },

@@ -1,5 +1,6 @@
 import { SocialButton } from '@/components/social-button'
 import { ThemedSafeAreaView } from '@/components/themed-safe-area-view'
+import { ThemedText } from '@/components/themed-text'
 import { Colors } from '@/constants/colors'
 import { commonStyles } from '@/constants/common-styles'
 import { useLogin } from '@/hooks/useAuth'
@@ -11,7 +12,6 @@ import { Controller, useForm } from 'react-hook-form'
 import {
   Pressable,
   StyleSheet,
-  Text,
   TextInput,
   TouchableOpacity,
   View,
@@ -60,7 +60,7 @@ export default function LoginScreen() {
     <ThemedSafeAreaView style={commonStyles.screenContainer}>
       {/* Title */}
       <View style={styles.titleContainer}>
-        <Text style={styles.title}>Sign In</Text>
+        <ThemedText style={styles.title}>Sign In</ThemedText>
       </View>
 
       {/* Form */}
@@ -86,7 +86,9 @@ export default function LoginScreen() {
               )}
             />
             {errors.email && (
-              <Text style={styles.errorText}>{errors.email.message}</Text>
+              <ThemedText style={styles.errorText}>
+                {errors.email.message}
+              </ThemedText>
             )}
           </View>
 
@@ -122,13 +124,17 @@ export default function LoginScreen() {
               </Pressable>
             </View>
             {errors.password && (
-              <Text style={styles.errorText}>{errors.password.message}</Text>
+              <ThemedText style={styles.errorText}>
+                {errors.password.message}
+              </ThemedText>
             )}
           </View>
 
           {/* Forgot Password */}
           <Pressable style={styles.forgotPasswordContainer} disabled={true}>
-            <Text style={styles.forgotPasswordText}>Forgot password?</Text>
+            <ThemedText style={styles.forgotPasswordText}>
+              Forgot password?
+            </ThemedText>
           </Pressable>
 
           {/* Sign In Button */}
@@ -141,15 +147,15 @@ export default function LoginScreen() {
             onPress={handleSubmit(onSubmit)}
             disabled={!isFormValid || loginMutation.isPending}
           >
-            <Text style={styles.signInButtonText}>
+            <ThemedText style={styles.signInButtonText}>
               {loginMutation.isPending ? 'Signing in...' : 'Sign in'}
-            </Text>
+            </ThemedText>
           </TouchableOpacity>
 
           {/* Or Divider */}
           <View style={styles.dividerContainer}>
             <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>or</Text>
+            <ThemedText style={styles.dividerText}>or</ThemedText>
             <View style={styles.dividerLine} />
           </View>
 
@@ -163,9 +169,11 @@ export default function LoginScreen() {
 
         {/* Sign Up Link */}
         <View style={styles.signUpContainer}>
-          <Text style={styles.signUpText}>Don't you have an account? </Text>
+          <ThemedText style={styles.signUpText}>
+            Don't you have an account?{' '}
+          </ThemedText>
           <Pressable onPress={handleSignUpPress}>
-            <Text style={styles.signUpLink}>Sign Up</Text>
+            <ThemedText style={styles.signUpLink}>Sign Up</ThemedText>
           </Pressable>
         </View>
       </View>
@@ -181,7 +189,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontFamily: 'Poppins_700Bold',
-    color: Colors.text.primary,
     marginBottom: 8,
   },
   formContainer: {
@@ -195,7 +202,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   input: {
-    backgroundColor: Colors.background.input,
+    backgroundColor: 'transparent',
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 16,
@@ -214,7 +221,6 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   errorText: {
-    color: Colors.text.error,
     fontSize: 14,
     fontFamily: 'Poppins_400Regular',
     marginTop: 8,
@@ -225,7 +231,6 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   forgotPasswordText: {
-    color: Colors.text.secondary,
     fontSize: 16,
     fontFamily: 'Poppins_500Medium',
   },
@@ -241,7 +246,6 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   signInButtonText: {
-    color: Colors.text.primary,
     fontSize: 18,
     fontFamily: 'Poppins_700Bold',
   },
@@ -256,7 +260,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.border.primary,
   },
   dividerText: {
-    color: Colors.text.secondary,
     fontSize: 16,
     fontFamily: 'Poppins_500Medium',
     marginHorizontal: 16,
@@ -273,12 +276,10 @@ const styles = StyleSheet.create({
     marginBottom: 100, // Move up from bottom
   },
   signUpText: {
-    color: Colors.text.secondary,
     fontSize: 16,
     fontFamily: 'Poppins_400Regular',
   },
   signUpLink: {
-    color: Colors.text.primary,
     fontSize: 16,
     fontFamily: 'Poppins_600SemiBold',
   },

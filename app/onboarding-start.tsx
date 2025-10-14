@@ -1,4 +1,5 @@
 import { ThemedSafeAreaView } from '@/components/themed-safe-area-view'
+import { ThemedText } from '@/components/themed-text'
 import { ThemedView } from '@/components/themed-view'
 import { Colors } from '@/constants/colors'
 import { commonStyles } from '@/constants/common-styles'
@@ -11,7 +12,6 @@ import {
   Image,
   Pressable,
   StyleSheet,
-  Text,
   TouchableOpacity,
   View,
 } from 'react-native'
@@ -57,7 +57,9 @@ export default function OnboardingStartScreen() {
       {/* Header */}
       <View style={styles.header}>
         <Pressable onPress={handleLoginPress}>
-          <Text style={styles.loginLink}>Already have an account? Log in</Text>
+          <ThemedText style={styles.loginLink}>
+            Already have an account? Log in
+          </ThemedText>
         </Pressable>
       </View>
 
@@ -89,12 +91,12 @@ export default function OnboardingStartScreen() {
 
       {/* Footer */}
       <View style={styles.footer}>
-        <Text style={styles.footerText}>
+        <ThemedText style={styles.footerText}>
           Tell us about your favorite movie genres
-        </Text>
+        </ThemedText>
 
         <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
-          <Text style={styles.nextButtonText}>Next</Text>
+          <ThemedText style={styles.nextButtonText}>Next</ThemedText>
         </TouchableOpacity>
 
         {/* Progress Indicator */}
@@ -113,7 +115,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   loginLink: {
-    color: Colors.text.primary,
     fontSize: 16,
     fontFamily: 'Poppins_500Medium',
   },
@@ -148,7 +149,6 @@ const styles = StyleSheet.create({
   footerText: {
     fontSize: 16,
     fontFamily: 'Poppins_500Medium',
-    color: Colors.text.primary,
     textAlign: 'center',
     marginBottom: 20,
   },
@@ -160,7 +160,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   nextButtonText: {
-    color: Colors.text.primary,
     fontSize: 18,
     fontFamily: 'Poppins_700Bold',
     textAlign: 'center',
