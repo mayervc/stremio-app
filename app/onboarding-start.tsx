@@ -1,4 +1,6 @@
+import { ThemedSafeAreaView } from '@/components/themed-safe-area-view'
 import { Colors } from '@/constants/colors'
+import { commonStyles } from '@/constants/common-styles'
 import { movies } from '@/lib/data/onboarding-placeholder-images'
 import { useOnboardingStore } from '@/store/onboardingStore'
 import { router } from 'expo-router'
@@ -7,7 +9,6 @@ import {
   FlatList,
   Image,
   Pressable,
-  SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -51,75 +52,61 @@ export default function OnboardingStartScreen() {
   }
 
   return (
-    <View style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Pressable onPress={handleLoginPress}>
-            <Text style={styles.loginLink}>
-              Already have an account? Log in
-            </Text>
-          </Pressable>
+    <ThemedSafeAreaView style={commonStyles.screenContainer}>
+      {/* Header */}
+      <View style={styles.header}>
+        <Pressable onPress={handleLoginPress}>
+          <Text style={styles.loginLink}>Already have an account? Log in</Text>
+        </Pressable>
+      </View>
+
+      {/* Content */}
+      <View style={styles.content}>
+        {/* Movies Grid - 2 Rows with Horizontal Scroll */}
+        <View style={styles.moviesContainer}>
+          {/* First Row */}
+          <FlatList
+            data={firstRow}
+            renderItem={renderMovie}
+            keyExtractor={item => item.id.toString()}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.moviesRow}
+          />
+
+          {/* Second Row */}
+          <FlatList
+            data={secondRow}
+            renderItem={renderMovie}
+            keyExtractor={item => item.id.toString()}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.moviesRow}
+          />
         </View>
+      </View>
 
-        {/* Content */}
-        <View style={styles.content}>
-          {/* Movies Grid - 2 Rows with Horizontal Scroll */}
-          <View style={styles.moviesContainer}>
-            {/* First Row */}
-            <FlatList
-              data={firstRow}
-              renderItem={renderMovie}
-              keyExtractor={item => item.id.toString()}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.moviesRow}
-            />
+      {/* Footer */}
+      <View style={styles.footer}>
+        <Text style={styles.footerText}>
+          Tell us about your favorite movie genres
+        </Text>
 
-            {/* Second Row */}
-            <FlatList
-              data={secondRow}
-              renderItem={renderMovie}
-              keyExtractor={item => item.id.toString()}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.moviesRow}
-            />
-          </View>
+        <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
+          <Text style={styles.nextButtonText}>Next</Text>
+        </TouchableOpacity>
+
+        {/* Progress Indicator */}
+        <View style={styles.progressContainer}>
+          <View style={[styles.progressDot, styles.progressDotActive]} />
+          <View style={styles.progressDot} />
         </View>
-
-        {/* Footer */}
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>
-            Tell us about your favorite movie genres
-          </Text>
-
-          <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
-            <Text style={styles.nextButtonText}>Next</Text>
-          </TouchableOpacity>
-
-          {/* Progress Indicator */}
-          <View style={styles.progressContainer}>
-            <View style={[styles.progressDot, styles.progressDotActive]} />
-            <View style={styles.progressDot} />
-          </View>
-        </View>
-      </SafeAreaView>
-    </View>
+      </View>
+    </ThemedSafeAreaView>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background.primary,
-  },
-  safeArea: {
-    flex: 1,
-    paddingHorizontal: 32,
-    paddingTop: 32,
-    paddingBottom: 32,
-  },
   header: {
     alignItems: 'flex-end',
     marginBottom: 20,

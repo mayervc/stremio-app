@@ -1,11 +1,12 @@
+import { ThemedSafeAreaView } from '@/components/themed-safe-area-view'
 import { Colors } from '@/constants/colors'
+import { commonStyles } from '@/constants/common-styles'
 import { genres } from '@/lib/data/movie-genres'
 import { useOnboardingStore } from '@/store/onboardingStore'
 import { router } from 'expo-router'
 import React, { useEffect } from 'react'
 import {
   Pressable,
-  SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -64,7 +65,7 @@ export default function OnboardingPickGenresScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ThemedSafeAreaView style={commonStyles.screenContainer}>
       {/* Header */}
       <View style={styles.header}>
         <Pressable onPress={handleLoginPress}>
@@ -109,15 +110,11 @@ export default function OnboardingPickGenresScreen() {
           <View style={[styles.progressDot, styles.progressDotActive]} />
         </View>
       </View>
-    </SafeAreaView>
+    </ThemedSafeAreaView>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background.primary,
-  },
   header: {
     paddingHorizontal: 20,
     paddingTop: 20,

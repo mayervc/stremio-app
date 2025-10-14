@@ -1,5 +1,7 @@
 import { SocialButton } from '@/components/social-button'
+import { ThemedSafeAreaView } from '@/components/themed-safe-area-view'
 import { Colors } from '@/constants/colors'
+import { commonStyles } from '@/constants/common-styles'
 import { useSignup } from '@/hooks/useAuth'
 import { Ionicons } from '@expo/vector-icons'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -14,7 +16,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { z } from 'zod'
 
 // Validation schema
@@ -38,7 +39,6 @@ export default function SignupScreen() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const signupMutation = useSignup()
-  const insets = useSafeAreaInsets()
 
   const {
     control,
@@ -78,16 +78,7 @@ export default function SignupScreen() {
   }
 
   return (
-    <View
-      style={[
-        styles.container,
-        {
-          paddingTop: insets.top + 24,
-          paddingBottom: 24,
-          paddingHorizontal: 24,
-        },
-      ]}
-    >
+    <ThemedSafeAreaView style={commonStyles.screenContainer}>
       {/* Header - Already have account link */}
       <View style={styles.header}>
         <Pressable onPress={handleLoginPress}>
@@ -251,15 +242,11 @@ export default function SignupScreen() {
           </Pressable>
         </View>
       </View>
-    </View>
+    </ThemedSafeAreaView>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background.primary,
-  },
   header: {
     alignItems: 'flex-end',
     marginTop: 20,
