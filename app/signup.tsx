@@ -207,7 +207,7 @@ export default function SignupScreen() {
             onPress={handleSubmit(onSubmit)}
             disabled={isSignupDisabled}
           >
-            <ThemedText style={styles.signUpButtonText}>
+            <ThemedText type='button' style={styles.signUpButtonText}>
               {signupMutation.isPending ? 'Signing up...' : 'Sign up'}
             </ThemedText>
           </TouchableOpacity>

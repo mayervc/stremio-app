@@ -110,7 +110,9 @@ export default function OnboardingPickGenresScreen() {
           onPress={handleNext}
           disabled={disableNextButton}
         >
-          <ThemedText style={styles.nextButtonText}>Next</ThemedText>
+          <ThemedText type='button' style={styles.nextButtonText}>
+            Next
+          </ThemedText>
         </TouchableOpacity>
 
         {/* Progress Indicator */}

@@ -156,7 +156,7 @@ export default function SignupSuccessScreen() {
           onPress={handleSubmit(onSubmit)}
           disabled={isContinueDisabled}
         >
-          <ThemedText style={styles.continueButtonText}>
+          <ThemedText type='button' style={styles.continueButtonText}>
             {updateProfileMutation.isPending ? 'Saving...' : 'Continue'}
           </ThemedText>
         </TouchableOpacity>
