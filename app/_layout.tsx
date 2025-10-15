@@ -18,12 +18,11 @@ import Toast from 'react-native-toast-message'
 
 import { useColorScheme } from '@/hooks/use-color-scheme'
 import { AuthInitializer } from '@/lib/auth-initializer'
-import { OnboardingGuard } from '@/lib/onboarding-guard'
 import { queryClient } from '@/lib/query-client'
 import { useAuthStore } from '@/store/authStore'
 
 export const unstable_settings = {
-  anchor: 'onboarding-start',
+  anchor: 'splash',
 }
 
 export default function RootLayout() {
@@ -46,9 +45,11 @@ export default function RootLayout() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <AuthInitializer />
-        <OnboardingGuard />
+        {/* <OnboardingGuard /> */}
         <StatusBar style='auto' />
         <Stack>
+          <Stack.Screen name='splash' options={{ headerShown: false }} />
+
           <Stack.Protected guard={isAuthenticated}>
             <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
             <Stack.Screen

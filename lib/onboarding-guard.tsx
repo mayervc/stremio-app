@@ -1,27 +1,32 @@
 import { useAuthStore } from '@/store/authStore'
 import { useOnboardingStore } from '@/store/onboardingStore'
-import { router } from 'expo-router'
+import { router, useSegments } from 'expo-router'
 import { useEffect } from 'react'
 
 export function OnboardingGuard() {
   const { isAuthenticated } = useAuthStore()
   const { hasSeenOnboarding, isCompleted, currentStep } = useOnboardingStore()
+  const segments = useSegments()
 
   useEffect(() => {
+    // Don't interfere if we're on the splash screen
+    if (segments[0] === 'splash') {
+      return
+    }
+
     // Add a small delay to prevent immediate navigation conflicts
     const timeoutId = setTimeout(() => {
-      // If user is authenticated but onboarding is not completed, go to signup success
-      if (isAuthenticated && !isCompleted) {
-        router.replace('/signup-success')
+      // If user is authenticated, handle based on onboarding completion
+      if (isAuthenticated) {
+        if (isCompleted) {
+          router.replace('/(tabs)')
+        } else {
+          router.replace('/signup-success')
+        }
         return
       }
 
-      // If user is authenticated and onboarding is completed, let them go to tabs
-      if (isAuthenticated && isCompleted) {
-        return
-      }
-
-      // If user has never seen onboarding, start the flow
+      // If user is not authenticated, handle onboarding flow
       if (!hasSeenOnboarding) {
         router.replace('/onboarding-start')
         return
@@ -37,15 +42,15 @@ export function OnboardingGuard() {
         return
       }
 
-      // If user has completed onboarding, go to signup (not login)
+      // If user has completed onboarding but is not authenticated, go to signup
       if (hasSeenOnboarding && isCompleted) {
         router.replace('/signup')
         return
       }
-    }, 100) // Small delay to prevent conflicts
+    }, 500) // Increased delay to prevent conflicts with splash screen
 
     return () => clearTimeout(timeoutId)
-  }, [isAuthenticated, hasSeenOnboarding, isCompleted, currentStep])
+  }, [isAuthenticated, hasSeenOnboarding, isCompleted, currentStep, segments])
 
   return null
 }
