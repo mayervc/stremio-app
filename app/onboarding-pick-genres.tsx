@@ -1,4 +1,5 @@
 import { ThemedSafeAreaView } from '@/components/themed-safe-area-view'
+import { ThemedText } from '@/components/themed-text'
 import { Colors } from '@/constants/colors'
 import { commonStyles } from '@/constants/common-styles'
 import { genres } from '@/lib/data/movie-genres'
@@ -56,7 +57,13 @@ export default function OnboardingPickGenresScreen() {
         onPress={() => toggleGenre(item.id)}
       >
         <Text
-          style={[styles.genreText, isSelected && styles.genreTextSelected]}
+          style={[
+            styles.genreText,
+            isSelected && {
+              color: Colors.button.primary,
+              fontFamily: 'Poppins_600SemiBold',
+            },
+          ]}
         >
           {item.name}
         </Text>
@@ -69,15 +76,17 @@ export default function OnboardingPickGenresScreen() {
       {/* Header */}
       <View style={styles.header}>
         <Pressable onPress={handleLoginPress}>
-          <Text style={styles.loginLink}>Already have an account? Log in</Text>
+          <ThemedText style={styles.loginLink}>
+            Already have an account? Log in
+          </ThemedText>
         </Pressable>
       </View>
 
       {/* Content */}
       <View style={styles.content}>
-        <Text style={styles.subtitle}>
+        <ThemedText style={styles.subtitle}>
           Select at least {MIN_GENRES_TO_SELECT} genres to continue
-        </Text>
+        </ThemedText>
 
         {/* Genres Grid */}
         <View style={styles.genresContainer}>
@@ -89,9 +98,9 @@ export default function OnboardingPickGenresScreen() {
 
       {/* Footer */}
       <View style={styles.footer}>
-        <Text style={styles.footerText}>
+        <ThemedText style={styles.footerText}>
           Select the genres you like to watch
-        </Text>
+        </ThemedText>
 
         <TouchableOpacity
           style={[
@@ -101,7 +110,7 @@ export default function OnboardingPickGenresScreen() {
           onPress={handleNext}
           disabled={disableNextButton}
         >
-          <Text style={styles.nextButtonText}>Next</Text>
+          <ThemedText style={styles.nextButtonText}>Next</ThemedText>
         </TouchableOpacity>
 
         {/* Progress Indicator */}
@@ -121,7 +130,6 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   loginLink: {
-    color: Colors.text.primary,
     fontSize: 16,
     fontFamily: 'Poppins_500Medium',
   },
@@ -133,7 +141,6 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     fontFamily: 'Poppins_400Regular',
-    color: Colors.text.secondary,
     textAlign: 'center',
     marginBottom: 40,
   },
@@ -164,10 +171,6 @@ const styles = StyleSheet.create({
     color: Colors.text.primary,
     textAlign: 'center',
   },
-  genreTextSelected: {
-    color: Colors.button.primary,
-    fontFamily: 'Poppins_600SemiBold',
-  },
   footer: {
     paddingHorizontal: 20,
     paddingBottom: 40,
@@ -176,7 +179,6 @@ const styles = StyleSheet.create({
   footerText: {
     fontSize: 18,
     fontFamily: 'Poppins_500Medium',
-    color: Colors.text.primary,
     textAlign: 'center',
     marginBottom: 20,
   },
@@ -192,7 +194,6 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   nextButtonText: {
-    color: Colors.text.primary,
     fontSize: 18,
     fontFamily: 'Poppins_700Bold',
     textAlign: 'center',

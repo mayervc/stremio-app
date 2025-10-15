@@ -1,5 +1,6 @@
 import { SocialButton } from '@/components/social-button'
 import { ThemedSafeAreaView } from '@/components/themed-safe-area-view'
+import { ThemedText } from '@/components/themed-text'
 import { Colors } from '@/constants/colors'
 import { commonStyles } from '@/constants/common-styles'
 import { useSignup } from '@/hooks/useAuth'
@@ -11,7 +12,6 @@ import { Controller, useForm } from 'react-hook-form'
 import {
   Pressable,
   StyleSheet,
-  Text,
   TextInput,
   TouchableOpacity,
   View,
@@ -82,13 +82,15 @@ export default function SignupScreen() {
       {/* Header - Already have account link */}
       <View style={styles.header}>
         <Pressable onPress={handleLoginPress}>
-          <Text style={styles.headerLink}>Already have an account? Log in</Text>
+          <ThemedText style={styles.headerLink}>
+            Already have an account? Log in
+          </ThemedText>
         </Pressable>
       </View>
 
       {/* Title */}
       <View style={styles.titleContainer}>
-        <Text style={styles.title}>Sign Up</Text>
+        <ThemedText style={styles.title}>Sign Up</ThemedText>
       </View>
 
       {/* Form */}
@@ -114,7 +116,9 @@ export default function SignupScreen() {
               )}
             />
             {errors.email && (
-              <Text style={styles.errorText}>{errors.email.message}</Text>
+              <ThemedText style={styles.errorText}>
+                {errors.email.message}
+              </ThemedText>
             )}
           </View>
 
@@ -150,7 +154,9 @@ export default function SignupScreen() {
               </Pressable>
             </View>
             {errors.password && (
-              <Text style={styles.errorText}>{errors.password.message}</Text>
+              <ThemedText style={styles.errorText}>
+                {errors.password.message}
+              </ThemedText>
             )}
           </View>
 
@@ -186,9 +192,9 @@ export default function SignupScreen() {
               </Pressable>
             </View>
             {errors.confirmPassword && (
-              <Text style={styles.errorText}>
+              <ThemedText style={styles.errorText}>
                 {errors.confirmPassword.message}
-              </Text>
+              </ThemedText>
             )}
           </View>
 
@@ -201,28 +207,28 @@ export default function SignupScreen() {
             onPress={handleSubmit(onSubmit)}
             disabled={isSignupDisabled}
           >
-            <Text style={styles.signUpButtonText}>
+            <ThemedText style={styles.signUpButtonText}>
               {signupMutation.isPending ? 'Signing up...' : 'Sign up'}
-            </Text>
+            </ThemedText>
           </TouchableOpacity>
 
           {/* Terms and Privacy Policy */}
           <View style={styles.termsContainer}>
-            <Text style={styles.termsText}>
+            <ThemedText style={styles.termsText}>
               By clicking the "sign up" button, you accept the terms of the{' '}
-              <Text
+              <ThemedText
                 style={styles.privacyLink}
                 onPress={handlePrivacyPolicyPress}
               >
                 Privacy Policy
-              </Text>
-            </Text>
+              </ThemedText>
+            </ThemedText>
           </View>
 
           {/* Or Divider */}
           <View style={styles.dividerContainer}>
             <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>or</Text>
+            <ThemedText style={styles.dividerText}>or</ThemedText>
             <View style={styles.dividerLine} />
           </View>
 
@@ -236,9 +242,11 @@ export default function SignupScreen() {
 
         {/* Footer - Already have account link */}
         <View style={styles.footer}>
-          <Text style={styles.footerText}>Already have an account? </Text>
+          <ThemedText style={styles.footerText}>
+            Already have an account?{' '}
+          </ThemedText>
           <Pressable onPress={handleLoginPress}>
-            <Text style={styles.footerLink}>Sign In</Text>
+            <ThemedText style={styles.footerLink}>Sign In</ThemedText>
           </Pressable>
         </View>
       </View>
@@ -253,7 +261,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   headerLink: {
-    color: Colors.text.secondary,
     fontSize: 16,
     fontFamily: 'Poppins_400Regular',
   },
@@ -263,7 +270,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontFamily: 'Poppins_700Bold',
-    color: Colors.text.primary,
   },
   formContainer: {
     flex: 1,
@@ -276,7 +282,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   input: {
-    backgroundColor: Colors.background.input,
+    backgroundColor: 'transparent',
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 16,
@@ -295,7 +301,6 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   errorText: {
-    color: Colors.text.error,
     fontSize: 14,
     fontFamily: 'Poppins_400Regular',
     marginTop: 8,
@@ -313,7 +318,6 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   signUpButtonText: {
-    color: Colors.text.primary,
     fontSize: 18,
     fontFamily: 'Poppins_700Bold',
   },
@@ -323,7 +327,6 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   termsText: {
-    color: Colors.text.secondary,
     fontSize: 14,
     fontFamily: 'Poppins_400Regular',
     textAlign: 'left',
@@ -332,7 +335,6 @@ const styles = StyleSheet.create({
     paddingLeft: 0,
   },
   privacyLink: {
-    color: Colors.text.primary,
     fontSize: 14,
     fontFamily: 'Poppins_600SemiBold',
   },
@@ -347,7 +349,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.border.primary,
   },
   dividerText: {
-    color: Colors.text.secondary,
     fontSize: 16,
     fontFamily: 'Poppins_500Medium',
     marginHorizontal: 16,
@@ -364,12 +365,10 @@ const styles = StyleSheet.create({
     marginBottom: 32, // Move up from bottom
   },
   footerText: {
-    color: Colors.text.secondary,
     fontSize: 16,
     fontFamily: 'Poppins_400Regular',
   },
   footerLink: {
-    color: Colors.text.primary,
     fontSize: 16,
     fontFamily: 'Poppins_600SemiBold',
   },
