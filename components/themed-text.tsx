@@ -5,7 +5,13 @@ import { useThemeColor } from '@/hooks/use-theme-color'
 export type ThemedTextProps = TextProps & {
   lightColor?: string
   darkColor?: string
-  type?: 'default' | 'title' | 'defaultSemiBold' | 'subtitle' | 'link'
+  type?:
+    | 'default'
+    | 'title'
+    | 'defaultSemiBold'
+    | 'subtitle'
+    | 'link'
+    | 'button'
 }
 
 export function ThemedText({
@@ -15,7 +21,11 @@ export function ThemedText({
   type = 'default',
   ...rest
 }: ThemedTextProps) {
-  const color = useThemeColor({ light: lightColor, dark: darkColor }, 'text')
+  // For button type, always use white color
+  const color =
+    type === 'button'
+      ? '#FFFFFF'
+      : useThemeColor({ light: lightColor, dark: darkColor }, 'text')
 
   return (
     <Text
@@ -26,6 +36,7 @@ export function ThemedText({
         type === 'defaultSemiBold' ? styles.defaultSemiBold : undefined,
         type === 'subtitle' ? styles.subtitle : undefined,
         type === 'link' ? styles.link : undefined,
+        type === 'button' ? styles.button : undefined,
         style,
       ]}
       {...rest}
@@ -52,5 +63,10 @@ const styles = StyleSheet.create({
   link: {
     fontSize: 16,
     color: '#0a7ea4',
+  },
+  button: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
   },
 })

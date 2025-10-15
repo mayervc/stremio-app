@@ -96,7 +96,9 @@ export default function OnboardingStartScreen() {
         </ThemedText>
 
         <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
-          <ThemedText style={styles.nextButtonText}>Next</ThemedText>
+          <ThemedText type='button' style={styles.nextButtonText}>
+            Next
+          </ThemedText>
         </TouchableOpacity>
 
         {/* Progress Indicator */}

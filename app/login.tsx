@@ -147,7 +147,7 @@ export default function LoginScreen() {
             onPress={handleSubmit(onSubmit)}
             disabled={!isFormValid || loginMutation.isPending}
           >
-            <ThemedText style={styles.signInButtonText}>
+            <ThemedText type='button' style={styles.signInButtonText}>
               {loginMutation.isPending ? 'Signing in...' : 'Sign in'}
             </ThemedText>
           </TouchableOpacity>
