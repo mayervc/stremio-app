@@ -18,8 +18,13 @@ import {
 const MIN_GENRES_TO_SELECT = 3
 
 export default function OnboardingPickGenresScreen() {
-  const { selectedGenres, setSelectedGenres, setCompleted, setCurrentStep } =
-    useOnboardingStore()
+  const {
+    selectedGenres,
+    setSelectedGenres,
+    setCompleted,
+    setCurrentStep,
+    setHasSeenOnboarding,
+  } = useOnboardingStore()
 
   // Computed values
   const disableNextButton = selectedGenres.length < MIN_GENRES_TO_SELECT
@@ -38,7 +43,9 @@ export default function OnboardingPickGenresScreen() {
 
   const handleNext = () => {
     if (selectedGenres.length >= MIN_GENRES_TO_SELECT) {
-      // Don't mark as completed yet - will be done after signup success
+      // Mark onboarding as completed and set hasSeenOnboarding
+      setCompleted(true)
+      setHasSeenOnboarding(true)
       // Navigate to signup after completing onboarding
       router.replace('/signup')
     }

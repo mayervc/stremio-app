@@ -23,7 +23,7 @@ import { queryClient } from '@/lib/query-client'
 import { useAuthStore } from '@/store/authStore'
 
 export const unstable_settings = {
-  anchor: 'onboarding-start',
+  anchor: 'splash',
 }
 
 export default function RootLayout() {
@@ -49,6 +49,8 @@ export default function RootLayout() {
         <OnboardingGuard />
         <StatusBar style='auto' />
         <Stack>
+          <Stack.Screen name='splash' options={{ headerShown: false }} />
+
           <Stack.Protected guard={isAuthenticated}>
             <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
             <Stack.Screen
