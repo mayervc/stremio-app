@@ -1,9 +1,11 @@
+import { useOnboardingStore } from '@/store/onboardingStore'
 import Constants from 'expo-constants'
 import { router } from 'expo-router'
 import React, { useEffect, useRef } from 'react'
 import { Animated, StyleSheet, Text, View } from 'react-native'
 
 export default function SplashScreenComponent() {
+  const { hasSeenOnboarding, isCompleted } = useOnboardingStore()
   const fadeAnim = useRef(new Animated.Value(0)).current
   const morphAnim = useRef(new Animated.Value(0)).current
   const rotateAnim = useRef(new Animated.Value(0)).current
@@ -71,12 +73,24 @@ export default function SplashScreenComponent() {
         // Wait for the full duration
         await new Promise(resolve => setTimeout(resolve, 4000))
 
-        // Navigate to onboarding start
-        router.replace('/onboarding-start')
+        // Navigate based on onboarding status
+        if (hasSeenOnboarding && isCompleted) {
+          console.log(
+            'Splash screen - Onboarding completed, navigating to signup'
+          )
+          router.replace('/signup')
+        } else {
+          console.log('Splash screen - Navigating to onboarding-start')
+          router.replace('/onboarding-start')
+        }
       } catch (e) {
         console.warn(e)
-        // Even if there's an error, navigate
-        router.replace('/onboarding-start')
+        // Even if there's an error, navigate based on onboarding status
+        if (hasSeenOnboarding && isCompleted) {
+          router.replace('/signup')
+        } else {
+          router.replace('/onboarding-start')
+        }
       }
     }
 

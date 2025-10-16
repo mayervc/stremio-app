@@ -9,13 +9,39 @@ export function OnboardingGuard() {
   const segments = useSegments()
 
   useEffect(() => {
+    console.log(
+      'OnboardingGuard - segments:',
+      segments,
+      'isAuthenticated:',
+      isAuthenticated,
+      'hasSeenOnboarding:',
+      hasSeenOnboarding,
+      'isCompleted:',
+      isCompleted
+    )
+
     // Don't interfere if we're on the splash screen
     if (segments[0] === 'splash') {
+      console.log('OnboardingGuard - On splash screen, skipping')
+      return
+    }
+
+    // Don't interfere if user has completed onboarding and is on auth screens
+    if (
+      hasSeenOnboarding &&
+      isCompleted &&
+      !isAuthenticated &&
+      (segments[0] === 'signup' || segments[0] === 'login')
+    ) {
+      console.log(
+        'OnboardingGuard - User completed onboarding, staying on auth screen'
+      )
       return
     }
 
     // Add a small delay to prevent immediate navigation conflicts
     const timeoutId = setTimeout(() => {
+      console.log('OnboardingGuard - Executing navigation logic')
       // If user is authenticated, handle based on onboarding completion
       if (isAuthenticated) {
         if (isCompleted) {
@@ -43,14 +69,29 @@ export function OnboardingGuard() {
       }
 
       // If user has completed onboarding but is not authenticated, go to signup
-      if (hasSeenOnboarding && isCompleted) {
-        router.replace('/signup')
+      if (hasSeenOnboarding && isCompleted && !isAuthenticated) {
+        // Only redirect to signup if we're not already on signup or login
+        if (
+          segments[0] !== 'signup' &&
+          segments[0] !== 'login' &&
+          segments[0] !== 'onboarding-start' &&
+          segments[0] !== 'onboarding-pick-genres'
+        ) {
+          console.log('OnboardingGuard - Redirecting to signup')
+          router.replace('/signup')
+        }
         return
       }
-    }, 500) // Increased delay to prevent conflicts with splash screen
+    }, 100) // Reduced delay for faster navigation
 
     return () => clearTimeout(timeoutId)
-  }, [isAuthenticated, hasSeenOnboarding, isCompleted, currentStep, segments])
+  }, [
+    isAuthenticated,
+    hasSeenOnboarding,
+    isCompleted,
+    currentStep,
+    segments[0],
+  ])
 
   return null
 }
