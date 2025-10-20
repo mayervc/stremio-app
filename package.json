@@ -11,7 +11,8 @@
     "lint": "expo lint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "lint:fix": "expo lint --fix"
+    "lint:fix": "expo lint --fix",
+    "prebuild": "expo prebuild --clean"
   },
   "dependencies": {
     "@expo-google-fonts/poppins": "^0.4.1",
