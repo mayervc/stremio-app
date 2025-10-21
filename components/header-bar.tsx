@@ -1,29 +1,36 @@
 import { Ionicons } from '@expo/vector-icons'
 import React from 'react'
-import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { Pressable, StyleSheet, View } from 'react-native'
+
+import { ThemedText } from '@/components/themed-text'
+import { useThemeColor } from '@/hooks/use-theme-color'
+import { useAuthStore } from '@/store/authStore'
 
 interface HeaderBarProps {
-  userName?: string
   onSearchPress?: () => void
   onProfilePress?: () => void
 }
 
 const HeaderBar = ({
-  userName = 'Sarthak',
-  onSearchPress,
-  onProfilePress,
+  onSearchPress = () => console.log('Search pressed'),
+  onProfilePress = () => console.log('Profile pressed'),
 }: HeaderBarProps) => {
+  const { user } = useAuthStore()
+  const iconColor = useThemeColor({ light: '#000000', dark: '#FFFFFF' }, 'text')
+
   return (
     <View style={styles.headerContainer}>
-      <Text style={styles.greetingText}>Hey, {userName}</Text>
+      <ThemedText style={styles.greetingText}>
+        Hey, {user?.firstName || 'User'}
+      </ThemedText>
 
       <View style={styles.iconsContainer}>
         <Pressable style={styles.iconButton} onPress={onSearchPress}>
-          <Ionicons name='search' size={20} color='#FFFFFF' />
+          <Ionicons name='search' size={20} color={iconColor} />
         </Pressable>
 
         <Pressable style={styles.iconButton} onPress={onProfilePress}>
-          <Ionicons name='person-outline' size={20} color='#FFFFFF' />
+          <Ionicons name='person-outline' size={20} color={iconColor} />
         </Pressable>
       </View>
     </View>
@@ -36,12 +43,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingTop: 60,
-    paddingBottom: 20,
-    backgroundColor: '#121011',
   },
   greetingText: {
-    color: '#FFFFFF',
     fontSize: 24,
     fontWeight: '600',
   },

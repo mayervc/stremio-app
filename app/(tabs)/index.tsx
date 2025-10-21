@@ -9,8 +9,8 @@ import {
 } from 'react-native'
 
 import HeaderBar from '@/components/header-bar'
+import { ThemedSafeAreaView } from '@/components/themed-safe-area-view'
 import { ThemedText } from '@/components/themed-text'
-import { ThemedView } from '@/components/themed-view'
 import { useAuthStore } from '@/store/authStore'
 
 export default function HomeScreen() {
@@ -63,13 +63,9 @@ export default function HomeScreen() {
   )
 
   return (
-    <ThemedView style={styles.container}>
+    <ThemedSafeAreaView style={styles.container}>
       {/* Header */}
-      <HeaderBar
-        userName={user?.firstName || 'User'}
-        onSearchPress={() => console.log('Search pressed')}
-        onProfilePress={() => console.log('Profile pressed')}
-      />
+      <HeaderBar />
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Featured Movie Section */}
@@ -152,14 +148,13 @@ export default function HomeScreen() {
       <TouchableOpacity style={styles.filterButton}>
         <Ionicons name='filter' size={20} color='#FFFFFF' />
       </TouchableOpacity>
-    </ThemedView>
+    </ThemedSafeAreaView>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#121011', // Dark background
   },
   content: {
     flex: 1,

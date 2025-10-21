@@ -1,31 +1,26 @@
 import { StyleSheet, View } from 'react-native'
 
 import HeaderBar from '@/components/header-bar'
+import { ThemedSafeAreaView } from '@/components/themed-safe-area-view'
 import { ThemedText } from '@/components/themed-text'
-import { ThemedView } from '@/components/themed-view'
 
 export default function MenuScreen() {
   return (
-    <ThemedView style={styles.container}>
-      <HeaderBar
-        userName='User'
-        onSearchPress={() => console.log('Search pressed')}
-        onProfilePress={() => console.log('Profile pressed')}
-      />
+    <ThemedSafeAreaView style={styles.container}>
+      <HeaderBar />
       <View style={styles.content}>
         <ThemedText style={styles.title}>Menu</ThemedText>
         <ThemedText style={styles.subtitle}>
           Menu functionality coming soon...
         </ThemedText>
       </View>
-    </ThemedView>
+    </ThemedSafeAreaView>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#121011',
   },
   content: {
     flex: 1,
