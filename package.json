@@ -33,6 +33,7 @@
     "expo-font": "~14.0.8",
     "expo-haptics": "~15.0.7",
     "expo-image": "~3.0.8",
+    "expo-linear-gradient": "~15.0.7",
     "expo-linking": "~8.0.8",
     "expo-router": "~6.0.7",
     "expo-secure-store": "^15.0.7",
@@ -70,6 +71,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-native": "^5.0.0",
     "prettier": "^3.6.2",
+    "react-native-svg-transformer": "^1.5.1",
     "typescript": "~5.9.2"
   },
   "private": true
