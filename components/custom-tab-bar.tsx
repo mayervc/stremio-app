@@ -2,15 +2,39 @@ import MenuIcon from '@/assets/icons/svg/menu-icon.svg'
 import MoviesIcon from '@/assets/icons/svg/movies-icon.svg'
 import PlayIcon from '@/assets/icons/svg/play-icon.svg'
 import TicketsIcon from '@/assets/icons/svg/tickets-icon.svg'
+import { ThemedText } from '@/components/themed-text'
+import { useThemeColor } from '@/hooks/use-theme-color'
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs'
 import { LinearGradient } from 'expo-linear-gradient'
-import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { Pressable, StyleSheet, View } from 'react-native'
 
 const CustomTabBar = ({
   state,
   descriptors,
   navigation,
 }: BottomTabBarProps) => {
+  const iconColor = useThemeColor({ light: '#000000', dark: '#FFFFFF' }, 'text')
+  const tabBarBackgroundColor = useThemeColor(
+    { light: '#F5F5F5', dark: '#1E1E1E' },
+    'background'
+  )
+  const activeTabBackgroundColor = useThemeColor(
+    { light: '#007AFF', dark: '#FF3B30' },
+    'tint'
+  )
+  const gradientColor1 = useThemeColor(
+    { light: '#E0E0E0', dark: '#D9D9D9' },
+    'background'
+  )
+  const gradientColor2 = useThemeColor(
+    { light: '#1F1F1F', dark: '#1F1F1F' },
+    'text'
+  )
+  const gradientColor3 = useThemeColor(
+    { light: '#333333', dark: '#333333' },
+    'text'
+  )
+
   const tabConfig = [
     {
       name: 'Movies',
@@ -61,7 +85,7 @@ const CustomTabBar = ({
   }
 
   return (
-    <View style={styles.tabBar}>
+    <View style={[styles.tabBar, { backgroundColor: tabBarBackgroundColor }]}>
       {state.routes.map((route, index) => {
         const { options } = descriptors[route.key]
         const isFocused = state.index === index
@@ -86,32 +110,33 @@ const CustomTabBar = ({
             onPress={onPress}
             style={[
               styles.tabItem,
-              isFocused && styles.tabItemActive,
+              isFocused && [
+                styles.tabItemActive,
+                { backgroundColor: activeTabBackgroundColor },
+              ],
               index > 0 && styles.tabItemSpacing,
             ]}
           >
             {!isFocused ? (
               <View style={styles.gradientBackground}>
-                {/* Primer gradiente: vertical sólido #D9D9D9 */}
                 <LinearGradient
-                  colors={['#D9D9D9', '#D9D9D9']}
+                  colors={[gradientColor1, gradientColor1]}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 0, y: 1 }}
                   style={styles.gradientLayer1}
                 />
-                {/* Segundo gradiente: diagonal #1F1F1F a #333333 */}
                 <LinearGradient
-                  colors={['#1F1F1F', '#333333']}
+                  colors={[gradientColor2, gradientColor3]}
                   start={{ x: 0.059, y: 0 }}
                   end={{ x: 0.923, y: 0 }}
                   style={styles.gradientLayer2}
                 />
-                {renderIcon(tab.icon, 20, '#FFFFFF', index)}
+                {renderIcon(tab.icon, 20, iconColor, index)}
               </View>
             ) : (
               <>
-                {renderIcon(tab.icon, 24, '#FFFFFF', index)}
-                <Text style={styles.tabLabel}>{tab.name}</Text>
+                {renderIcon(tab.icon, 24, iconColor, index)}
+                <ThemedText style={styles.tabLabel}>{tab.name}</ThemedText>
               </>
             )}
           </Pressable>
@@ -124,17 +149,14 @@ const CustomTabBar = ({
 const styles = StyleSheet.create({
   tabBar: {
     flexDirection: 'row',
-    backgroundColor: '#1E1E1E',
-    borderRadius: 41,
+    borderRadius: 36,
     marginHorizontal: 16,
     marginBottom: 16,
-    paddingHorizontal: 8,
-    paddingVertical: 12,
+    padding: 12,
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    height: 82,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -173,8 +195,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   tabItemActive: {
-    backgroundColor: '#FF3B30',
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 30,
     minWidth: 140,
@@ -182,7 +203,6 @@ const styles = StyleSheet.create({
     borderWidth: 0,
   },
   tabLabel: {
-    color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '600',
     marginLeft: 8,

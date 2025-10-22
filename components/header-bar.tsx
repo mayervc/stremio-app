@@ -17,6 +17,10 @@ const HeaderBar = ({
 }: HeaderBarProps) => {
   const { user } = useAuthStore()
   const iconColor = useThemeColor({ light: '#000000', dark: '#FFFFFF' }, 'text')
+  const buttonBackgroundColor = useThemeColor(
+    { light: '#E5E5E5', dark: '#1E1E1E' },
+    'background'
+  )
 
   return (
     <View style={styles.headerContainer}>
@@ -25,11 +29,23 @@ const HeaderBar = ({
       </ThemedText>
 
       <View style={styles.iconsContainer}>
-        <Pressable style={styles.iconButton} onPress={onSearchPress}>
+        <Pressable
+          style={[
+            styles.iconButton,
+            { backgroundColor: buttonBackgroundColor },
+          ]}
+          onPress={onSearchPress}
+        >
           <Ionicons name='search' size={20} color={iconColor} />
         </Pressable>
 
-        <Pressable style={styles.iconButton} onPress={onProfilePress}>
+        <Pressable
+          style={[
+            styles.iconButton,
+            { backgroundColor: buttonBackgroundColor },
+          ]}
+          onPress={onProfilePress}
+        >
           <Ionicons name='person-outline' size={20} color={iconColor} />
         </Pressable>
       </View>
@@ -56,7 +72,6 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: '#1E1E1E',
     justifyContent: 'center',
     alignItems: 'center',
   },
