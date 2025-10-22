@@ -1,122 +1,347 @@
+import { Ionicons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
-import { Platform, StyleSheet } from 'react-native'
+import {
+  FlatList,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native'
 
-import { HelloWave } from '@/components/hello-wave'
-import { LogoutButton } from '@/components/logout-button'
-import ParallaxScrollView from '@/components/parallax-scroll-view'
+import HeaderBar from '@/components/header-bar'
+import { ThemedSafeAreaView } from '@/components/themed-safe-area-view'
 import { ThemedText } from '@/components/themed-text'
-import { ThemedView } from '@/components/themed-view'
 import { useAuthStore } from '@/store/authStore'
-import { Link } from 'expo-router'
 
 export default function HomeScreen() {
   const { user } = useAuthStore()
 
+  // Mock data for movies
+  const featuredMovie = {
+    id: 1,
+    title: 'EVIL DEAD RISE',
+    subtitle: 'A NEW VISION FROM THE PRODUCERS OF THE ORIGINAL CLASSIC',
+    image: require('@/assets/images/movies/e7163aa26068d47aca0e991ff7f1b30649ad42fb.jpg'),
+    rating: 'A',
+    language: 'ENGLISH',
+    genre: 'HORROR',
+    formats: '2D.3D.4DX',
+    isTrending: true,
+  }
+
+  const recommendedMovies = [
+    {
+      id: 2,
+      title: 'SALAAR (PART 1)',
+      image: require('@/assets/images/movies/01839d17af1b80c392925771af1a50ea3cb7d140.jpg'),
+    },
+    {
+      id: 3,
+      title: 'FLASH (2023)',
+      image: require('@/assets/images/movies/15120971aa7848def590eaeeda16dddc64d4fe45.jpg'),
+    },
+    {
+      id: 4,
+      title: 'AQUAMAN',
+      image: require('@/assets/images/movies/762390e133aef26ddd029fc8c7cad1e3bbfccd99.jpg'),
+    },
+    {
+      id: 5,
+      title: 'GUARDIANS',
+      image: require('@/assets/images/movies/900980cc012e8a892443f1ffc4b1045b1e124173.jpg'),
+    },
+  ]
+
+  const renderMovieCard = ({ item }: { item: any }) => (
+    <View style={styles.movieCard}>
+      <Image source={item.image} style={styles.moviePoster} />
+      <View style={styles.playOverlay}>
+        <Ionicons name='play' size={24} color='#FFFFFF' />
+      </View>
+      <ThemedText style={styles.movieTitle}>{item.title}</ThemedText>
+    </View>
+  )
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }
-    >
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type='title'>Welcome!</ThemedText>
-        <HelloWave />
-        <ThemedText type='subtitle' style={styles.userInfo}>
-          Hello{user ? `, ${user.firstName}` : ''}!
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type='subtitle'>Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit{' '}
-          <ThemedText type='defaultSemiBold'>app/(tabs)/index.tsx</ThemedText>{' '}
-          to see changes. Press{' '}
-          <ThemedText type='defaultSemiBold'>
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href='/modal'>
-          <Link.Trigger>
-            <ThemedText type='subtitle'>Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction
-              title='Action'
-              icon='cube'
-              onPress={() => alert('Action pressed')}
-            />
-            <Link.MenuAction
-              title='Share'
-              icon='square.and.arrow.up'
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title='More' icon='ellipsis'>
-              <Link.MenuAction
-                title='Delete'
-                icon='trash'
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+    <ThemedSafeAreaView style={styles.container}>
+      {/* Header */}
+      <HeaderBar />
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type='subtitle'>Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type='defaultSemiBold'>
-            npm run reset-project
-          </ThemedText>{' '}
-          to get a fresh <ThemedText type='defaultSemiBold'>app</ThemedText>{' '}
-          directory. This will move the current{' '}
-          <ThemedText type='defaultSemiBold'>app</ThemedText> to{' '}
-          <ThemedText type='defaultSemiBold'>app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {/* Featured Movie Section */}
+        <View style={styles.featuredSection}>
+          <View style={styles.featuredPoster}>
+            <Image source={featuredMovie.image} style={styles.featuredImage} />
 
-      <ThemedView style={styles.stepContainer}>
-        <LogoutButton />
-      </ThemedView>
-    </ParallaxScrollView>
+            {/* Title Overlay */}
+            <View style={styles.titleOverlay}>
+              <ThemedText style={styles.subtitleText}>
+                {featuredMovie.subtitle}
+              </ThemedText>
+              <ThemedText style={styles.featuredTitle}>
+                {featuredMovie.title}
+              </ThemedText>
+            </View>
+
+            {/* Watch Trailer Button */}
+            <TouchableOpacity style={styles.trailerButton}>
+              <Ionicons name='play' size={16} color='#FFFFFF' />
+              <ThemedText style={styles.trailerButtonText}>
+                Watch Trailer
+              </ThemedText>
+            </TouchableOpacity>
+
+            {/* Movie Details Overlay */}
+            <View style={styles.detailsOverlay}>
+              <View style={styles.detailsLeft}>
+                <View style={styles.trendingBadge}>
+                  <ThemedText style={styles.trendingText}>TRENDING</ThemedText>
+                </View>
+                <ThemedText style={styles.detailsTitle}>
+                  {featuredMovie.title}
+                </ThemedText>
+                <ThemedText style={styles.detailsInfo}>
+                  <ThemedText style={styles.rating}>
+                    {featuredMovie.rating}
+                  </ThemedText>
+                  <ThemedText> . {featuredMovie.language}</ThemedText>
+                </ThemedText>
+                <ThemedText style={styles.genreText}>
+                  {featuredMovie.genre}
+                </ThemedText>
+              </View>
+              <View style={styles.detailsRight}>
+                <TouchableOpacity style={styles.bookButton}>
+                  <ThemedText style={styles.bookButtonText}>Book</ThemedText>
+                </TouchableOpacity>
+                <ThemedText style={styles.formatsText}>
+                  {featuredMovie.formats}
+                </ThemedText>
+              </View>
+            </View>
+          </View>
+        </View>
+
+        {/* Recommended Movies Section */}
+        <View style={styles.recommendedSection}>
+          <View style={styles.sectionHeader}>
+            <ThemedText style={styles.sectionTitle}>
+              Recommended Movies
+            </ThemedText>
+            <TouchableOpacity>
+              <ThemedText style={styles.seeAllText}>See All &gt;</ThemedText>
+            </TouchableOpacity>
+          </View>
+
+          <FlatList
+            data={recommendedMovies}
+            renderItem={renderMovieCard}
+            keyExtractor={item => item.id.toString()}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.moviesList}
+          />
+        </View>
+      </ScrollView>
+
+      {/* Floating Filter Button */}
+      <TouchableOpacity style={styles.filterButton}>
+        <Ionicons name='filter' size={20} color='#FFFFFF' />
+      </TouchableOpacity>
+    </ThemedSafeAreaView>
   )
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  container: {
+    flex: 1,
+  },
+  content: {
+    flex: 1,
+  },
+  featuredSection: {
+    paddingHorizontal: 24,
+    marginBottom: 32,
+  },
+  featuredPoster: {
+    height: 400,
+    borderRadius: 16,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  featuredImage: {
+    width: '100%',
+    height: '100%',
+  },
+  titleOverlay: {
+    position: 'absolute',
+    top: 20,
+    left: 20,
+    right: 20,
+  },
+  subtitleText: {
+    fontSize: 12,
+    color: '#FFFFFF',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+    marginBottom: 8,
+  },
+  featuredTitle: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    textTransform: 'uppercase',
+  },
+  trailerButton: {
+    position: 'absolute',
+    top: 100,
+    right: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  trailerButtonText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
+  detailsOverlay: {
+    position: 'absolute',
     bottom: 0,
     left: 0,
-    position: 'absolute',
+    right: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    padding: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
   },
-  userInfo: {
+  detailsLeft: {
+    flex: 1,
+  },
+  trendingBadge: {
+    backgroundColor: '#FF3B30',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+    alignSelf: 'flex-start',
+    marginBottom: 8,
+  },
+  trendingText: {
+    fontSize: 10,
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+    textTransform: 'uppercase',
+  },
+  detailsTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 4,
+  },
+  detailsInfo: {
+    fontSize: 14,
+    color: '#FFFFFF',
+    marginBottom: 4,
+  },
+  rating: {
+    color: '#FF3B30',
+    fontWeight: 'bold',
+  },
+  genreText: {
+    fontSize: 14,
+    color: '#FFFFFF',
+  },
+  detailsRight: {
+    alignItems: 'flex-end',
+  },
+  bookButton: {
+    backgroundColor: '#333333',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  bookButtonText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  formatsText: {
+    fontSize: 12,
+    color: '#FFFFFF',
+  },
+  recommendedSection: {
+    paddingHorizontal: 24,
+    marginBottom: 100, // Space for bottom navigation
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+  seeAllText: {
+    fontSize: 14,
+    color: '#FF3B30',
+    fontWeight: '600',
+  },
+  moviesList: {
+    paddingRight: 24,
+  },
+  movieCard: {
+    marginRight: 16,
+    width: 120,
+  },
+  moviePoster: {
+    width: 120,
+    height: 160,
+    borderRadius: 8,
+  },
+  playOverlay: {
+    position: 'absolute',
+    top: 60,
+    left: 48,
+    width: 24,
+    height: 24,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  movieTitle: {
+    fontSize: 12,
+    color: '#FFFFFF',
     marginTop: 8,
-    fontStyle: 'italic',
+    textAlign: 'center',
+    fontWeight: '500',
+  },
+  filterButton: {
+    position: 'absolute',
+    bottom: 100,
+    right: 24,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#FF3B30',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
 })
