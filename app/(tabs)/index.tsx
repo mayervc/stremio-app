@@ -393,7 +393,6 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#FFFFFF',
   },
   seeAllButton: {
     flexDirection: 'row',
