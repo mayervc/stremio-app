@@ -1,6 +1,10 @@
 import { Ionicons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
+import { LinearGradient } from 'expo-linear-gradient'
+import { useEffect, useRef, useState } from 'react'
 import {
+  Animated,
+  Dimensions,
   FlatList,
   ScrollView,
   StyleSheet,
@@ -15,18 +19,94 @@ import { useAuthStore } from '@/store/authStore'
 
 export default function HomeScreen() {
   const { user } = useAuthStore()
+  const screenHeight = Dimensions.get('window').height
+  const [currentTrendingIndex, setCurrentTrendingIndex] = useState(0)
+  const scrollViewRef = useRef<ScrollView>(null)
+  const fadeAnim = useRef(new Animated.Value(1)).current
 
-  // Mock data for movies
-  const featuredMovie = {
-    id: 1,
-    title: 'EVIL DEAD RISE',
-    subtitle: 'A NEW VISION FROM THE PRODUCERS OF THE ORIGINAL CLASSIC',
-    image: require('@/assets/images/movies/e7163aa26068d47aca0e991ff7f1b30649ad42fb.jpg'),
-    rating: 'A',
-    language: 'ENGLISH',
-    genre: 'HORROR',
-    formats: '2D.3D.4DX',
-    isTrending: true,
+  // Mock data for trending movies
+  const trendingMovies = [
+    {
+      id: 1,
+      title: 'EVIL DEAD RISE',
+      subtitle: 'A NEW VISION FROM THE PRODUCERS OF THE ORIGINAL CLASSIC',
+      image: require('@/assets/images/movies/e7163aa26068d47aca0e991ff7f1b30649ad42fb.jpg'),
+      rating: 'A',
+      language: 'ENGLISH',
+      genre: 'HORROR',
+      formats: '2D.3D.4DX',
+      isTrending: true,
+    },
+    {
+      id: 2,
+      title: 'SPIDER-MAN: ACROSS THE SPIDER-VERSE',
+      subtitle: 'MILES MORALES RETURNS FOR AN EPIC ADVENTURE',
+      image: require('@/assets/images/movies/01839d17af1b80c392925771af1a50ea3cb7d140.jpg'),
+      rating: 'PG-13',
+      language: 'ENGLISH',
+      genre: 'ACTION',
+      formats: '2D.3D.IMAX',
+      isTrending: true,
+    },
+    {
+      id: 3,
+      title: 'GUARDIANS OF THE GALAXY VOL. 3',
+      subtitle: 'THE FINAL CHAPTER OF THE GUARDIANS',
+      image: require('@/assets/images/movies/900980cc012e8a892443f1ffc4b1045b1e124173.jpg'),
+      rating: 'PG-13',
+      language: 'ENGLISH',
+      genre: 'ACTION',
+      formats: '2D.3D.4DX',
+      isTrending: true,
+    },
+    {
+      id: 4,
+      title: 'THE FLASH',
+      subtitle: 'SPEED FORCE ADVENTURE BEGINS',
+      image: require('@/assets/images/movies/15120971aa7848def590eaeeda16dddc64d4fe45.jpg'),
+      rating: 'PG-13',
+      language: 'ENGLISH',
+      genre: 'ACTION',
+      formats: '2D.3D',
+      isTrending: true,
+    },
+  ]
+
+  const featuredMovie = trendingMovies[currentTrendingIndex]
+
+  // Auto-scroll functionality
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTrendingIndex(prevIndex => {
+        const nextIndex = (prevIndex + 1) % trendingMovies.length
+        return nextIndex
+      })
+    }, 5000) // Change every 5 seconds
+
+    return () => clearInterval(interval)
+  }, [trendingMovies.length])
+
+  // Animate when trending movie changes
+  useEffect(() => {
+    Animated.sequence([
+      Animated.timing(fadeAnim, {
+        toValue: 0.3,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+    ]).start()
+  }, [currentTrendingIndex, fadeAnim])
+
+  const handleTrendingScroll = (event: any) => {
+    const contentOffsetX = event.nativeEvent.contentOffset.x
+    const screenWidth = Dimensions.get('window').width
+    const index = Math.round(contentOffsetX / screenWidth)
+    setCurrentTrendingIndex(index)
   }
 
   const recommendedMovies = [
@@ -54,9 +134,11 @@ export default function HomeScreen() {
 
   const renderMovieCard = ({ item }: { item: any }) => (
     <View style={styles.movieCard}>
-      <Image source={item.image} style={styles.moviePoster} />
-      <View style={styles.playOverlay}>
-        <Ionicons name='play' size={24} color='#FFFFFF' />
+      <View style={styles.posterContainer}>
+        <Image source={item.image} style={styles.moviePoster} />
+        <View style={styles.playOverlay}>
+          <Ionicons name='play-outline' size={24} color='#FFFFFF' />
+        </View>
       </View>
       <ThemedText style={styles.movieTitle}>{item.title}</ThemedText>
     </View>
@@ -67,57 +149,69 @@ export default function HomeScreen() {
       {/* Header */}
       <HeaderBar />
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <View style={styles.content}>
         {/* Featured Movie Section */}
         <View style={styles.featuredSection}>
-          <View style={styles.featuredPoster}>
-            <Image source={featuredMovie.image} style={styles.featuredImage} />
+          <ScrollView
+            ref={scrollViewRef}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            onMomentumScrollEnd={handleTrendingScroll}
+            style={styles.trendingScrollView}
+          >
+            {trendingMovies.map((movie, index) => (
+              <View key={movie.id} style={styles.trendingSlide}>
+                <Animated.View
+                  style={[styles.featuredPoster, { opacity: fadeAnim }]}
+                >
+                  <Image source={movie.image} style={styles.featuredImage} />
 
-            {/* Title Overlay */}
-            <View style={styles.titleOverlay}>
-              <ThemedText style={styles.subtitleText}>
-                {featuredMovie.subtitle}
-              </ThemedText>
-              <ThemedText style={styles.featuredTitle}>
+                  {/* Watch Trailer Button */}
+                  <TouchableOpacity style={styles.trailerButton}>
+                    <ThemedText style={styles.trailerButtonText}>
+                      Watch Trailer
+                    </ThemedText>
+                    <Ionicons name='play-outline' size={16} color='#FFFFFF' />
+                  </TouchableOpacity>
+                </Animated.View>
+              </View>
+            ))}
+          </ScrollView>
+
+          {/* Movie Details Overlay */}
+          <View style={styles.detailsOverlay}>
+            <View style={styles.detailsLeft}>
+              <View style={styles.trendingBadgeContainer}>
+                <ThemedText style={styles.trendingText}>TRENDING</ThemedText>
+              </View>
+              <ThemedText style={styles.detailsTitle}>
                 {featuredMovie.title}
               </ThemedText>
-            </View>
-
-            {/* Watch Trailer Button */}
-            <TouchableOpacity style={styles.trailerButton}>
-              <Ionicons name='play' size={16} color='#FFFFFF' />
-              <ThemedText style={styles.trailerButtonText}>
-                Watch Trailer
+              <ThemedText style={styles.detailsInfo}>
+                <ThemedText style={styles.rating}>
+                  {featuredMovie.rating}
+                </ThemedText>
+                <ThemedText> . {featuredMovie.language}</ThemedText>
               </ThemedText>
-            </TouchableOpacity>
-
-            {/* Movie Details Overlay */}
-            <View style={styles.detailsOverlay}>
-              <View style={styles.detailsLeft}>
-                <View style={styles.trendingBadge}>
-                  <ThemedText style={styles.trendingText}>TRENDING</ThemedText>
-                </View>
-                <ThemedText style={styles.detailsTitle}>
-                  {featuredMovie.title}
-                </ThemedText>
-                <ThemedText style={styles.detailsInfo}>
-                  <ThemedText style={styles.rating}>
-                    {featuredMovie.rating}
-                  </ThemedText>
-                  <ThemedText> . {featuredMovie.language}</ThemedText>
-                </ThemedText>
-                <ThemedText style={styles.genreText}>
-                  {featuredMovie.genre}
-                </ThemedText>
-              </View>
-              <View style={styles.detailsRight}>
-                <TouchableOpacity style={styles.bookButton}>
+              <ThemedText style={styles.genreText}>
+                {featuredMovie.genre}
+              </ThemedText>
+            </View>
+            <View style={styles.detailsRight}>
+              <TouchableOpacity style={styles.bookButton}>
+                <LinearGradient
+                  colors={['#323232', '#767676', '#363535']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={styles.bookButtonGradient}
+                >
                   <ThemedText style={styles.bookButtonText}>Book</ThemedText>
-                </TouchableOpacity>
-                <ThemedText style={styles.formatsText}>
-                  {featuredMovie.formats}
-                </ThemedText>
-              </View>
+                </LinearGradient>
+              </TouchableOpacity>
+              <ThemedText style={styles.formatsText}>
+                {featuredMovie.formats}
+              </ThemedText>
             </View>
           </View>
         </View>
@@ -128,8 +222,9 @@ export default function HomeScreen() {
             <ThemedText style={styles.sectionTitle}>
               Recommended Movies
             </ThemedText>
-            <TouchableOpacity>
-              <ThemedText style={styles.seeAllText}>See All &gt;</ThemedText>
+            <TouchableOpacity style={styles.seeAllButton}>
+              <ThemedText style={styles.seeAllText}>See All</ThemedText>
+              <Ionicons name='chevron-forward' size={16} color='#FF3B30' />
             </TouchableOpacity>
           </View>
 
@@ -139,15 +234,11 @@ export default function HomeScreen() {
             keyExtractor={item => item.id.toString()}
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.moviesList}
+            style={styles.moviesList}
+            contentContainerStyle={styles.moviesListContent}
           />
         </View>
-      </ScrollView>
-
-      {/* Floating Filter Button */}
-      <TouchableOpacity style={styles.filterButton}>
-        <Ionicons name='filter' size={20} color='#FFFFFF' />
-      </TouchableOpacity>
+      </View>
     </ThemedSafeAreaView>
   )
 }
@@ -160,18 +251,27 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   featuredSection: {
-    paddingHorizontal: 24,
-    marginBottom: 32,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    marginBottom: 80,
+  },
+  trendingScrollView: {
+    height: 280,
+  },
+  trendingSlide: {
+    width: Dimensions.get('window').width - 40, // Full width minus padding
   },
   featuredPoster: {
-    height: 400,
-    borderRadius: 16,
+    width: '100%',
+    height: 280,
+    borderRadius: 32,
     overflow: 'hidden',
     position: 'relative',
   },
   featuredImage: {
     width: '100%',
     height: '100%',
+    borderRadius: 32,
   },
   titleOverlay: {
     position: 'absolute',
@@ -194,12 +294,12 @@ const styles = StyleSheet.create({
   },
   trailerButton: {
     position: 'absolute',
-    top: 100,
+    bottom: 80,
     right: 20,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: 'rgba(51, 51, 51, 0.9)',
     paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
+    paddingVertical: 10,
+    borderRadius: 25,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
@@ -211,11 +311,13 @@ const styles = StyleSheet.create({
   },
   detailsOverlay: {
     position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    bottom: -55,
+    left: 35,
+    right: 35,
+    height: 125,
+    backgroundColor: '#1E1E1E',
     padding: 20,
+    borderRadius: 55,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-end',
@@ -223,11 +325,7 @@ const styles = StyleSheet.create({
   detailsLeft: {
     flex: 1,
   },
-  trendingBadge: {
-    backgroundColor: '#FF3B30',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
+  trendingBadgeContainer: {
     alignSelf: 'flex-start',
     marginBottom: 8,
   },
@@ -260,11 +358,16 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   bookButton: {
-    backgroundColor: '#333333',
+    marginBottom: 8,
+    borderRadius: 25,
+    overflow: 'hidden',
+  },
+  bookButtonGradient: {
     paddingHorizontal: 20,
     paddingVertical: 10,
-    borderRadius: 8,
-    marginBottom: 8,
+    borderRadius: 25,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   bookButtonText: {
     color: '#FFFFFF',
@@ -276,8 +379,10 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   recommendedSection: {
-    paddingHorizontal: 24,
-    marginBottom: 100, // Space for bottom navigation
+    paddingHorizontal: 20,
+    paddingBottom: 100, // Add bottom padding to prevent overlap with tab bar
+    flex: 1,
+    height: '100%',
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -290,58 +395,58 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#FFFFFF',
   },
+  seeAllButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
   seeAllText: {
     fontSize: 14,
     color: '#FF3B30',
     fontWeight: '600',
   },
   moviesList: {
-    paddingRight: 24,
+    flex: 1,
+    maxHeight: '100%',
+  },
+  moviesListContent: {
+    paddingRight: 20,
   },
   movieCard: {
     marginRight: 16,
-    width: 120,
+    width: 200,
+    marginBottom: 16, // Add bottom margin to ensure title visibility
+  },
+  posterContainer: {
+    position: 'relative',
+    width: 200,
+    height: 250,
+    borderRadius: 32,
+    overflow: 'hidden',
   },
   moviePoster: {
-    width: 120,
-    height: 160,
-    borderRadius: 8,
+    width: '100%',
+    height: '100%',
+    borderRadius: 32,
+    resizeMode: 'cover',
   },
   playOverlay: {
     position: 'absolute',
-    top: 60,
-    left: 48,
-    width: 24,
-    height: 24,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    borderRadius: 12,
+    top: '50%',
+    left: '50%',
+    transform: [{ translateX: -20 }, { translateY: -20 }],
+    width: 40,
+    height: 40,
+    backgroundColor: '#1E1E1E',
+    borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
   },
   movieTitle: {
-    fontSize: 12,
+    fontSize: 16,
     color: '#FFFFFF',
     marginTop: 8,
     textAlign: 'center',
     fontWeight: '500',
-  },
-  filterButton: {
-    position: 'absolute',
-    bottom: 100,
-    right: 24,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#FF3B30',
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
   },
 })
