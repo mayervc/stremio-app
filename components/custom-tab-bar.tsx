@@ -13,13 +13,13 @@ const CustomTabBar = ({
   descriptors,
   navigation,
 }: BottomTabBarProps) => {
-  const iconColor = useThemeColor({ light: '#000000', dark: '#FFFFFF' }, 'text')
+  const iconColor = useThemeColor({ light: '#FFFFFF', dark: '#FFFFFF' }, 'text')
   const tabBarBackgroundColor = useThemeColor(
     { light: '#F5F5F5', dark: '#1E1E1E' },
     'background'
   )
   const activeTabBackgroundColor = useThemeColor(
-    { light: '#007AFF', dark: '#FF3B30' },
+    { light: '#FF3B30', dark: '#FF3B30' },
     'tint'
   )
   const gradientColor1 = useThemeColor(
