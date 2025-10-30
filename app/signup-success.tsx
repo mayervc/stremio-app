@@ -54,15 +54,6 @@ export default function SignupSuccessScreen() {
   const isContinueDisabled = !isFormValid || updateProfileMutation.isPending
 
   const onSubmit = (data: UserInfoFormData) => {
-    console.log(
-      '🟡 [COMPONENT] onSubmit - Form data received:',
-      JSON.stringify(data, null, 2)
-    )
-    console.log(
-      '🟡 [COMPONENT] onSubmit - Selected genres:',
-      JSON.stringify(selectedGenres, null, 2)
-    )
-
     // Split name into firstName and lastName
     const nameParts = data.name.trim().split(' ')
     const firstName = nameParts[0] || ''

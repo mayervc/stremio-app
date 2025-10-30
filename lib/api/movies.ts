@@ -13,7 +13,7 @@ export const moviesApi = {
       const requestBody = {
         trending: true,
         page: 1,
-        limit: 10,
+        limit: 3,
       }
       const response = await apiClient.post('/api/movies/search', requestBody)
       return response.data
