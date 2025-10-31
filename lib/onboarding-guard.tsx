@@ -5,7 +5,8 @@ import { useEffect } from 'react'
 
 export function OnboardingGuard() {
   const { isAuthenticated } = useAuthStore()
-  const { hasSeenOnboarding, isCompleted, currentStep } = useOnboardingStore()
+  const { hasSeenOnboarding, isCompleted, currentStep, selectedGenres } =
+    useOnboardingStore()
   const segments = useSegments()
 
   useEffect(() => {
@@ -17,7 +18,9 @@ export function OnboardingGuard() {
       'hasSeenOnboarding:',
       hasSeenOnboarding,
       'isCompleted:',
-      isCompleted
+      isCompleted,
+      'selectedGenres:',
+      selectedGenres
     )
 
     // Don't interfere if we're on the splash screen
@@ -42,12 +45,60 @@ export function OnboardingGuard() {
     // Add a small delay to prevent immediate navigation conflicts
     const timeoutId = setTimeout(() => {
       console.log('OnboardingGuard - Executing navigation logic')
+
+      // Special case: If user is on signup-success but hasn't selected genres, redirect to genre selection
+      if (
+        isAuthenticated &&
+        segments[0] === 'signup-success' &&
+        selectedGenres.length === 0
+      ) {
+        console.log(
+          'OnboardingGuard - User on signup-success but no genres selected, redirecting to genre selection'
+        )
+        router.replace('/onboarding-pick-genres')
+        return
+      }
+
       // If user is authenticated, handle based on onboarding completion
       if (isAuthenticated) {
+        console.log(
+          'OnboardingGuard - User is authenticated, checking completion status'
+        )
         if (isCompleted) {
-          router.replace('/(tabs)')
+          console.log(
+            'OnboardingGuard - User completed onboarding, navigating to /(tabs)'
+          )
+          // Only navigate if we're not already on tabs
+          if (segments[0] !== '(tabs)') {
+            router.replace('/(tabs)')
+          } else {
+            console.log(
+              'OnboardingGuard - Already on tabs, skipping navigation'
+            )
+          }
         } else {
-          router.replace('/signup-success')
+          console.log(
+            'OnboardingGuard - User not completed onboarding, checking if needs genre selection'
+          )
+          // Check if user needs to select genres first
+          if (selectedGenres.length === 0) {
+            console.log(
+              'OnboardingGuard - No genres selected, navigating to genre selection'
+            )
+            router.replace('/onboarding-pick-genres')
+          } else {
+            console.log(
+              'OnboardingGuard - Genres selected, navigating to /signup-success'
+            )
+            // Only navigate if we're not already on signup-success
+            if (segments[0] !== 'signup-success') {
+              router.replace('/signup-success')
+            } else {
+              console.log(
+                'OnboardingGuard - Already on signup-success, skipping navigation'
+              )
+            }
+          }
         }
         return
       }
@@ -90,6 +141,7 @@ export function OnboardingGuard() {
     hasSeenOnboarding,
     isCompleted,
     currentStep,
+    selectedGenres,
     segments[0],
   ])
 

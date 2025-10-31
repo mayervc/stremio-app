@@ -7,7 +7,6 @@ import { getApiError } from '@/lib/utils/getApiError'
 import { useAuthStore } from '@/store/authStore'
 import { useOnboardingStore } from '@/store/onboardingStore'
 import { useMutation } from '@tanstack/react-query'
-import { router } from 'expo-router'
 import Toast from 'react-native-toast-message'
 
 export function useUpdateProfile() {
@@ -20,7 +19,6 @@ export function useUpdateProfile() {
     ): Promise<UpdateUserProfileResponse> => {
       // Update user profile API call
       const response = await userApi.updateProfile(data)
-
       return response
     },
     onSuccess: async response => {
@@ -29,9 +27,6 @@ export function useUpdateProfile() {
 
       // Mark onboarding as completed
       setCompleted(true)
-
-      // Navigate to main app
-      router.replace('/(tabs)')
 
       // Show success toast
       Toast.show({

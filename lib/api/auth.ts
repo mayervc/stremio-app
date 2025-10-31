@@ -22,7 +22,7 @@ export type SignupResponse = {
   user: User
 }
 
-export type ApiError = {
+export type AuthApiError = {
   errors: Array<{
     message: string
     field?: string

@@ -12,6 +12,7 @@ import {
 } from 'react-native'
 
 import { ThemedText } from '@/components/themed-text'
+import { useTrendingMovies } from '@/hooks/useMovies'
 
 interface TrendingMovie {
   id: number
@@ -30,53 +31,20 @@ const FeaturedMovies = () => {
   const scrollViewRef = useRef<ScrollView>(null)
   const fadeAnim = useRef(new Animated.Value(1)).current
 
-  // Mock data for trending movies
-  const trendingMovies: TrendingMovie[] = [
-    {
-      id: 1,
-      title: 'EVIL DEAD RISE',
-      subtitle: 'A NEW VISION FROM THE PRODUCERS OF THE ORIGINAL CLASSIC',
-      image: require('@/assets/images/movies/e7163aa26068d47aca0e991ff7f1b30649ad42fb.jpg'),
-      rating: 'A',
-      language: 'ENGLISH',
-      genre: 'HORROR',
-      formats: '2D.3D.4DX',
-      isTrending: true,
-    },
-    {
-      id: 2,
-      title: 'SPIDER-MAN: ACROSS THE SPIDER-VERSE',
-      subtitle: 'MILES MORALES RETURNS FOR AN EPIC ADVENTURE',
-      image: require('@/assets/images/movies/01839d17af1b80c392925771af1a50ea3cb7d140.jpg'),
-      rating: 'PG-13',
-      language: 'ENGLISH',
-      genre: 'ACTION',
-      formats: '2D.3D.IMAX',
-      isTrending: true,
-    },
-    {
-      id: 3,
-      title: 'GUARDIANS OF THE GALAXY VOL. 3',
-      subtitle: 'THE FINAL CHAPTER OF THE GUARDIANS',
-      image: require('@/assets/images/movies/900980cc012e8a892443f1ffc4b1045b1e124173.jpg'),
-      rating: 'PG-13',
-      language: 'ENGLISH',
-      genre: 'ACTION',
-      formats: '2D.3D.4DX',
-      isTrending: true,
-    },
-    {
-      id: 4,
-      title: 'THE FLASH',
-      subtitle: 'SPEED FORCE ADVENTURE BEGINS',
-      image: require('@/assets/images/movies/15120971aa7848def590eaeeda16dddc64d4fe45.jpg'),
-      rating: 'PG-13',
-      language: 'ENGLISH',
-      genre: 'ACTION',
-      formats: '2D.3D',
-      isTrending: true,
-    },
-  ]
+  const { data: trendingData } = useTrendingMovies()
+  const trendingMovies: TrendingMovie[] = (trendingData?.movies || []).map(
+    (m: any) => ({
+      id: m.id,
+      title: m.title,
+      subtitle: m.subtitle || '',
+      image: { uri: m.image_url },
+      rating: m.rating || '',
+      language: m.language || '',
+      genre: m.genre || '',
+      formats: m.formats || '',
+      isTrending: !!m.isTrending,
+    })
+  )
 
   const featuredMovie = trendingMovies[currentTrendingIndex]
 
@@ -91,6 +59,17 @@ const FeaturedMovies = () => {
 
     return () => clearInterval(interval)
   }, [trendingMovies.length])
+
+  // Keep ScrollView position in sync with currentTrendingIndex
+  useEffect(() => {
+    const screenWidth = Dimensions.get('window').width
+    const slideWidth = screenWidth - 40 // matches styles.trendingSlide width
+    scrollViewRef.current?.scrollTo({
+      x: currentTrendingIndex * slideWidth,
+      y: 0,
+      animated: true,
+    })
+  }, [currentTrendingIndex])
 
   // Animate when trending movie changes
   useEffect(() => {
@@ -111,7 +90,8 @@ const FeaturedMovies = () => {
   const handleTrendingScroll = (event: any) => {
     const contentOffsetX = event.nativeEvent.contentOffset.x
     const screenWidth = Dimensions.get('window').width
-    const index = Math.round(contentOffsetX / screenWidth)
+    const slideWidth = screenWidth - 40 // debe coincidir con styles.trendingSlide width
+    const index = Math.round(contentOffsetX / slideWidth)
     setCurrentTrendingIndex(index)
   }
 
@@ -120,7 +100,6 @@ const FeaturedMovies = () => {
       <ScrollView
         ref={scrollViewRef}
         horizontal
-        pagingEnabled
         showsHorizontalScrollIndicator={false}
         onMomentumScrollEnd={handleTrendingScroll}
         style={styles.trendingScrollView}
@@ -130,7 +109,11 @@ const FeaturedMovies = () => {
             <Animated.View
               style={[styles.featuredPoster, { opacity: fadeAnim }]}
             >
-              <Image source={movie.image} style={styles.featuredImage} />
+              <Image
+                source={movie.image}
+                style={styles.featuredImage}
+                contentFit='cover'
+              />
 
               {/* Watch Trailer Button */}
               <TouchableOpacity style={styles.trailerButton}>

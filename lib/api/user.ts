@@ -6,8 +6,9 @@ export type UpdateUserProfileData = {
   firstName?: string
   lastName?: string
   phoneNumber?: string
+  birthday?: string
   city?: string
-  genres?: number[]
+  genres?: string[]
 }
 
 export type UpdateUserProfileResponse = {
@@ -21,7 +22,6 @@ export const userApi = {
   ): Promise<UpdateUserProfileResponse> {
     try {
       const response = await apiClient.patch('/api/users/me', data)
-
       return response.data
     } catch (error: any) {
       const errorMessage = getApiError(error)
