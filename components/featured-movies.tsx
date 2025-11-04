@@ -12,6 +12,7 @@ import {
 } from 'react-native'
 
 import { ThemedText } from '@/components/themed-text'
+import { useTrendingMovies } from '@/hooks/useMovies'
 
 interface TrendingMovie {
   id: number
@@ -30,58 +31,32 @@ const FeaturedMovies = () => {
   const scrollViewRef = useRef<ScrollView>(null)
   const fadeAnim = useRef(new Animated.Value(1)).current
 
-  // Mock data for trending movies
-  const trendingMovies: TrendingMovie[] = [
-    {
-      id: 1,
-      title: 'EVIL DEAD RISE',
-      subtitle: 'A NEW VISION FROM THE PRODUCERS OF THE ORIGINAL CLASSIC',
-      image: require('@/assets/images/movies/e7163aa26068d47aca0e991ff7f1b30649ad42fb.jpg'),
-      rating: 'A',
-      language: 'ENGLISH',
-      genre: 'HORROR',
-      formats: '2D.3D.4DX',
-      isTrending: true,
-    },
-    {
-      id: 2,
-      title: 'SPIDER-MAN: ACROSS THE SPIDER-VERSE',
-      subtitle: 'MILES MORALES RETURNS FOR AN EPIC ADVENTURE',
-      image: require('@/assets/images/movies/01839d17af1b80c392925771af1a50ea3cb7d140.jpg'),
-      rating: 'PG-13',
-      language: 'ENGLISH',
-      genre: 'ACTION',
-      formats: '2D.3D.IMAX',
-      isTrending: true,
-    },
-    {
-      id: 3,
-      title: 'GUARDIANS OF THE GALAXY VOL. 3',
-      subtitle: 'THE FINAL CHAPTER OF THE GUARDIANS',
-      image: require('@/assets/images/movies/900980cc012e8a892443f1ffc4b1045b1e124173.jpg'),
-      rating: 'PG-13',
-      language: 'ENGLISH',
-      genre: 'ACTION',
-      formats: '2D.3D.4DX',
-      isTrending: true,
-    },
-    {
-      id: 4,
-      title: 'THE FLASH',
-      subtitle: 'SPEED FORCE ADVENTURE BEGINS',
-      image: require('@/assets/images/movies/15120971aa7848def590eaeeda16dddc64d4fe45.jpg'),
-      rating: 'PG-13',
-      language: 'ENGLISH',
-      genre: 'ACTION',
-      formats: '2D.3D',
-      isTrending: true,
-    },
-  ]
+  const { data: trendingData } = useTrendingMovies()
+  const trendingMovies: TrendingMovie[] = (trendingData?.movies || [])
+    .map((m: any) => ({
+      id: m.id,
+      title: m.title,
+      subtitle: m.subtitle || '',
+      image: m.image_url ? { uri: m.image_url } : undefined,
+      rating: m.rating || '',
+      language: m.language || '',
+      genre: m.genre || '',
+      formats: m.formats || '',
+      isTrending: !!m.isTrending,
+    }))
+    .filter(movie => movie.image) // Only show movies with valid images
 
-  const featuredMovie = trendingMovies[currentTrendingIndex]
+  // Ensure currentTrendingIndex is within bounds
+  const safeIndex =
+    trendingMovies.length > 0
+      ? Math.min(currentTrendingIndex, trendingMovies.length - 1)
+      : 0
+  const featuredMovie = trendingMovies[safeIndex]
 
   // Auto-scroll functionality
   useEffect(() => {
+    if (trendingMovies.length === 0) return
+
     const interval = setInterval(() => {
       setCurrentTrendingIndex(prevIndex => {
         const nextIndex = (prevIndex + 1) % trendingMovies.length
@@ -91,6 +66,19 @@ const FeaturedMovies = () => {
 
     return () => clearInterval(interval)
   }, [trendingMovies.length])
+
+  // Keep ScrollView position in sync with currentTrendingIndex
+  useEffect(() => {
+    if (trendingMovies.length === 0) return
+
+    const screenWidth = Dimensions.get('window').width
+    const slideWidth = screenWidth - 40 // matches styles.trendingSlide width
+    scrollViewRef.current?.scrollTo({
+      x: safeIndex * slideWidth,
+      y: 0,
+      animated: true,
+    })
+  }, [currentTrendingIndex, trendingMovies.length, safeIndex])
 
   // Animate when trending movie changes
   useEffect(() => {
@@ -109,10 +97,14 @@ const FeaturedMovies = () => {
   }, [currentTrendingIndex, fadeAnim])
 
   const handleTrendingScroll = (event: any) => {
+    if (trendingMovies.length === 0) return
+
     const contentOffsetX = event.nativeEvent.contentOffset.x
     const screenWidth = Dimensions.get('window').width
-    const index = Math.round(contentOffsetX / screenWidth)
-    setCurrentTrendingIndex(index)
+    const slideWidth = screenWidth - 40 // debe coincidir con styles.trendingSlide width
+    const index = Math.round(contentOffsetX / slideWidth)
+    const safeIndex = Math.max(0, Math.min(index, trendingMovies.length - 1))
+    setCurrentTrendingIndex(safeIndex)
   }
 
   return (
@@ -120,7 +112,6 @@ const FeaturedMovies = () => {
       <ScrollView
         ref={scrollViewRef}
         horizontal
-        pagingEnabled
         showsHorizontalScrollIndicator={false}
         onMomentumScrollEnd={handleTrendingScroll}
         style={styles.trendingScrollView}
@@ -130,7 +121,11 @@ const FeaturedMovies = () => {
             <Animated.View
               style={[styles.featuredPoster, { opacity: fadeAnim }]}
             >
-              <Image source={movie.image} style={styles.featuredImage} />
+              <Image
+                source={movie.image}
+                style={styles.featuredImage}
+                contentFit='cover'
+              />
 
               {/* Watch Trailer Button */}
               <TouchableOpacity style={styles.trailerButton}>
@@ -145,40 +140,42 @@ const FeaturedMovies = () => {
       </ScrollView>
 
       {/* Movie Details Overlay */}
-      <View style={styles.detailsOverlay}>
-        <View style={styles.detailsLeft}>
-          <View style={styles.trendingBadgeContainer}>
-            <ThemedText style={styles.trendingText}>TRENDING</ThemedText>
-          </View>
-          <ThemedText style={styles.detailsTitle}>
-            {featuredMovie.title}
-          </ThemedText>
-          <ThemedText style={styles.detailsInfo}>
-            <ThemedText style={styles.rating}>
-              {featuredMovie.rating}
+      {featuredMovie && (
+        <View style={styles.detailsOverlay}>
+          <View style={styles.detailsLeft}>
+            <View style={styles.trendingBadgeContainer}>
+              <ThemedText style={styles.trendingText}>TRENDING</ThemedText>
+            </View>
+            <ThemedText style={styles.detailsTitle}>
+              {featuredMovie.title}
             </ThemedText>
-            <ThemedText> . {featuredMovie.language}</ThemedText>
-          </ThemedText>
-          <ThemedText style={styles.genreText}>
-            {featuredMovie.genre}
-          </ThemedText>
+            <ThemedText style={styles.detailsInfo}>
+              <ThemedText style={styles.rating}>
+                {featuredMovie.rating}
+              </ThemedText>
+              <ThemedText> . {featuredMovie.language}</ThemedText>
+            </ThemedText>
+            <ThemedText style={styles.genreText}>
+              {featuredMovie.genre}
+            </ThemedText>
+          </View>
+          <View style={styles.detailsRight}>
+            <TouchableOpacity style={styles.bookButton}>
+              <LinearGradient
+                colors={['#323232', '#767676', '#363535']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.bookButtonGradient}
+              >
+                <ThemedText style={styles.bookButtonText}>Book</ThemedText>
+              </LinearGradient>
+            </TouchableOpacity>
+            <ThemedText style={styles.formatsText}>
+              {featuredMovie.formats}
+            </ThemedText>
+          </View>
         </View>
-        <View style={styles.detailsRight}>
-          <TouchableOpacity style={styles.bookButton}>
-            <LinearGradient
-              colors={['#323232', '#767676', '#363535']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.bookButtonGradient}
-            >
-              <ThemedText style={styles.bookButtonText}>Book</ThemedText>
-            </LinearGradient>
-          </TouchableOpacity>
-          <ThemedText style={styles.formatsText}>
-            {featuredMovie.formats}
-          </ThemedText>
-        </View>
-      </View>
+      )}
     </View>
   )
 }

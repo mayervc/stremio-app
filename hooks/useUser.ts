@@ -7,20 +7,22 @@ import { getApiError } from '@/lib/utils/getApiError'
 import { useAuthStore } from '@/store/authStore'
 import { useOnboardingStore } from '@/store/onboardingStore'
 import { useMutation } from '@tanstack/react-query'
-import { router } from 'expo-router'
 import Toast from 'react-native-toast-message'
 
 export function useUpdateProfile() {
-  const { setUser } = useAuthStore()
+  const { user, setUser } = useAuthStore()
   const { setCompleted } = useOnboardingStore()
 
   return useMutation({
     mutationFn: async (
       data: UpdateUserProfileData
     ): Promise<UpdateUserProfileResponse> => {
+      // Check if user is authenticated and has an ID
+      if (!user?.id) {
+        throw new Error('User not authenticated')
+      }
       // Update user profile API call
-      const response = await userApi.updateProfile(data)
-
+      const response = await userApi.updateProfile(user.id, data)
       return response
     },
     onSuccess: async response => {
@@ -29,9 +31,6 @@ export function useUpdateProfile() {
 
       // Mark onboarding as completed
       setCompleted(true)
-
-      // Navigate to main app
-      router.replace('/(tabs)')
 
       // Show success toast
       Toast.show({

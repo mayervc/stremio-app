@@ -3,6 +3,7 @@ import { ThemedText } from '@/components/themed-text'
 import { Colors } from '@/constants/colors'
 import { commonStyles } from '@/constants/common-styles'
 import { useUpdateProfile } from '@/hooks/useUser'
+import { genres } from '@/lib/data/movie-genres'
 import { useOnboardingStore } from '@/store/onboardingStore'
 import { zodResolver } from '@hookform/resolvers/zod'
 import React from 'react'
@@ -18,6 +19,14 @@ const userInfoSchema = z.object({
 })
 
 type UserInfoFormData = z.infer<typeof userInfoSchema>
+
+// Function to convert genre IDs to names
+const getGenreNames = (genreIds: number[]): string[] => {
+  return genreIds.map(id => {
+    const genre = genres.find(g => g.id === id)
+    return genre ? genre.name : 'Unknown'
+  })
+}
 
 export default function SignupSuccessScreen() {
   const { selectedGenres } = useOnboardingStore()
@@ -50,14 +59,17 @@ export default function SignupSuccessScreen() {
     const firstName = nameParts[0] || ''
     const lastName = nameParts.slice(1).join(' ') || ''
 
-    // Update user profile with form data and selected genres
-    updateProfileMutation.mutate({
+    const updateData = {
       firstName,
-      lastName,
+      lastName: lastName || 'User', // Send default value instead of undefined
       phoneNumber: data.phoneNumber,
       city: data.city,
-      genres: selectedGenres,
-    })
+      genres:
+        selectedGenres.length > 0 ? getGenreNames(selectedGenres) : ['Action'], // Convert IDs to names, default to "Action" if none selected
+    }
+
+    // Update user profile with form data and selected genres
+    updateProfileMutation.mutate(updateData)
   }
 
   return (

@@ -6,38 +6,28 @@ import FeaturedMovies from '@/components/featured-movies'
 import HeaderBar from '@/components/header-bar'
 import { ThemedSafeAreaView } from '@/components/themed-safe-area-view'
 import { ThemedText } from '@/components/themed-text'
+import { useRecommendedMovies } from '@/hooks/useMovies'
 import { useAuthStore } from '@/store/authStore'
 
 export default function HomeScreen() {
   const { user } = useAuthStore()
-
-  const recommendedMovies = [
-    {
-      id: 2,
-      title: 'SALAAR (PART 1)',
-      image: require('@/assets/images/movies/01839d17af1b80c392925771af1a50ea3cb7d140.jpg'),
-    },
-    {
-      id: 3,
-      title: 'FLASH (2023)',
-      image: require('@/assets/images/movies/15120971aa7848def590eaeeda16dddc64d4fe45.jpg'),
-    },
-    {
-      id: 4,
-      title: 'AQUAMAN',
-      image: require('@/assets/images/movies/762390e133aef26ddd029fc8c7cad1e3bbfccd99.jpg'),
-    },
-    {
-      id: 5,
-      title: 'GUARDIANS',
-      image: require('@/assets/images/movies/900980cc012e8a892443f1ffc4b1045b1e124173.jpg'),
-    },
-  ]
+  const { data: recommendedData } = useRecommendedMovies()
+  const recommendedMovies = (recommendedData?.movies || [])
+    .map((m: any) => ({
+      id: m.id,
+      title: m.title,
+      image: m.image_url ? { uri: m.image_url } : undefined,
+    }))
+    .filter(movie => movie.image) // Only show movies with valid images
 
   const renderMovieCard = ({ item }: { item: any }) => (
     <View style={styles.movieCard}>
       <View style={styles.posterContainer}>
-        <Image source={item.image} style={styles.moviePoster} />
+        <Image
+          source={item.image}
+          style={styles.moviePoster}
+          contentFit='cover'
+        />
         <View style={styles.playOverlay}>
           <Ionicons name='play-outline' size={24} color='#FFFFFF' />
         </View>
@@ -48,14 +38,9 @@ export default function HomeScreen() {
 
   return (
     <ThemedSafeAreaView style={styles.container}>
-      {/* Header */}
       <HeaderBar />
-
       <View style={styles.content}>
-        {/* Featured Movie Section */}
         <FeaturedMovies />
-
-        {/* Recommended Movies Section */}
         <View style={styles.recommendedSection}>
           <View style={styles.sectionHeader}>
             <ThemedText style={styles.sectionTitle}>
@@ -66,7 +51,6 @@ export default function HomeScreen() {
               <Ionicons name='chevron-forward' size={16} color='#FF3B30' />
             </TouchableOpacity>
           </View>
-
           <FlatList
             data={recommendedMovies}
             renderItem={renderMovieCard}
