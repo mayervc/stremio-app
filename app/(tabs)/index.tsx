@@ -12,11 +12,13 @@ import { useAuthStore } from '@/store/authStore'
 export default function HomeScreen() {
   const { user } = useAuthStore()
   const { data: recommendedData } = useRecommendedMovies()
-  const recommendedMovies = (recommendedData?.movies || []).map((m: any) => ({
-    id: m.id,
-    title: m.title,
-    image: { uri: m.image_url },
-  }))
+  const recommendedMovies = (recommendedData?.movies || [])
+    .map((m: any) => ({
+      id: m.id,
+      title: m.title,
+      image: m.image_url ? { uri: m.image_url } : undefined,
+    }))
+    .filter(movie => movie.image) // Only show movies with valid images
 
   const renderMovieCard = ({ item }: { item: any }) => (
     <View style={styles.movieCard}>

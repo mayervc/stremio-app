@@ -10,15 +10,19 @@ import { useMutation } from '@tanstack/react-query'
 import Toast from 'react-native-toast-message'
 
 export function useUpdateProfile() {
-  const { setUser } = useAuthStore()
+  const { user, setUser } = useAuthStore()
   const { setCompleted } = useOnboardingStore()
 
   return useMutation({
     mutationFn: async (
       data: UpdateUserProfileData
     ): Promise<UpdateUserProfileResponse> => {
+      // Check if user is authenticated and has an ID
+      if (!user?.id) {
+        throw new Error('User not authenticated')
+      }
       // Update user profile API call
-      const response = await userApi.updateProfile(data)
+      const response = await userApi.updateProfile(user.id, data)
       return response
     },
     onSuccess: async response => {

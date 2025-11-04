@@ -59,22 +59,6 @@ export default function SignupSuccessScreen() {
     const firstName = nameParts[0] || ''
     const lastName = nameParts.slice(1).join(' ') || ''
 
-    // Validate required fields
-    if (!firstName) {
-      console.log(
-        '🔴 [COMPONENT] onSubmit - Validation error: firstName is required'
-      )
-      return
-    }
-
-    // Temporarily disable genre validation
-    // if (selectedGenres.length === 0) {
-    //   console.log(
-    //     '🔴 [COMPONENT] onSubmit - Validation error: At least one genre is required'
-    //   )
-    //   return
-    // }
-
     const updateData = {
       firstName,
       lastName: lastName || 'User', // Send default value instead of undefined
@@ -83,11 +67,6 @@ export default function SignupSuccessScreen() {
       genres:
         selectedGenres.length > 0 ? getGenreNames(selectedGenres) : ['Action'], // Convert IDs to names, default to "Action" if none selected
     }
-
-    console.log(
-      '🟡 [COMPONENT] onSubmit - Final update data:',
-      JSON.stringify(updateData, null, 2)
-    )
 
     // Update user profile with form data and selected genres
     updateProfileMutation.mutate(updateData)

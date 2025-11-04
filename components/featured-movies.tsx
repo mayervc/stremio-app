@@ -32,24 +32,31 @@ const FeaturedMovies = () => {
   const fadeAnim = useRef(new Animated.Value(1)).current
 
   const { data: trendingData } = useTrendingMovies()
-  const trendingMovies: TrendingMovie[] = (trendingData?.movies || []).map(
-    (m: any) => ({
+  const trendingMovies: TrendingMovie[] = (trendingData?.movies || [])
+    .map((m: any) => ({
       id: m.id,
       title: m.title,
       subtitle: m.subtitle || '',
-      image: { uri: m.image_url },
+      image: m.image_url ? { uri: m.image_url } : undefined,
       rating: m.rating || '',
       language: m.language || '',
       genre: m.genre || '',
       formats: m.formats || '',
       isTrending: !!m.isTrending,
-    })
-  )
+    }))
+    .filter(movie => movie.image) // Only show movies with valid images
 
-  const featuredMovie = trendingMovies[currentTrendingIndex]
+  // Ensure currentTrendingIndex is within bounds
+  const safeIndex =
+    trendingMovies.length > 0
+      ? Math.min(currentTrendingIndex, trendingMovies.length - 1)
+      : 0
+  const featuredMovie = trendingMovies[safeIndex]
 
   // Auto-scroll functionality
   useEffect(() => {
+    if (trendingMovies.length === 0) return
+
     const interval = setInterval(() => {
       setCurrentTrendingIndex(prevIndex => {
         const nextIndex = (prevIndex + 1) % trendingMovies.length
@@ -62,14 +69,16 @@ const FeaturedMovies = () => {
 
   // Keep ScrollView position in sync with currentTrendingIndex
   useEffect(() => {
+    if (trendingMovies.length === 0) return
+
     const screenWidth = Dimensions.get('window').width
     const slideWidth = screenWidth - 40 // matches styles.trendingSlide width
     scrollViewRef.current?.scrollTo({
-      x: currentTrendingIndex * slideWidth,
+      x: safeIndex * slideWidth,
       y: 0,
       animated: true,
     })
-  }, [currentTrendingIndex])
+  }, [currentTrendingIndex, trendingMovies.length, safeIndex])
 
   // Animate when trending movie changes
   useEffect(() => {
@@ -88,11 +97,14 @@ const FeaturedMovies = () => {
   }, [currentTrendingIndex, fadeAnim])
 
   const handleTrendingScroll = (event: any) => {
+    if (trendingMovies.length === 0) return
+
     const contentOffsetX = event.nativeEvent.contentOffset.x
     const screenWidth = Dimensions.get('window').width
     const slideWidth = screenWidth - 40 // debe coincidir con styles.trendingSlide width
     const index = Math.round(contentOffsetX / slideWidth)
-    setCurrentTrendingIndex(index)
+    const safeIndex = Math.max(0, Math.min(index, trendingMovies.length - 1))
+    setCurrentTrendingIndex(safeIndex)
   }
 
   return (
@@ -128,40 +140,42 @@ const FeaturedMovies = () => {
       </ScrollView>
 
       {/* Movie Details Overlay */}
-      <View style={styles.detailsOverlay}>
-        <View style={styles.detailsLeft}>
-          <View style={styles.trendingBadgeContainer}>
-            <ThemedText style={styles.trendingText}>TRENDING</ThemedText>
-          </View>
-          <ThemedText style={styles.detailsTitle}>
-            {featuredMovie.title}
-          </ThemedText>
-          <ThemedText style={styles.detailsInfo}>
-            <ThemedText style={styles.rating}>
-              {featuredMovie.rating}
+      {featuredMovie && (
+        <View style={styles.detailsOverlay}>
+          <View style={styles.detailsLeft}>
+            <View style={styles.trendingBadgeContainer}>
+              <ThemedText style={styles.trendingText}>TRENDING</ThemedText>
+            </View>
+            <ThemedText style={styles.detailsTitle}>
+              {featuredMovie.title}
             </ThemedText>
-            <ThemedText> . {featuredMovie.language}</ThemedText>
-          </ThemedText>
-          <ThemedText style={styles.genreText}>
-            {featuredMovie.genre}
-          </ThemedText>
+            <ThemedText style={styles.detailsInfo}>
+              <ThemedText style={styles.rating}>
+                {featuredMovie.rating}
+              </ThemedText>
+              <ThemedText> . {featuredMovie.language}</ThemedText>
+            </ThemedText>
+            <ThemedText style={styles.genreText}>
+              {featuredMovie.genre}
+            </ThemedText>
+          </View>
+          <View style={styles.detailsRight}>
+            <TouchableOpacity style={styles.bookButton}>
+              <LinearGradient
+                colors={['#323232', '#767676', '#363535']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.bookButtonGradient}
+              >
+                <ThemedText style={styles.bookButtonText}>Book</ThemedText>
+              </LinearGradient>
+            </TouchableOpacity>
+            <ThemedText style={styles.formatsText}>
+              {featuredMovie.formats}
+            </ThemedText>
+          </View>
         </View>
-        <View style={styles.detailsRight}>
-          <TouchableOpacity style={styles.bookButton}>
-            <LinearGradient
-              colors={['#323232', '#767676', '#363535']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.bookButtonGradient}
-            >
-              <ThemedText style={styles.bookButtonText}>Book</ThemedText>
-            </LinearGradient>
-          </TouchableOpacity>
-          <ThemedText style={styles.formatsText}>
-            {featuredMovie.formats}
-          </ThemedText>
-        </View>
-      </View>
+      )}
     </View>
   )
 }
