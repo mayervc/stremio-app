@@ -48,4 +48,23 @@ export const moviesApi = {
       throw new Error(errorMessage)
     }
   },
+
+  async searchMovies(
+    query: string,
+    page: number = 1,
+    limit: number = 20
+  ): Promise<RecommendedMoviesResponse> {
+    try {
+      const requestBody = {
+        search: query,
+        page,
+        limit,
+      }
+      const response = await apiClient.post('/api/movies/search', requestBody)
+      return response.data
+    } catch (error: any) {
+      const errorMessage = getApiError(error)
+      throw new Error(errorMessage)
+    }
+  },
 }

@@ -7,6 +7,7 @@ export const movieQueryKeys = {
   trending: () => [...movieQueryKeys.all, 'trending'] as const,
   recommended: () => [...movieQueryKeys.all, 'recommended'] as const,
   detail: (id: number) => [...movieQueryKeys.all, 'detail', id] as const,
+  search: (query: string) => [...movieQueryKeys.all, 'search', query] as const,
 }
 
 // Hook to fetch trending movies
@@ -37,5 +38,16 @@ export const useMovie = (id: number) => {
     enabled: !!id, // Only run query if id is provided
     staleTime: 1000 * 60 * 30, // 30 minutes - movie details rarely change
     gcTime: 1000 * 60 * 60, // 1 hour
+  })
+}
+
+// Hook to search movies
+export const useSearchMovies = (query: string, enabled: boolean = true) => {
+  return useQuery({
+    queryKey: movieQueryKeys.search(query),
+    queryFn: () => moviesApi.searchMovies(query),
+    enabled: enabled && query.length > 0, // Only search if query is provided
+    staleTime: 1000 * 60 * 5, // 5 minutes - search results can change
+    gcTime: 1000 * 60 * 10, // 10 minutes
   })
 }

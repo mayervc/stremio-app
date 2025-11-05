@@ -29,6 +29,21 @@ export function OnboardingGuard() {
       return
     }
 
+    // Don't interfere if user is authenticated and on allowed routes (search, modal, etc)
+    if (
+      isAuthenticated &&
+      isCompleted &&
+      (segments[0] === 'search' ||
+        segments[0] === 'modal' ||
+        segments[0] === 'signup-success' ||
+        segments[0] === '(tabs)')
+    ) {
+      console.log(
+        `OnboardingGuard - User authenticated and on allowed route: ${segments[0]}, skipping`
+      )
+      return
+    }
+
     // Don't interfere if user has completed onboarding and is on auth screens
     if (
       hasSeenOnboarding &&
@@ -68,12 +83,19 @@ export function OnboardingGuard() {
           console.log(
             'OnboardingGuard - User completed onboarding, navigating to /(tabs)'
           )
-          // Only navigate if we're not already on tabs
-          if (segments[0] !== '(tabs)') {
+          // Allowed routes that should not redirect to tabs
+          const allowedRoutes = ['(tabs)', 'search', 'signup-success', 'modal']
+          const currentRoute = segments[0]
+
+          // Only navigate if we're not already on an allowed route
+          if (!allowedRoutes.includes(currentRoute)) {
+            console.log(
+              `OnboardingGuard - User authenticated, redirecting to home from ${currentRoute}`
+            )
             router.replace('/(tabs)')
           } else {
             console.log(
-              'OnboardingGuard - Already on tabs, skipping navigation'
+              `OnboardingGuard - Already on allowed route: ${currentRoute}, skipping navigation`
             )
           }
         } else {

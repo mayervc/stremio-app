@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
+import { router } from 'expo-router'
 import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native'
 
 import FeaturedMovies from '@/components/featured-movies'
@@ -11,6 +12,10 @@ import { useAuthStore } from '@/store/authStore'
 
 export default function HomeScreen() {
   const { user } = useAuthStore()
+
+  const handleSearchPress = () => {
+    router.push('/search' as any)
+  }
   const { data: recommendedData } = useRecommendedMovies()
   const recommendedMovies = (recommendedData?.movies || [])
     .map((m: any) => ({
@@ -38,7 +43,7 @@ export default function HomeScreen() {
 
   return (
     <ThemedSafeAreaView style={styles.container}>
-      <HeaderBar />
+      <HeaderBar onSearchPress={handleSearchPress} />
       <View style={styles.content}>
         <FeaturedMovies />
         <View style={styles.recommendedSection}>
