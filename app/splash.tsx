@@ -1,3 +1,4 @@
+import { useAuthStore } from '@/store/authStore'
 import { useOnboardingStore } from '@/store/onboardingStore'
 import Constants from 'expo-constants'
 import { router } from 'expo-router'
@@ -5,6 +6,7 @@ import React, { useEffect, useRef } from 'react'
 import { Animated, StyleSheet, Text, View } from 'react-native'
 
 export default function SplashScreenComponent() {
+  const { isAuthenticated } = useAuthStore()
   const { hasSeenOnboarding, isCompleted } = useOnboardingStore()
   const fadeAnim = useRef(new Animated.Value(0)).current
   const morphAnim = useRef(new Animated.Value(0)).current
@@ -71,22 +73,30 @@ export default function SplashScreenComponent() {
         ]).start()
 
         // Wait for the full duration
-        await new Promise(resolve => setTimeout(resolve, 4000))
+        await new Promise(resolve => setTimeout(resolve, 2000))
 
-        // Navigate based on onboarding status
-        if (hasSeenOnboarding && isCompleted) {
+        // Navigate based on authentication and onboarding status
+        if (isAuthenticated) {
+          // User is authenticated, go directly to home
+          console.log('Splash screen - User authenticated, navigating to home')
+          router.replace('/(tabs)')
+        } else if (hasSeenOnboarding && isCompleted) {
+          // User completed onboarding but not authenticated, go to signup
           console.log(
             'Splash screen - Onboarding completed, navigating to signup'
           )
           router.replace('/signup')
         } else {
+          // User hasn't completed onboarding, go to onboarding
           console.log('Splash screen - Navigating to onboarding-start')
           router.replace('/onboarding-start')
         }
       } catch (e) {
         console.warn(e)
-        // Even if there's an error, navigate based on onboarding status
-        if (hasSeenOnboarding && isCompleted) {
+        // Even if there's an error, navigate based on auth and onboarding status
+        if (isAuthenticated) {
+          router.replace('/(tabs)')
+        } else if (hasSeenOnboarding && isCompleted) {
           router.replace('/signup')
         } else {
           router.replace('/onboarding-start')
@@ -96,7 +106,7 @@ export default function SplashScreenComponent() {
 
     // Start immediately
     prepare()
-  }, [])
+  }, [isAuthenticated, hasSeenOnboarding, isCompleted])
 
   return (
     <View style={styles.container}>

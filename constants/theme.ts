@@ -23,6 +23,7 @@ export const Colors = {
     // Border colors
     borderPrimary: '#D1D1D6',
     borderSecondary: '#007AFF',
+    borderList: '#D1D1D6',
 
     // Button colors
     buttonPrimary: '#FF3B30',
@@ -32,6 +33,9 @@ export const Colors = {
     placeholder: '#6E6E73',
     iconPrimary: '#6E6E73',
     iconSocial: '#1C1C1E',
+    backgroundOverlay: '#1E1E1E',
+    backgroundPlaceholder: '#F2F2F7',
+    textWhite: '#FFFFFF',
 
     // Legacy (for compatibility)
     text: '#1C1C1E',
@@ -55,6 +59,7 @@ export const Colors = {
     // Border colors
     borderPrimary: '#3A3A3C',
     borderSecondary: '#007AFF',
+    borderList: '#3A3A3C',
 
     // Button colors
     buttonPrimary: '#FF3B30',
@@ -64,6 +69,9 @@ export const Colors = {
     placeholder: '#8E8E93',
     iconPrimary: '#8E8E93',
     iconSocial: '#FFFFFF',
+    backgroundOverlay: '#1E1E1E',
+    backgroundPlaceholder: '#2C2C2E',
+    textWhite: '#FFFFFF',
 
     // Legacy (for compatibility)
     text: '#FFFFFF',

@@ -42,6 +42,13 @@ export default function TabLayout() {
           },
         }}
       />
+      <Tabs.Screen
+        name='search'
+        options={{
+          href: null, // Hide from tab bar
+          headerShown: false,
+        }}
+      />
     </Tabs>
   )
 }
