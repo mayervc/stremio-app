@@ -47,7 +47,7 @@ export const useSearchMovies = (query: string, enabled: boolean = true) => {
     queryKey: movieQueryKeys.search(query),
     queryFn: () => moviesApi.searchMovies(query),
     enabled: enabled && query.length > 0, // Only search if query is provided
-    staleTime: 1000 * 60 * 5, // 5 minutes - search results can change
-    gcTime: 1000 * 60 * 10, // 10 minutes
+    staleTime: 0, // Always fetch fresh results for search
+    gcTime: 0, // Don't cache search results
   })
 }

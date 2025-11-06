@@ -84,11 +84,24 @@ const CustomTabBar = ({
     return <Icon width={width} height={height} color={color} />
   }
 
+  // Check if current route is search - if so, hide the entire tab bar
+  const currentRoute = state.routes[state.index]
+  const hiddenRoutes = ['search']
+  if (currentRoute && hiddenRoutes.includes(currentRoute.name)) {
+    return null
+  }
+
   return (
     <View style={[styles.tabBar, { backgroundColor: tabBarBackgroundColor }]}>
       {state.routes.map((route, index) => {
         const { options } = descriptors[route.key]
         const isFocused = state.index === index
+
+        // Skip routes that should not be displayed in tab bar (like search)
+        // Check if route name is in the list of hidden routes
+        if (hiddenRoutes.includes(route.name)) {
+          return null
+        }
 
         const onPress = () => {
           const event = navigation.emit({
@@ -103,6 +116,11 @@ const CustomTabBar = ({
         }
 
         const tab = tabConfig[index]
+
+        // Safety check: if tab doesn't exist, don't render
+        if (!tab) {
+          return null
+        }
 
         return (
           <Pressable

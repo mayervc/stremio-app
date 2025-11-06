@@ -55,8 +55,14 @@ export const moviesApi = {
     limit: number = 20
   ): Promise<RecommendedMoviesResponse> {
     try {
+      // Trim and validate query
+      const trimmedQuery = query.trim()
+      if (!trimmedQuery) {
+        throw new Error('Search query cannot be empty')
+      }
+
       const requestBody = {
-        search: query,
+        search: trimmedQuery,
         page,
         limit,
       }
