@@ -62,7 +62,7 @@ export const moviesApi = {
       }
 
       const requestBody = {
-        search: trimmedQuery,
+        searchText: trimmedQuery,
         page,
         limit,
       }
