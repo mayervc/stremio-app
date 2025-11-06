@@ -3,11 +3,11 @@ import { Image } from 'expo-image'
 import { router } from 'expo-router'
 import { useEffect, useState } from 'react'
 import {
-  FlatList,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  View,
+    FlatList,
+    StyleSheet,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from 'react-native'
 import Toast from 'react-native-toast-message'
 import { useDebounce } from 'use-debounce'
@@ -19,8 +19,8 @@ import { useThemeColor } from '@/hooks/use-theme-color'
 import { useSearchMovies } from '@/hooks/useMovies'
 import { Movie } from '@/lib/api/types'
 import {
-  RecentSearch,
-  useRecentSearchesStore,
+    RecentSearch,
+    useRecentSearchesStore,
 } from '@/store/recentSearchesStore'
 
 export default function SearchScreen() {
@@ -67,17 +67,11 @@ export default function SearchScreen() {
     'borderList'
   )
   const backgroundOverlayColor = useThemeColor(
-    {
-      light: Colors.light.backgroundOverlay,
-      dark: Colors.dark.backgroundOverlay,
-    },
+    { light: Colors.light.backgroundOverlay, dark: Colors.dark.backgroundOverlay },
     'backgroundOverlay'
   )
   const backgroundPlaceholderColor = useThemeColor(
-    {
-      light: Colors.light.backgroundPlaceholder,
-      dark: Colors.dark.backgroundPlaceholder,
-    },
+    { light: Colors.light.backgroundPlaceholder, dark: Colors.dark.backgroundPlaceholder },
     'backgroundPlaceholder'
   )
   const textWhiteColor = useThemeColor(
@@ -175,7 +169,10 @@ export default function SearchScreen() {
 
   const renderSearchResultItem = ({ item }: { item: Movie }) => (
     <TouchableOpacity
-      style={[styles.searchResultItem, { borderBottomColor: borderListColor }]}
+      style={[
+        styles.searchResultItem,
+        { borderBottomColor: borderListColor },
+      ]}
       onPress={() => handleMoviePress(item)}
     >
       <View style={styles.searchResultContent}>
@@ -270,6 +267,7 @@ export default function SearchScreen() {
             <ThemedText>Searching...</ThemedText>
           </View>
         )}
+
 
         {showSearchResults && (
           <FlatList
