@@ -101,6 +101,10 @@ export default function SearchScreen() {
     { light: Colors.light.textWhite, dark: Colors.dark.textWhite },
     'textWhite'
   )
+  const movieTitleColor = useThemeColor(
+    { light: Colors.light.textPrimary, dark: Colors.dark.textWhite },
+    'text'
+  )
 
   const handleBackPress = () => {
     router.back()
@@ -182,7 +186,7 @@ export default function SearchScreen() {
         </View>
       </View>
       <ThemedText
-        style={[styles.recentSearchCardTitle, { color: textWhiteColor }]}
+        style={[styles.recentSearchCardTitle, { color: movieTitleColor }]}
         numberOfLines={2}
       >
         {item.title}
@@ -223,7 +227,7 @@ export default function SearchScreen() {
         </View>
       </View>
       <ThemedText
-        style={[styles.searchResultCardTitle, { color: textWhiteColor }]}
+        style={[styles.searchResultCardTitle, { color: movieTitleColor }]}
         numberOfLines={2}
       >
         {item.title}
