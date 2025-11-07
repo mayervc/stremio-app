@@ -3,11 +3,11 @@ import { Image } from 'expo-image'
 import { router } from 'expo-router'
 import { useEffect, useState } from 'react'
 import {
-    FlatList,
-    StyleSheet,
-    TextInput,
-    TouchableOpacity,
-    View,
+  FlatList,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native'
 import Toast from 'react-native-toast-message'
 import { useDebounce } from 'use-debounce'
@@ -19,8 +19,8 @@ import { useThemeColor } from '@/hooks/use-theme-color'
 import { useSearchMovies } from '@/hooks/useMovies'
 import { Movie } from '@/lib/api/types'
 import {
-    RecentSearch,
-    useRecentSearchesStore,
+  RecentSearch,
+  useRecentSearchesStore,
 } from '@/store/recentSearchesStore'
 
 export default function SearchScreen() {
@@ -38,6 +38,23 @@ export default function SearchScreen() {
     isLoading,
     error,
   } = useSearchMovies(debouncedQuery, debouncedQuery.length > 0)
+
+  // Map search results to include image_url and filter properly
+  const searchResults = (searchData?.movies || [])
+    .map((m: any) => {
+      const imageUrl = m.image_url || m.image
+      return {
+        id: m.id,
+        title: m.title,
+        subtitle: m.subtitle,
+        image: imageUrl && imageUrl.trim() ? imageUrl : undefined,
+        rating: m.rating,
+        language: m.language,
+        genres: m.genres,
+        formats: m.formats,
+      }
+    })
+    .filter((movie: any) => movie.image) // Only show movies with valid images
 
   const iconColor = useThemeColor(
     { light: Colors.light.iconPrimary, dark: Colors.dark.iconPrimary },
@@ -67,16 +84,26 @@ export default function SearchScreen() {
     'borderList'
   )
   const backgroundOverlayColor = useThemeColor(
-    { light: Colors.light.backgroundOverlay, dark: Colors.dark.backgroundOverlay },
+    {
+      light: Colors.light.backgroundOverlay,
+      dark: Colors.dark.backgroundOverlay,
+    },
     'backgroundOverlay'
   )
   const backgroundPlaceholderColor = useThemeColor(
-    { light: Colors.light.backgroundPlaceholder, dark: Colors.dark.backgroundPlaceholder },
+    {
+      light: Colors.light.backgroundPlaceholder,
+      dark: Colors.dark.backgroundPlaceholder,
+    },
     'backgroundPlaceholder'
   )
   const textWhiteColor = useThemeColor(
     { light: Colors.light.textWhite, dark: Colors.dark.textWhite },
     'textWhite'
+  )
+  const movieTitleColor = useThemeColor(
+    { light: Colors.light.textPrimary, dark: Colors.dark.textWhite },
+    'text'
   )
 
   const handleBackPress = () => {
@@ -113,7 +140,7 @@ export default function SearchScreen() {
   const shouldShowRecentSearches =
     searchQuery.length === 0 && recentSearches.length > 0
   const showSearchResults = debouncedQuery.length > 0 && !isLoading && !error
-  const showEmptyState = showSearchResults && searchData?.movies.length === 0
+  const showEmptyState = showSearchResults && searchResults.length === 0
 
   // Show error toast when there's an error
   useEffect(() => {
@@ -159,7 +186,7 @@ export default function SearchScreen() {
         </View>
       </View>
       <ThemedText
-        style={[styles.recentSearchCardTitle, { color: textWhiteColor }]}
+        style={[styles.recentSearchCardTitle, { color: movieTitleColor }]}
         numberOfLines={2}
       >
         {item.title}
@@ -169,35 +196,42 @@ export default function SearchScreen() {
 
   const renderSearchResultItem = ({ item }: { item: Movie }) => (
     <TouchableOpacity
-      style={[
-        styles.searchResultItem,
-        { borderBottomColor: borderListColor },
-      ]}
+      style={styles.searchResultCard}
       onPress={() => handleMoviePress(item)}
     >
-      <View style={styles.searchResultContent}>
-        {item.image && (
+      <View style={styles.searchResultPosterContainer}>
+        {item.image ? (
           <Image
             source={{ uri: item.image }}
-            style={styles.searchResultImage}
+            style={styles.searchResultPoster}
             contentFit='cover'
           />
+        ) : (
+          <View
+            style={[
+              styles.searchResultPoster,
+              styles.placeholderImage,
+              { backgroundColor: backgroundPlaceholderColor },
+            ]}
+          >
+            <Ionicons name='image-outline' size={48} color='#666666' />
+          </View>
         )}
-        <View style={styles.searchResultTextContainer}>
-          <ThemedText style={styles.searchResultTitle}>{item.title}</ThemedText>
-          {item.subtitle && (
-            <ThemedText style={styles.searchResultSubtitle}>
-              {item.subtitle}
-            </ThemedText>
-          )}
-          {item.rating && (
-            <ThemedText style={styles.searchResultRating}>
-              ⭐ {item.rating}
-            </ThemedText>
-          )}
+        <View
+          style={[
+            styles.searchResultPlayOverlay,
+            { backgroundColor: backgroundOverlayColor },
+          ]}
+        >
+          <Ionicons name='play' size={16} color={textWhiteColor} />
         </View>
       </View>
-      <Ionicons name='chevron-forward' size={20} color={iconColor} />
+      <ThemedText
+        style={[styles.searchResultCardTitle, { color: movieTitleColor }]}
+        numberOfLines={2}
+      >
+        {item.title}
+      </ThemedText>
     </TouchableOpacity>
   )
 
@@ -268,15 +302,24 @@ export default function SearchScreen() {
           </View>
         )}
 
-
         {showSearchResults && (
-          <FlatList
-            data={searchData?.movies || []}
-            renderItem={renderSearchResultItem}
-            keyExtractor={item => item.id.toString()}
-            style={styles.searchResultsList}
-            contentContainerStyle={styles.searchResultsContent}
-          />
+          <View style={styles.searchResultsSection}>
+            <View style={styles.sectionHeader}>
+              <ThemedText style={styles.sectionTitle}>
+                Search Results
+              </ThemedText>
+            </View>
+            <FlatList
+              data={searchResults}
+              renderItem={renderSearchResultItem}
+              keyExtractor={item => item.id.toString()}
+              numColumns={2}
+              columnWrapperStyle={styles.searchResultsRow}
+              showsVerticalScrollIndicator={false}
+              style={styles.searchResultsList}
+              contentContainerStyle={styles.searchResultsContent}
+            />
+          </View>
         )}
 
         {showEmptyState && (
@@ -399,46 +442,51 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 40,
   },
+  searchResultsSection: {
+    flex: 1,
+  },
   searchResultsList: {
     flex: 1,
   },
   searchResultsContent: {
     paddingTop: 8,
   },
-  searchResultItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  searchResultsRow: {
     justifyContent: 'space-between',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
+    marginBottom: 16,
   },
-  searchResultContent: {
-    flex: 1,
-    flexDirection: 'row',
+  searchResultCard: {
+    width: '48%',
+  },
+  searchResultPosterContainer: {
+    position: 'relative',
+    width: '100%',
+    aspectRatio: 0.8, // 200/250 ratio
+    borderRadius: 32,
+    overflow: 'hidden',
+    marginBottom: 8,
+  },
+  searchResultPoster: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 32,
+  },
+  searchResultPlayOverlay: {
+    position: 'absolute',
+    bottom: 12,
+    right: 12,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
     alignItems: 'center',
-    gap: 12,
+    opacity: 0.9,
   },
-  searchResultImage: {
-    width: 60,
-    height: 80,
-    borderRadius: 8,
-  },
-  searchResultTextContainer: {
-    flex: 1,
-  },
-  searchResultTitle: {
+  searchResultCardTitle: {
     fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  searchResultSubtitle: {
-    fontSize: 14,
-    opacity: 0.7,
-    marginBottom: 4,
-  },
-  searchResultRating: {
-    fontSize: 14,
-    opacity: 0.8,
+    textAlign: 'center',
+    fontWeight: '500',
+    paddingHorizontal: 4,
   },
   emptyContainer: {
     flex: 1,
