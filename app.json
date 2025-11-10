@@ -10,7 +10,10 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.mayer-vargas.stremioapp"
+      "bundleIdentifier": "com.mayer-vargas.stremioapp",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -39,6 +42,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "08f0560a-137d-43cf-9f45-d154954e42d2"
+      }
+    },
+    "owner": "cf-training"
   }
 }
