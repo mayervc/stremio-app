@@ -4,10 +4,11 @@ import { ThemedText } from '@/components/themed-text'
 import { Colors } from '@/constants/colors'
 import { commonStyles } from '@/constants/common-styles'
 import { useSignup } from '@/hooks/useAuth'
+import { useOnboardingStore } from '@/store/onboardingStore'
 import { Ionicons } from '@expo/vector-icons'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { router } from 'expo-router'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import {
   Pressable,
@@ -39,6 +40,11 @@ export default function SignupScreen() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const signupMutation = useSignup()
+  const { setCurrentStep } = useOnboardingStore()
+
+  useEffect(() => {
+    setCurrentStep(3)
+  }, [setCurrentStep])
 
   const {
     control,

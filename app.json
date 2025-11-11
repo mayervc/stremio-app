@@ -37,7 +37,8 @@
           "configureAndroidBackup": true,
           "faceIDPermission": "Allow stremio-app to access your Face ID biometric data."
         }
-      ]
+      ],
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true,

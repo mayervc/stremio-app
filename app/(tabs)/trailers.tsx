@@ -1,6 +1,7 @@
 import { StyleSheet, View } from 'react-native'
 
 import HeaderBar from '@/components/header-bar'
+import { LogoutButton } from '@/components/logout-button'
 import { ThemedSafeAreaView } from '@/components/themed-safe-area-view'
 import { ThemedText } from '@/components/themed-text'
 
@@ -13,6 +14,7 @@ export default function TrailersScreen() {
         <ThemedText style={styles.subtitle}>
           This is the Trailers screen. Content coming soon...
         </ThemedText>
+        <LogoutButton />
       </View>
     </ThemedSafeAreaView>
   )

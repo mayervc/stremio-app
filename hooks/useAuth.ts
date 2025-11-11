@@ -1,4 +1,3 @@
-import { useOnboardingData } from '@/hooks/useOnboardingData'
 import {
   authApi,
   type LoginCredentials,
@@ -8,7 +7,6 @@ import {
 } from '@/lib/api/auth'
 import { getApiError } from '@/lib/utils/getApiError'
 import { useAuthStore, type User } from '@/store/authStore'
-import { useOnboardingStore } from '@/store/onboardingStore'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { router } from 'expo-router'
 import Toast from 'react-native-toast-message'
@@ -49,9 +47,7 @@ export function useLogin() {
 }
 
 export function useSignup() {
-  const { login } = useAuthStore()
-  const { clearOnboardingData } = useOnboardingData()
-  const { setCompleted } = useOnboardingStore()
+  const { setToken } = useAuthStore()
 
   return useMutation({
     mutationFn: async (
@@ -63,12 +59,8 @@ export function useSignup() {
       return response
     },
     onSuccess: async response => {
-      // Store user and token in Zustand store
-      login(response.user, response.token)
-
-      // Clear onboarding data but don't mark as completed yet
-      // We'll mark it as completed after user finishes signup success screen
-      clearOnboardingData()
+      // Store auth token for subsequent requests but don't mark the user as fully authenticated yet
+      setToken(response.token)
 
       // Navigate to signup success screen
       router.replace('/signup-success')
