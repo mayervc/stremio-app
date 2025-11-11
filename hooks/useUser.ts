@@ -1,36 +1,50 @@
+import { authApi } from '@/lib/api/auth'
 import {
   type UpdateUserProfileData,
   type UpdateUserProfileResponse,
   userApi,
 } from '@/lib/api/user'
+import { tokenStorage } from '@/lib/secure-store'
 import { getApiError } from '@/lib/utils/getApiError'
 import { useAuthStore } from '@/store/authStore'
 import { useOnboardingStore } from '@/store/onboardingStore'
 import { useMutation } from '@tanstack/react-query'
+import { router } from 'expo-router'
 import Toast from 'react-native-toast-message'
 
 export function useUpdateProfile() {
-  const { user, setUser } = useAuthStore()
-  const { setCompleted } = useOnboardingStore()
+  const { user, setUser, login } = useAuthStore()
+  const { setCompleted, setSelectedGenres } = useOnboardingStore()
 
   return useMutation({
     mutationFn: async (
       data: UpdateUserProfileData
     ): Promise<UpdateUserProfileResponse> => {
-      // Check if user is authenticated and has an ID
-      if (!user?.id) {
+      // Ensure we have a user context; fetch if necessary
+      const currentUser = user ?? (await authApi.getCurrentUser())
+
+      if (!currentUser?.id) {
         throw new Error('User not authenticated')
       }
+
       // Update user profile API call
-      const response = await userApi.updateProfile(user.id, data)
+      const response = await userApi.updateProfile(currentUser.id, data)
       return response
     },
     onSuccess: async response => {
-      // Update user in store with new data
-      setUser(response.user)
+      // Refresh user data to ensure store reflects latest profile
+      const updatedUser = await authApi.getCurrentUser()
+      const token = await tokenStorage.getToken()
+
+      if (updatedUser && token) {
+        login(updatedUser, token)
+      } else if (updatedUser) {
+        setUser(updatedUser)
+      }
 
       // Mark onboarding as completed
       setCompleted(true)
+      setSelectedGenres([])
 
       // Show success toast
       Toast.show({
@@ -38,6 +52,8 @@ export function useUpdateProfile() {
         text1: 'Profile Updated',
         text2: 'Your profile has been updated successfully',
       })
+
+      router.replace('/(tabs)')
     },
     onError: (error: Error) => {
       const errorMessage = getApiError(error)

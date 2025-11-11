@@ -23,37 +23,19 @@ export function OnboardingGuard() {
       selectedGenres
     )
 
-    // Don't interfere if we're on the splash screen
-    if (segments[0] === 'splash') {
-      console.log('OnboardingGuard - On splash screen, skipping')
-      return
-    }
+    const currentSegment = segments[0] as string | undefined
 
-    // Don't interfere if user is authenticated and on allowed routes (search, modal, etc)
-    if (
-      isAuthenticated &&
-      isCompleted &&
-      (segments[0] === 'search' ||
-        segments[0] === 'modal' ||
-        segments[0] === 'signup-success' ||
-        segments[0] === '(tabs)')
-    ) {
+    // Don't interfere if we're on the splash screen or signup-success
+    if (currentSegment === 'splash' || currentSegment === 'signup-success') {
       console.log(
-        `OnboardingGuard - User authenticated and on allowed route: ${segments[0]}, skipping`
+        `OnboardingGuard - On ${currentSegment} screen, skipping guard logic`
       )
       return
     }
 
-    // Don't interfere if user has completed onboarding and is on auth screens
-    if (
-      hasSeenOnboarding &&
-      isCompleted &&
-      !isAuthenticated &&
-      (segments[0] === 'signup' || segments[0] === 'login')
-    ) {
-      console.log(
-        'OnboardingGuard - User completed onboarding, staying on auth screen'
-      )
+    // If user is authenticated, let the authenticated stack handle navigation
+    if (isAuthenticated) {
+      console.log('OnboardingGuard - User authenticated, skipping guard logic')
       return
     }
 
@@ -61,82 +43,24 @@ export function OnboardingGuard() {
     const timeoutId = setTimeout(() => {
       console.log('OnboardingGuard - Executing navigation logic')
 
-      // Special case: If user is on signup-success but hasn't selected genres, redirect to genre selection
-      if (
-        isAuthenticated &&
-        segments[0] === 'signup-success' &&
-        selectedGenres.length === 0
-      ) {
-        console.log(
-          'OnboardingGuard - User on signup-success but no genres selected, redirecting to genre selection'
-        )
-        router.replace('/onboarding-pick-genres')
-        return
-      }
-
-      // If user is authenticated, handle based on onboarding completion
-      if (isAuthenticated) {
-        console.log(
-          'OnboardingGuard - User is authenticated, checking completion status'
-        )
-        if (isCompleted) {
-          console.log(
-            'OnboardingGuard - User completed onboarding, navigating to /(tabs)'
-          )
-          // Allowed routes that should not redirect to tabs
-          const allowedRoutes = ['(tabs)', 'search', 'signup-success', 'modal']
-          const currentRoute = segments[0]
-
-          // Only navigate if we're not already on an allowed route
-          if (!allowedRoutes.includes(currentRoute)) {
-            console.log(
-              `OnboardingGuard - User authenticated, redirecting to home from ${currentRoute}`
-            )
-            router.replace('/(tabs)')
-          } else {
-            console.log(
-              `OnboardingGuard - Already on allowed route: ${currentRoute}, skipping navigation`
-            )
-          }
-        } else {
-          console.log(
-            'OnboardingGuard - User not completed onboarding, checking if needs genre selection'
-          )
-          // Check if user needs to select genres first
-          if (selectedGenres.length === 0) {
-            console.log(
-              'OnboardingGuard - No genres selected, navigating to genre selection'
-            )
-            router.replace('/onboarding-pick-genres')
-          } else {
-            console.log(
-              'OnboardingGuard - Genres selected, navigating to /signup-success'
-            )
-            // Only navigate if we're not already on signup-success
-            if (segments[0] !== 'signup-success') {
-              router.replace('/signup-success')
-            } else {
-              console.log(
-                'OnboardingGuard - Already on signup-success, skipping navigation'
-              )
-            }
-          }
-        }
-        return
-      }
-
       // If user is not authenticated, handle onboarding flow
       if (!hasSeenOnboarding) {
-        router.replace('/onboarding-start')
+        if (currentSegment !== 'onboarding-start') {
+          router.replace('/onboarding-start')
+        }
         return
       }
 
       // If user has seen onboarding but hasn't completed it, resume from current step
       if (hasSeenOnboarding && !isCompleted) {
         if (currentStep === 1) {
-          router.replace('/onboarding-start')
+          if (currentSegment !== 'onboarding-start') {
+            router.replace('/onboarding-start')
+          }
         } else if (currentStep === 2) {
-          router.replace('/onboarding-pick-genres')
+          if (currentSegment !== 'onboarding-pick-genres') {
+            router.replace('/onboarding-pick-genres')
+          }
         }
         return
       }
@@ -145,10 +69,10 @@ export function OnboardingGuard() {
       if (hasSeenOnboarding && isCompleted && !isAuthenticated) {
         // Only redirect to signup if we're not already on signup or login
         if (
-          segments[0] !== 'signup' &&
-          segments[0] !== 'login' &&
-          segments[0] !== 'onboarding-start' &&
-          segments[0] !== 'onboarding-pick-genres'
+          currentSegment !== 'signup' &&
+          currentSegment !== 'login' &&
+          currentSegment !== 'onboarding-start' &&
+          currentSegment !== 'onboarding-pick-genres'
         ) {
           console.log('OnboardingGuard - Redirecting to signup')
           router.replace('/signup')

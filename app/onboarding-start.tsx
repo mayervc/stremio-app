@@ -17,7 +17,12 @@ import {
 } from 'react-native'
 
 export default function OnboardingStartScreen() {
-  const { setHasSeenOnboarding, setCurrentStep } = useOnboardingStore()
+  const {
+    setHasSeenOnboarding,
+    setCurrentStep,
+    setCompleted,
+    setSelectedGenres,
+  } = useOnboardingStore()
 
   // Split movies into 2 rows
   const firstRow = movies.slice(0, 4)
@@ -29,8 +34,9 @@ export default function OnboardingStartScreen() {
   useEffect(() => {
     setHasSeenOnboarding(true)
     setCurrentStep(1)
-    // Don't reset completion status here - let onboarding-pick-genres handle it
-  }, [setHasSeenOnboarding, setCurrentStep])
+    setCompleted(false)
+    setSelectedGenres([])
+  }, [setHasSeenOnboarding, setCurrentStep, setCompleted, setSelectedGenres])
 
   const handleNext = () => {
     setCurrentStep(2)
