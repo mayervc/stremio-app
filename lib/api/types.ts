@@ -13,6 +13,15 @@ export interface ApiError {
 }
 
 // Movie Types
+export interface MovieCastMember {
+  id: number
+  name: string
+  character?: string
+  image?: string
+  imageProfile?: string
+  image_profile?: string
+}
+
 export interface Movie {
   id: number
   title: string
@@ -27,7 +36,7 @@ export interface Movie {
   releaseDate?: string
   duration?: number
   director?: string
-  cast?: string[]
+  cast?: MovieCastMember[]
   trailerUrl?: string
 }
 

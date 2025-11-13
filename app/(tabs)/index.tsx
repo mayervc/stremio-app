@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
-import { router } from 'expo-router'
+import { router, type Href } from 'expo-router'
 import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native'
 
 import FeaturedMovies from '@/components/featured-movies'
@@ -16,17 +16,32 @@ export default function HomeScreen() {
   const handleSearchPress = () => {
     router.push('/search' as any)
   }
+  const navigateToMovieDetails = (movieId: number) => {
+    const href = {
+      pathname: '/movie/[id]',
+      params: { id: String(movieId) },
+    } as const
+
+    router.push(href as unknown as Href)
+  }
   const { data: recommendedData } = useRecommendedMovies()
   const recommendedMovies = (recommendedData?.movies || [])
-    .map((m: any) => ({
-      id: m.id,
-      title: m.title,
-      image: m.image_url ? { uri: m.image_url } : undefined,
-    }))
+    .map((m: any) => {
+      const imageUrl = m.image_url || m.image
+      return {
+        id: m.id,
+        title: m.title,
+        image: imageUrl ? { uri: imageUrl } : undefined,
+      }
+    })
     .filter(movie => movie.image) // Only show movies with valid images
 
   const renderMovieCard = ({ item }: { item: any }) => (
-    <View style={styles.movieCard}>
+    <TouchableOpacity
+      style={styles.movieCard}
+      activeOpacity={0.85}
+      onPress={() => navigateToMovieDetails(item.id)}
+    >
       <View style={styles.posterContainer}>
         <Image
           source={item.image}
@@ -38,14 +53,14 @@ export default function HomeScreen() {
         </View>
       </View>
       <ThemedText style={styles.movieTitle}>{item.title}</ThemedText>
-    </View>
+    </TouchableOpacity>
   )
 
   return (
     <ThemedSafeAreaView style={styles.container}>
       <HeaderBar onSearchPress={handleSearchPress} />
       <View style={styles.content}>
-        <FeaturedMovies />
+        <FeaturedMovies onMoviePress={navigateToMovieDetails} />
         <View style={styles.recommendedSection}>
           <View style={styles.sectionHeader}>
             <ThemedText style={styles.sectionTitle}>
