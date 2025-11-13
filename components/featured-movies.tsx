@@ -26,7 +26,11 @@ interface TrendingMovie {
   isTrending: boolean
 }
 
-const FeaturedMovies = () => {
+interface FeaturedMoviesProps {
+  onMoviePress?: (movieId: number) => void
+}
+
+const FeaturedMovies = ({ onMoviePress }: FeaturedMoviesProps) => {
   const [currentTrendingIndex, setCurrentTrendingIndex] = useState(0)
   const scrollViewRef = useRef<ScrollView>(null)
   const fadeAnim = useRef(new Animated.Value(1)).current
@@ -116,25 +120,30 @@ const FeaturedMovies = () => {
         onMomentumScrollEnd={handleTrendingScroll}
         style={styles.trendingScrollView}
       >
-        {trendingMovies.map((movie, index) => (
+        {trendingMovies.map(movie => (
           <View key={movie.id} style={styles.trendingSlide}>
-            <Animated.View
-              style={[styles.featuredPoster, { opacity: fadeAnim }]}
+            <TouchableOpacity
+              activeOpacity={0.9}
+              onPress={() => onMoviePress?.(movie.id)}
             >
-              <Image
-                source={movie.image}
-                style={styles.featuredImage}
-                contentFit='cover'
-              />
+              <Animated.View
+                style={[styles.featuredPoster, { opacity: fadeAnim }]}
+              >
+                <Image
+                  source={movie.image}
+                  style={styles.featuredImage}
+                  contentFit='cover'
+                />
 
-              {/* Watch Trailer Button */}
-              <TouchableOpacity style={styles.trailerButton}>
-                <ThemedText style={styles.trailerButtonText}>
-                  Watch Trailer
-                </ThemedText>
-                <Ionicons name='play-outline' size={16} color='#FFFFFF' />
-              </TouchableOpacity>
-            </Animated.View>
+                {/* Watch Trailer Button */}
+                <TouchableOpacity style={styles.trailerButton}>
+                  <ThemedText style={styles.trailerButtonText}>
+                    Watch Trailer
+                  </ThemedText>
+                  <Ionicons name='play-outline' size={16} color='#FFFFFF' />
+                </TouchableOpacity>
+              </Animated.View>
+            </TouchableOpacity>
           </View>
         ))}
       </ScrollView>

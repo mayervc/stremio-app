@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
-import { router } from 'expo-router'
+import { router, type Href } from 'expo-router'
 import { useEffect, useState } from 'react'
 import {
   FlatList,
@@ -94,6 +94,15 @@ export default function SearchScreen() {
     console.log('Filter pressed')
   }
 
+  const navigateToMovieDetails = (movieId: number) => {
+    const href = {
+      pathname: '/movie/[id]',
+      params: { id: String(movieId) },
+    } as const
+
+    router.push(href as unknown as Href)
+  }
+
   const handleMoviePress = (movie: Movie) => {
     // Add to recent searches
     addRecentSearch({
@@ -102,14 +111,14 @@ export default function SearchScreen() {
       image: movie.image,
       subtitle: movie.subtitle,
     })
+
+    navigateToMovieDetails(movie.id)
   }
 
   const handleRecentSearchPress = (search: RecentSearch) => {
     // Set search query to recent search
     setSearchQuery(search.title)
-    // Navigate to movie details or show results
-    // TODO: Navigate to movie details
-    console.log('Recent search pressed:', search.id)
+    navigateToMovieDetails(search.id)
   }
 
   const handleRemoveRecentSearch = (id: number) => {
