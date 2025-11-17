@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
-import { router, type Href } from 'expo-router'
+import { router } from 'expo-router'
 import { useEffect, useState } from 'react'
 import {
   FlatList,
@@ -116,12 +116,7 @@ export default function SearchScreen() {
   }
 
   const navigateToMovieDetails = (movieId: number) => {
-    const href = {
-      pathname: '/movie/[id]',
-      params: { id: String(movieId) },
-    } as const
-
-    router.push(href as unknown as Href)
+    router.push(`/movie/${movieId}`)
   }
 
   const handleMoviePress = (movie: Movie) => {

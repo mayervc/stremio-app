@@ -182,7 +182,7 @@ export default function MovieDetailsScreen() {
     }
   }
 
-  if (isLoading || !movie) {
+  if (isLoading) {
     return (
       <ThemedSafeAreaView
         style={[styles.loadingContainer, { backgroundColor }]}
@@ -192,137 +192,70 @@ export default function MovieDetailsScreen() {
     )
   }
 
+  if (!movie) {
+    return null
+  }
+
   const subtitle = formatSubtitle(movie.genre, movie.formats)
-  const heroImage =
-    typeof movie.image === 'string' && movie.image.trim().length > 0
-      ? movie.image
-      : typeof (movie as Record<string, any>).image_url === 'string'
-        ? (movie as Record<string, any>).image_url
-        : undefined
-  const rawCast = useMemo(() => {
-    const source =
-      (movie as Record<string, any>).cast ??
-      (movie as Record<string, any>).casts ??
-      (movie as Record<string, any>).movie_cast ??
-      (movie as Record<string, any>).actors ??
-      (movie as Record<string, any>).movieActors ??
-      []
-
-    if (Array.isArray(source)) {
-      return source
-    }
-
-    if (source && typeof source === 'object') {
-      if (Array.isArray((source as Record<string, any>).items)) {
-        return (source as Record<string, any>).items
-      }
-      if (Array.isArray((source as Record<string, any>).data)) {
-        return (source as Record<string, any>).data
-      }
-      if (Array.isArray((source as Record<string, any>).actors)) {
-        return (source as Record<string, any>).actors
-      }
-    }
-
-    return []
-  }, [movie])
+  const heroImage = movie.image || movie.image_url
 
   const castMembers = useMemo<NormalizedCastMember[]>(() => {
-    if (!Array.isArray(rawCast)) {
-      return []
-    }
+    const castList = Array.isArray(movie.cast) ? movie.cast : []
 
-    const normalized: NormalizedCastMember[] = []
+    return castList
+      .map((member: any) => {
+        if (!member) {
+          return null
+        }
 
-    rawCast.forEach(member => {
-      if (!member) return
+        const actor = member.actor
+        if (!actor) {
+          return null
+        }
 
-      const memberObj =
-        typeof member === 'object' && member !== null ? member : {}
-      const actorObj =
-        (memberObj as Record<string, any>).actor ??
-        (memberObj as Record<string, any>).actorInfo ??
-        (memberObj as Record<string, any>).actor_data ??
-        memberObj
+        const name =
+          [actor.firstName, actor.lastName].filter(Boolean).join(' ').trim() ||
+          actor.nickName ||
+          ''
 
-      const nameCandidates = [
-        typeof member === 'string' ? member : undefined,
-        (actorObj as Record<string, any>).name,
-        (actorObj as Record<string, any>).fullName,
-        (actorObj as Record<string, any>).full_name,
-        (actorObj as Record<string, any>).actor_name,
-        (memberObj as Record<string, any>).actor_name,
-        (memberObj as Record<string, any>).name,
-        [
-          (actorObj as Record<string, any>).first_name ??
-            (actorObj as Record<string, any>).firstName,
-          (actorObj as Record<string, any>).last_name ??
-            (actorObj as Record<string, any>).lastName,
-        ]
-          .filter(Boolean)
-          .join(' ')
-          .trim(),
-      ]
+        if (!name) {
+          return null
+        }
 
-      const name = nameCandidates.find(
-        candidate =>
-          typeof candidate === 'string' && candidate.trim().length > 0
-      ) as string | undefined
+        const id =
+          actor.id ??
+          member.actor_id ??
+          (member.movie_id ? `${member.movie_id}-${name}` : name)
 
-      if (!name) {
-        return
-      }
+        const character =
+          (Array.isArray(member.characters) && member.characters.length > 0
+            ? member.characters.join(', ')
+            : null) ||
+          member.role ||
+          undefined
 
-      const idRaw =
-        (memberObj as Record<string, any>).id ??
-        (actorObj as Record<string, any>).id ??
-        (memberObj as Record<string, any>).actor_id ??
-        (actorObj as Record<string, any>).actor_id ??
-        (memberObj as Record<string, any>).cast_id ??
-        name
+        const image =
+          actor.profile_image && actor.profile_image.trim().length > 0
+            ? actor.profile_image
+            : undefined
 
-      const characterCandidates = [
-        (memberObj as Record<string, any>).character,
-        (memberObj as Record<string, any>).character_name,
-        (memberObj as Record<string, any>).characterName,
-        (memberObj as Record<string, any>).role,
-        (memberObj as Record<string, any>).as,
-        (memberObj as Record<string, any>).personaje,
-      ]
+        const normalized: NormalizedCastMember = {
+          id: String(id),
+          name,
+        }
 
-      const character = characterCandidates.find(
-        candidate =>
-          typeof candidate === 'string' && candidate.trim().length > 0
-      ) as string | undefined
+        if (character) {
+          normalized.character = character
+        }
 
-      const imageCandidates = [
-        (actorObj as Record<string, any>).image,
-        (actorObj as Record<string, any>).imageUrl,
-        (actorObj as Record<string, any>).image_url,
-        (actorObj as Record<string, any>).imageProfile,
-        (actorObj as Record<string, any>).profile_image,
-        (memberObj as Record<string, any>).image,
-        (memberObj as Record<string, any>).imageProfile,
-        (memberObj as Record<string, any>).profile_image,
-        (actorObj as Record<string, any>).profile_path,
-        (memberObj as Record<string, any>).profile_path,
-      ]
+        if (image) {
+          normalized.image = image
+        }
 
-      const image = imageCandidates.find(
-        candidate =>
-          typeof candidate === 'string' && candidate.trim().length > 0
-      ) as string | undefined
-
-      normalized.push({
-        id: String(idRaw),
-        name,
-        character,
-        image,
+        return normalized
       })
-    })
-
-    return normalized
-  }, [rawCast])
+      .filter((member): member is NormalizedCastMember => member !== null)
+  }, [movie.cast])
 
   return (
     <ThemedSafeAreaView style={[styles.container, { backgroundColor }]}>

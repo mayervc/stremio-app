@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
-import { router, type Href } from 'expo-router'
+import { router } from 'expo-router'
 import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native'
 
 import FeaturedMovies from '@/components/featured-movies'
@@ -17,12 +17,7 @@ export default function HomeScreen() {
     router.push('/search' as any)
   }
   const navigateToMovieDetails = (movieId: number) => {
-    const href = {
-      pathname: '/movie/[id]',
-      params: { id: String(movieId) },
-    } as const
-
-    router.push(href as unknown as Href)
+    router.push(`/movie/${movieId}`)
   }
   const { data: recommendedData } = useRecommendedMovies()
   const recommendedMovies = (recommendedData?.movies || [])

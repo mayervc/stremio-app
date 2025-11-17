@@ -61,12 +61,6 @@ export default function RootLayout() {
               name='modal'
               options={{ presentation: 'modal', title: 'Modal' }}
             />
-            <Stack.Screen
-              name='movie/[id]'
-              options={{
-                headerShown: false,
-              }}
-            />
           </Stack.Protected>
 
           <Stack.Protected guard={!isAuthenticated}>
