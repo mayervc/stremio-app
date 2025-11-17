@@ -56,6 +56,13 @@ export default function TabLayout() {
           headerShown: false,
         }}
       />
+      <Tabs.Screen
+        name='actor/[id]'
+        options={{
+          href: null,
+          headerShown: false,
+        }}
+      />
     </Tabs>
   )
 }

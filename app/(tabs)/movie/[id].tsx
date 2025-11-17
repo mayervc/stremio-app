@@ -156,6 +156,10 @@ export default function MovieDetailsScreen() {
     router.back()
   }
 
+  const handleActorPress = (actorId: string) => {
+    router.push(`/actor/${actorId}`)
+  }
+
   const handleWatchTrailer = async () => {
     if (!movie?.trailerUrl) {
       return
@@ -200,62 +204,124 @@ export default function MovieDetailsScreen() {
   const heroImage = movie.image || movie.image_url
 
   const castMembers = useMemo<NormalizedCastMember[]>(() => {
-    const castList = Array.isArray(movie.cast) ? movie.cast : []
+    // Handle new structure: movie.actors (array of actors with cast info)
+    if (Array.isArray(movie.actors) && movie.actors.length > 0) {
+      return movie.actors
+        .map((actorWithCast: any) => {
+          if (!actorWithCast) {
+            return null
+          }
 
-    return castList
-      .map((member: any) => {
-        if (!member) {
-          return null
-        }
+          const name =
+            [actorWithCast.firstName, actorWithCast.lastName]
+              .filter(Boolean)
+              .join(' ')
+              .trim() ||
+            actorWithCast.nickName ||
+            ''
 
-        const actor = member.actor
-        if (!actor) {
-          return null
-        }
+          if (!name) {
+            return null
+          }
 
-        const name =
-          [actor.firstName, actor.lastName].filter(Boolean).join(' ').trim() ||
-          actor.nickName ||
-          ''
+          const id = actorWithCast.id ?? String(actorWithCast.tmdb_id ?? name)
 
-        if (!name) {
-          return null
-        }
+          // Get character info from nested cast object
+          const castInfo = actorWithCast.cast
+          const character =
+            (Array.isArray(castInfo?.characters) &&
+            castInfo.characters.length > 0
+              ? castInfo.characters.join(', ')
+              : null) ||
+            castInfo?.role ||
+            undefined
 
-        const id =
-          actor.id ??
-          member.actor_id ??
-          (member.movie_id ? `${member.movie_id}-${name}` : name)
+          const image =
+            actorWithCast.profile_image &&
+            actorWithCast.profile_image.trim().length > 0
+              ? actorWithCast.profile_image
+              : undefined
 
-        const character =
-          (Array.isArray(member.characters) && member.characters.length > 0
-            ? member.characters.join(', ')
-            : null) ||
-          member.role ||
-          undefined
+          const normalized: NormalizedCastMember = {
+            id: String(id),
+            name,
+          }
 
-        const image =
-          actor.profile_image && actor.profile_image.trim().length > 0
-            ? actor.profile_image
-            : undefined
+          if (character) {
+            normalized.character = character
+          }
 
-        const normalized: NormalizedCastMember = {
-          id: String(id),
-          name,
-        }
+          if (image) {
+            normalized.image = image
+          }
 
-        if (character) {
-          normalized.character = character
-        }
+          return normalized
+        })
+        .filter((member): member is NormalizedCastMember => member !== null)
+    }
 
-        if (image) {
-          normalized.image = image
-        }
+    // Fallback to legacy structure: movie.cast (array of cast entries with actor nested)
+    if (Array.isArray(movie.cast) && movie.cast.length > 0) {
+      return movie.cast
+        .map((member: any) => {
+          if (!member) {
+            return null
+          }
 
-        return normalized
-      })
-      .filter((member): member is NormalizedCastMember => member !== null)
-  }, [movie.cast])
+          const actor = member.actor
+          if (!actor) {
+            return null
+          }
+
+          const name =
+            [actor.firstName, actor.lastName]
+              .filter(Boolean)
+              .join(' ')
+              .trim() ||
+            actor.nickName ||
+            ''
+
+          if (!name) {
+            return null
+          }
+
+          const id =
+            actor.id ??
+            member.actor_id ??
+            (member.movie_id ? `${member.movie_id}-${name}` : name)
+
+          const character =
+            (Array.isArray(member.characters) && member.characters.length > 0
+              ? member.characters.join(', ')
+              : null) ||
+            member.role ||
+            undefined
+
+          const image =
+            actor.profile_image && actor.profile_image.trim().length > 0
+              ? actor.profile_image
+              : undefined
+
+          const normalized: NormalizedCastMember = {
+            id: String(id),
+            name,
+          }
+
+          if (character) {
+            normalized.character = character
+          }
+
+          if (image) {
+            normalized.image = image
+          }
+
+          return normalized
+        })
+        .filter((member): member is NormalizedCastMember => member !== null)
+    }
+
+    return []
+  }, [movie.actors, movie.cast])
 
   return (
     <ThemedSafeAreaView style={[styles.container, { backgroundColor }]}>
@@ -422,28 +488,33 @@ export default function MovieDetailsScreen() {
                 >
                   {castMembers.map(member => (
                     <View key={member.id} style={styles.castItem}>
-                      <View
-                        style={[
-                          styles.castAvatar,
-                          { borderColor: accentColor },
-                          !member.image && {
-                            backgroundColor: placeholderColor,
-                            borderColor: 'transparent',
-                          },
-                        ]}
+                      <TouchableOpacity
+                        onPress={() => handleActorPress(member.id)}
+                        activeOpacity={0.7}
                       >
-                        {member.image ? (
-                          <Image
-                            source={{ uri: member.image }}
-                            style={styles.castAvatarImage}
-                            contentFit='cover'
-                          />
-                        ) : (
-                          <ThemedText style={styles.castAvatarInitial}>
-                            {member.name.charAt(0).toUpperCase()}
-                          </ThemedText>
-                        )}
-                      </View>
+                        <View
+                          style={[
+                            styles.castAvatar,
+                            { borderColor: accentColor },
+                            !member.image && {
+                              backgroundColor: placeholderColor,
+                              borderColor: 'transparent',
+                            },
+                          ]}
+                        >
+                          {member.image ? (
+                            <Image
+                              source={{ uri: member.image }}
+                              style={styles.castAvatarImage}
+                              contentFit='cover'
+                            />
+                          ) : (
+                            <ThemedText style={styles.castAvatarInitial}>
+                              {member.name.charAt(0).toUpperCase()}
+                            </ThemedText>
+                          )}
+                        </View>
+                      </TouchableOpacity>
                       <ThemedText
                         style={[styles.castName, { color: textSecondaryColor }]}
                         numberOfLines={1}

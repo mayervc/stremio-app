@@ -19,7 +19,7 @@ export interface Actor {
   lastName: string
   nickName?: string | null
   birthdate?: string | null
-  popularity?: number | null
+  popularity?: string | null // String decimal from backend
   profile_image?: string | null
   tmdb_id?: number | null
   createdAt?: string
@@ -32,6 +32,14 @@ export interface Cast {
   role?: string | null
   characters?: string[] | null
   actor?: Actor | null
+}
+
+// Actor with cast information (as returned by GET /api/movies/:id)
+export interface ActorWithCast extends Actor {
+  cast?: {
+    role?: string | null
+    characters?: string[] | null
+  }
 }
 
 export interface Movie {
@@ -49,7 +57,8 @@ export interface Movie {
   releaseDate?: string
   duration?: number
   director?: string
-  cast?: Cast[]
+  cast?: Cast[] // Legacy structure
+  actors?: ActorWithCast[] // New structure from backend
   trailerUrl?: string
 }
 
