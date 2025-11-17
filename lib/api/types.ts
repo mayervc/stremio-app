@@ -13,7 +13,7 @@ export interface ApiError {
 }
 
 // Movie Types
-export interface MovieActor {
+export interface Actor {
   id: number
   firstName: string
   lastName: string
@@ -26,12 +26,12 @@ export interface MovieActor {
   updatedAt?: string
 }
 
-export interface MovieCastEntry {
+export interface Cast {
   movie_id: number
   actor_id: number
   role?: string | null
   characters?: string[] | null
-  actor?: MovieActor | null
+  actor?: Actor | null
 }
 
 export interface Movie {
@@ -49,7 +49,7 @@ export interface Movie {
   releaseDate?: string
   duration?: number
   director?: string
-  cast?: MovieCastEntry[]
+  cast?: Cast[]
   trailerUrl?: string
 }
 
