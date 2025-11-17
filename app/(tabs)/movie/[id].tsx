@@ -204,124 +204,62 @@ export default function MovieDetailsScreen() {
   const heroImage = movie.image || movie.image_url
 
   const castMembers = useMemo<NormalizedCastMember[]>(() => {
-    // Handle new structure: movie.actors (array of actors with cast info)
-    if (Array.isArray(movie.actors) && movie.actors.length > 0) {
-      return movie.actors
-        .map((actorWithCast: any) => {
-          if (!actorWithCast) {
-            return null
-          }
-
-          const name =
-            [actorWithCast.firstName, actorWithCast.lastName]
-              .filter(Boolean)
-              .join(' ')
-              .trim() ||
-            actorWithCast.nickName ||
-            ''
-
-          if (!name) {
-            return null
-          }
-
-          const id = actorWithCast.id ?? String(actorWithCast.tmdb_id ?? name)
-
-          // Get character info from nested cast object
-          const castInfo = actorWithCast.cast
-          const character =
-            (Array.isArray(castInfo?.characters) &&
-            castInfo.characters.length > 0
-              ? castInfo.characters.join(', ')
-              : null) ||
-            castInfo?.role ||
-            undefined
-
-          const image =
-            actorWithCast.profile_image &&
-            actorWithCast.profile_image.trim().length > 0
-              ? actorWithCast.profile_image
-              : undefined
-
-          const normalized: NormalizedCastMember = {
-            id: String(id),
-            name,
-          }
-
-          if (character) {
-            normalized.character = character
-          }
-
-          if (image) {
-            normalized.image = image
-          }
-
-          return normalized
-        })
-        .filter((member): member is NormalizedCastMember => member !== null)
+    if (!Array.isArray(movie.actors) || movie.actors.length === 0) {
+      return []
     }
 
-    // Fallback to legacy structure: movie.cast (array of cast entries with actor nested)
-    if (Array.isArray(movie.cast) && movie.cast.length > 0) {
-      return movie.cast
-        .map((member: any) => {
-          if (!member) {
-            return null
-          }
+    return movie.actors
+      .map((actorWithCast: any) => {
+        if (!actorWithCast) {
+          return null
+        }
 
-          const actor = member.actor
-          if (!actor) {
-            return null
-          }
+        const name =
+          [actorWithCast.firstName, actorWithCast.lastName]
+            .filter(Boolean)
+            .join(' ')
+            .trim() ||
+          actorWithCast.nickName ||
+          ''
 
-          const name =
-            [actor.firstName, actor.lastName]
-              .filter(Boolean)
-              .join(' ')
-              .trim() ||
-            actor.nickName ||
-            ''
+        if (!name) {
+          return null
+        }
 
-          if (!name) {
-            return null
-          }
+        const id = actorWithCast.id ?? String(actorWithCast.tmdb_id ?? name)
 
-          const id =
-            actor.id ??
-            member.actor_id ??
-            (member.movie_id ? `${member.movie_id}-${name}` : name)
+        // Get character info from nested cast object
+        const castInfo = actorWithCast.cast
+        const character =
+          (Array.isArray(castInfo?.characters) && castInfo.characters.length > 0
+            ? castInfo.characters.join(', ')
+            : null) ||
+          castInfo?.role ||
+          undefined
 
-          const character =
-            (Array.isArray(member.characters) && member.characters.length > 0
-              ? member.characters.join(', ')
-              : null) ||
-            member.role ||
-            undefined
+        const image =
+          actorWithCast.profile_image &&
+          actorWithCast.profile_image.trim().length > 0
+            ? actorWithCast.profile_image
+            : undefined
 
-          const image =
-            actor.profile_image && actor.profile_image.trim().length > 0
-              ? actor.profile_image
-              : undefined
+        const normalized: NormalizedCastMember = {
+          id: String(id),
+          name,
+        }
 
-          const normalized: NormalizedCastMember = {
-            id: String(id),
-            name,
-          }
+        if (character) {
+          normalized.character = character
+        }
 
-          if (character) {
-            normalized.character = character
-          }
+        if (image) {
+          normalized.image = image
+        }
 
-          if (image) {
-            normalized.image = image
-          }
-
-          return normalized
-        })
-        .filter((member): member is NormalizedCastMember => member !== null)
-    }
-
-    return []
-  }, [movie.actors, movie.cast])
+        return normalized
+      })
+      .filter((member): member is NormalizedCastMember => member !== null)
+  }, [movie.actors])
 
   return (
     <ThemedSafeAreaView style={[styles.container, { backgroundColor }]}>

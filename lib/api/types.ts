@@ -26,15 +26,6 @@ export interface Actor {
   updatedAt?: string
 }
 
-export interface Cast {
-  movie_id: number
-  actor_id: number
-  role?: string | null
-  characters?: string[] | null
-  actor?: Actor | null
-}
-
-// Actor with cast information (as returned by GET /api/movies/:id)
 export interface ActorWithCast extends Actor {
   cast?: {
     role?: string | null
@@ -57,8 +48,7 @@ export interface Movie {
   releaseDate?: string
   duration?: number
   director?: string
-  cast?: Cast[] // Legacy structure
-  actors?: ActorWithCast[] // New structure from backend
+  actors?: ActorWithCast[]
   trailerUrl?: string
 }
 
