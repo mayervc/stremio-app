@@ -94,6 +94,10 @@ export default function SearchScreen() {
     console.log('Filter pressed')
   }
 
+  const navigateToMovieDetails = (movieId: number) => {
+    router.push(`/movie/${movieId}`)
+  }
+
   const handleMoviePress = (movie: Movie) => {
     // Add to recent searches
     addRecentSearch({
@@ -102,14 +106,14 @@ export default function SearchScreen() {
       image: movie.image,
       subtitle: movie.subtitle,
     })
+
+    navigateToMovieDetails(movie.id)
   }
 
   const handleRecentSearchPress = (search: RecentSearch) => {
     // Set search query to recent search
     setSearchQuery(search.title)
-    // Navigate to movie details or show results
-    // TODO: Navigate to movie details
-    console.log('Recent search pressed:', search.id)
+    navigateToMovieDetails(search.id)
   }
 
   const handleRemoveRecentSearch = (id: number) => {

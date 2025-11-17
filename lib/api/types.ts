@@ -13,11 +13,33 @@ export interface ApiError {
 }
 
 // Movie Types
+export interface Actor {
+  id: number
+  firstName: string
+  lastName: string
+  nickName?: string | null
+  birthdate?: string | null
+  popularity?: number | null
+  profile_image?: string | null
+  tmdb_id?: number | null
+  createdAt?: string
+  updatedAt?: string
+}
+
+export interface Cast {
+  movie_id: number
+  actor_id: number
+  role?: string | null
+  characters?: string[] | null
+  actor?: Actor | null
+}
+
 export interface Movie {
   id: number
   title: string
   subtitle?: string
-  image: string
+  image?: string
+  image_url?: string
   rating?: string
   language?: string
   genre?: string
@@ -27,7 +49,7 @@ export interface Movie {
   releaseDate?: string
   duration?: number
   director?: string
-  cast?: string[]
+  cast?: Cast[]
   trailerUrl?: string
 }
 
