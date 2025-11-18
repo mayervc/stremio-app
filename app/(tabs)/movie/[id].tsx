@@ -664,6 +664,7 @@ const styles = StyleSheet.create({
     paddingBottom: 32,
     paddingTop: 16,
     backgroundColor: 'transparent',
+    zIndex: 1000,
   },
   bookButton: {
     borderRadius: 24,
