@@ -2,43 +2,22 @@ import { Ionicons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
 import { LinearGradient } from 'expo-linear-gradient'
 import { router, useLocalSearchParams } from 'expo-router'
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import {
   ActivityIndicator,
-  Linking,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
   View,
 } from 'react-native'
-import Toast from 'react-native-toast-message'
 
 import { ThemedSafeAreaView } from '@/components/themed-safe-area-view'
 import { ThemedText } from '@/components/themed-text'
 import { Colors } from '@/constants/theme'
 import { useThemeColor } from '@/hooks/use-theme-color'
-import { useMovie } from '@/hooks/useMovies'
+import { Actor } from '@/lib/api/types'
 
-type NormalizedCastMember = {
-  id: string
-  name: string
-  character?: string
-  image?: string
-}
-
-const formatDuration = (minutes?: number) => {
-  if (!minutes || Number.isNaN(minutes)) {
-    return 'N/A'
-  }
-  const hrs = Math.floor(minutes / 60)
-  const mins = minutes % 60
-  if (!hrs) {
-    return `${mins}min`
-  }
-  return `${hrs}hr${hrs > 1 ? 's' : ''}:${mins.toString().padStart(2, '0')}min`
-}
-
-const formatReleaseDate = (date?: string) => {
+const formatBirthDate = (date?: string | null) => {
   if (!date) {
     return 'N/A'
   }
@@ -46,44 +25,68 @@ const formatReleaseDate = (date?: string) => {
   if (Number.isNaN(parsedDate.getTime())) {
     return date
   }
-  return new Intl.DateTimeFormat('en-GB', {
-    day: '2-digit',
+  return new Intl.DateTimeFormat('en-US', {
     month: 'long',
+    day: 'numeric',
     year: 'numeric',
   }).format(parsedDate)
 }
 
-const formatLanguages = (languages?: string | string[]) => {
-  if (!languages || (Array.isArray(languages) && languages.length === 0)) {
+const formatOccupations = (occupations?: string[] | null) => {
+  if (!occupations || occupations.length === 0) {
     return 'N/A'
   }
-  if (Array.isArray(languages)) {
-    return languages.join(', ')
-  }
-  return languages
+  return occupations.join(' - ')
 }
 
-const formatSubtitle = (genre?: string, formats?: string | string[]) => {
-  const genreText = genre ? genre.toUpperCase() : null
-  let formatsText: string | null = null
-
-  if (Array.isArray(formats)) {
-    formatsText = formats.join('.').toUpperCase()
-  } else if (typeof formats === 'string' && formats.trim().length > 0) {
-    formatsText = formats.toUpperCase()
+const formatPartners = (
+  partners?: Array<{ name: string; period: string }> | null
+) => {
+  if (!partners || partners.length === 0) {
+    return null
   }
-
-  return [genreText, formatsText].filter(Boolean).join(' ')
+  return partners.map(p => `${p.name} (${p.period})`).join('\n')
 }
 
-export default function MovieDetailsScreen() {
+export default function ActorDetailsScreen() {
   const params = useLocalSearchParams<{ id?: string }>()
-  const movieId = useMemo(() => {
+  const actorId = useMemo(() => {
     const parsed = Number(params.id)
     return Number.isFinite(parsed) ? parsed : undefined
   }, [params.id])
 
-  const { data: movie, isLoading, isError, error } = useMovie(movieId ?? 0)
+  // TODO: Replace with real API call
+  const isLoading = false
+  const actor: Actor | null = useMemo(() => {
+    // Mock data for view-only implementation
+    if (!actorId) {
+      return null
+    }
+    return {
+      id: actorId,
+      firstName: 'Keanu',
+      lastName: 'Reeves',
+      nickName: null,
+      birthdate: '1964-09-02',
+      birthPlace: 'Beirut, Lebanon',
+      height: '1.86 m',
+      occupations: ['Actor', 'Musician'],
+      partners: [
+        { name: 'Jennifer Syme', period: '1998-2000, 2001; her death' },
+        { name: 'Alexandra Grant', period: 'c. 2018-present' },
+      ],
+      biography:
+        'Keanu Charles Reeves is a Canadian actor and musician. The recipient of numerous accolades in a career on screen spanning four decades, he is known for his leading roles in action films, his amiable public image, and his philanthropic efforts.',
+      profile_image: null,
+      movies: [
+        { id: 1, title: 'Movie 1' },
+        { id: 2, title: 'Movie 2' },
+        { id: 3, title: 'Movie 3' },
+        { id: 4, title: 'Movie 4' },
+        { id: 5, title: 'Movie 5' },
+      ],
+    }
+  }, [actorId])
 
   const backgroundColor = useThemeColor(
     {
@@ -131,59 +134,8 @@ export default function MovieDetailsScreen() {
     'iconPrimary'
   )
 
-  useEffect(() => {
-    if (isError && error) {
-      Toast.show({
-        type: 'error',
-        text1: 'Unable to load movie',
-        text2: error instanceof Error ? error.message : 'Unknown error',
-      })
-    }
-  }, [isError, error])
-
-  useEffect(() => {
-    if (!movieId) {
-      Toast.show({
-        type: 'error',
-        text1: 'Invalid movie',
-        text2: 'Movie identifier is missing.',
-      })
-      router.back()
-    }
-  }, [movieId])
-
   const handleGoBack = () => {
     router.back()
-  }
-
-  const handleActorPress = (actorId: string) => {
-    router.push(`/actor/${actorId}`)
-  }
-
-  const handleWatchTrailer = async () => {
-    if (!movie?.trailerUrl) {
-      return
-    }
-
-    try {
-      const canOpen = await Linking.canOpenURL(movie.trailerUrl)
-      if (canOpen) {
-        await Linking.openURL(movie.trailerUrl)
-      } else {
-        Toast.show({
-          type: 'error',
-          text1: 'Unable to open trailer',
-          text2: 'The trailer link is invalid.',
-        })
-      }
-    } catch (err) {
-      console.error('Failed to open trailer:', err)
-      Toast.show({
-        type: 'error',
-        text1: 'Unable to open trailer',
-        text2: 'Please try again later.',
-      })
-    }
   }
 
   if (isLoading) {
@@ -196,70 +148,15 @@ export default function MovieDetailsScreen() {
     )
   }
 
-  if (!movie) {
+  if (!actor) {
     return null
   }
 
-  const subtitle = formatSubtitle(movie.genre, movie.formats)
-  const heroImage = movie.image || movie.image_url
-
-  const castMembers = useMemo<NormalizedCastMember[]>(() => {
-    if (!Array.isArray(movie.actors) || movie.actors.length === 0) {
-      return []
-    }
-
-    return movie.actors
-      .map((actorWithCast: any) => {
-        if (!actorWithCast) {
-          return null
-        }
-
-        const name =
-          [actorWithCast.firstName, actorWithCast.lastName]
-            .filter(Boolean)
-            .join(' ')
-            .trim() ||
-          actorWithCast.nickName ||
-          ''
-
-        if (!name) {
-          return null
-        }
-
-        const id = actorWithCast.id ?? String(actorWithCast.tmdb_id ?? name)
-
-        // Get character info from nested cast object
-        const castInfo = actorWithCast.cast
-        const character =
-          (Array.isArray(castInfo?.characters) && castInfo.characters.length > 0
-            ? castInfo.characters.join(', ')
-            : null) ||
-          castInfo?.role ||
-          undefined
-
-        const image =
-          actorWithCast.profile_image &&
-          actorWithCast.profile_image.trim().length > 0
-            ? actorWithCast.profile_image
-            : undefined
-
-        const normalized: NormalizedCastMember = {
-          id: String(id),
-          name,
-        }
-
-        if (character) {
-          normalized.character = character
-        }
-
-        if (image) {
-          normalized.image = image
-        }
-
-        return normalized
-      })
-      .filter((member): member is NormalizedCastMember => member !== null)
-  }, [movie.actors])
+  const actorName =
+    [actor.firstName, actor.lastName].filter(Boolean).join(' ').trim() ||
+    actor.nickName ||
+    'Unknown Actor'
+  const heroImage = actor.profile_image
 
   return (
     <ThemedSafeAreaView style={[styles.container, { backgroundColor }]}>
@@ -282,7 +179,7 @@ export default function MovieDetailsScreen() {
               ]}
             >
               <Ionicons
-                name='image-outline'
+                name='person-outline'
                 size={64}
                 color={placeholderIconColor}
               />
@@ -311,30 +208,16 @@ export default function MovieDetailsScreen() {
           <View style={styles.titleRow}>
             <View style={styles.titleContainer}>
               <ThemedText style={[styles.title, { color: textPrimaryColor }]}>
-                {movie.title}
+                {actorName}
               </ThemedText>
-              {subtitle ? (
+              {actor.birthPlace ? (
                 <ThemedText
                   style={[styles.subtitle, { color: textSecondaryColor }]}
                 >
-                  {subtitle}
+                  {actor.birthPlace.toUpperCase()}
                 </ThemedText>
               ) : null}
             </View>
-
-            {movie.trailerUrl ? (
-              <TouchableOpacity
-                style={[styles.trailerButton, { backgroundColor: accentColor }]}
-                onPress={handleWatchTrailer}
-              >
-                <Ionicons name='play' size={16} color={buttonTextColor} />
-                <ThemedText
-                  style={[styles.trailerButtonText, { color: buttonTextColor }]}
-                >
-                  Watch Trailer
-                </ThemedText>
-              </TouchableOpacity>
-            ) : null}
           </View>
 
           <View style={[styles.divider, { backgroundColor: dividerColor }]} />
@@ -344,71 +227,41 @@ export default function MovieDetailsScreen() {
               <ThemedText
                 style={[styles.metaLabel, { color: textSecondaryColor }]}
               >
-                Censor Rating
+                Born
               </ThemedText>
               <ThemedText
                 style={[styles.metaValue, { color: textPrimaryColor }]}
               >
-                {movie.rating ?? 'N/A'}
+                {formatBirthDate(actor.birthdate)}
               </ThemedText>
             </View>
             <View style={styles.metaItem}>
               <ThemedText
                 style={[styles.metaLabel, { color: textSecondaryColor }]}
               >
-                Duration
+                Height
               </ThemedText>
               <ThemedText
                 style={[styles.metaValue, { color: textPrimaryColor }]}
               >
-                {formatDuration(movie.duration)}
+                {actor.height ?? 'N/A'}
               </ThemedText>
             </View>
             <View style={styles.metaItem}>
               <ThemedText
                 style={[styles.metaLabel, { color: textSecondaryColor }]}
               >
-                Release date
+                Occupations
               </ThemedText>
               <ThemedText
                 style={[styles.metaValue, { color: textPrimaryColor }]}
               >
-                {formatReleaseDate(movie.releaseDate)}
+                {formatOccupations(actor.occupations)}
               </ThemedText>
             </View>
           </View>
 
-          <View style={[styles.divider, { backgroundColor: dividerColor }]} />
-
-          <View style={styles.section}>
-            <ThemedText
-              style={[styles.sectionTitle, { color: textPrimaryColor }]}
-            >
-              Available in languages
-            </ThemedText>
-            <ThemedText
-              style={[styles.sectionText, { color: textSecondaryColor }]}
-            >
-              {formatLanguages(movie.language)}
-            </ThemedText>
-          </View>
-
-          <View style={[styles.divider, { backgroundColor: dividerColor }]} />
-
-          <View style={styles.section}>
-            <ThemedText
-              style={[styles.sectionTitle, { color: textPrimaryColor }]}
-            >
-              Story Plot
-            </ThemedText>
-            <ThemedText
-              style={[styles.sectionText, { color: textSecondaryColor }]}
-            >
-              {movie.description ?? 'Description coming soon.'}
-            </ThemedText>
-          </View>
-
-          {castMembers.length > 0 ? (
+          {actor.partners && actor.partners.length > 0 ? (
             <>
               <View
                 style={[styles.divider, { backgroundColor: dividerColor }]}
@@ -417,59 +270,75 @@ export default function MovieDetailsScreen() {
                 <ThemedText
                   style={[styles.sectionTitle, { color: textPrimaryColor }]}
                 >
-                  Cast
+                  Partners
+                </ThemedText>
+                <ThemedText
+                  style={[styles.sectionText, { color: textSecondaryColor }]}
+                >
+                  {formatPartners(actor.partners)}
+                </ThemedText>
+              </View>
+            </>
+          ) : null}
+
+          {actor.biography ? (
+            <>
+              <View
+                style={[styles.divider, { backgroundColor: dividerColor }]}
+              />
+              <View style={styles.section}>
+                <ThemedText
+                  style={[styles.sectionTitle, { color: textPrimaryColor }]}
+                >
+                  Biography
+                </ThemedText>
+                <ThemedText
+                  style={[styles.sectionText, { color: textSecondaryColor }]}
+                >
+                  {actor.biography}
+                </ThemedText>
+              </View>
+            </>
+          ) : null}
+
+          {actor.movies && actor.movies.length > 0 ? (
+            <>
+              <View
+                style={[styles.divider, { backgroundColor: dividerColor }]}
+              />
+              <View style={styles.section}>
+                <ThemedText
+                  style={[styles.sectionTitle, { color: textPrimaryColor }]}
+                >
+                  Movies
                 </ThemedText>
                 <ScrollView
                   horizontal
                   showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={styles.castList}
+                  contentContainerStyle={styles.moviesList}
                 >
-                  {castMembers.map(member => (
-                    <View key={member.id} style={styles.castItem}>
-                      <TouchableOpacity
-                        onPress={() => handleActorPress(member.id)}
-                        activeOpacity={0.7}
-                      >
+                  {actor.movies.map(movie => (
+                    <View key={movie.id} style={styles.movieItem}>
+                      {movie.image || movie.image_url ? (
+                        <Image
+                          source={{ uri: movie.image || movie.image_url }}
+                          style={styles.moviePoster}
+                          contentFit='cover'
+                        />
+                      ) : (
                         <View
                           style={[
-                            styles.castAvatar,
-                            { borderColor: accentColor },
-                            !member.image && {
-                              backgroundColor: placeholderColor,
-                              borderColor: 'transparent',
-                            },
+                            styles.moviePosterPlaceholder,
+                            { backgroundColor: placeholderColor },
                           ]}
                         >
-                          {member.image ? (
-                            <Image
-                              source={{ uri: member.image }}
-                              style={styles.castAvatarImage}
-                              contentFit='cover'
-                            />
-                          ) : (
-                            <ThemedText style={styles.castAvatarInitial}>
-                              {member.name.charAt(0).toUpperCase()}
-                            </ThemedText>
-                          )}
+                          <Ionicons
+                            name='film-outline'
+                            size={24}
+                            color={placeholderIconColor}
+                          />
                         </View>
-                      </TouchableOpacity>
-                      <ThemedText
-                        style={[styles.castName, { color: textSecondaryColor }]}
-                        numberOfLines={1}
-                      >
-                        {member.name}
-                      </ThemedText>
-                      {member.character ? (
-                        <ThemedText
-                          style={[
-                            styles.castRole,
-                            { color: textSecondaryColor },
-                          ]}
-                          numberOfLines={1}
-                        >
-                          {member.character}
-                        </ThemedText>
-                      ) : null}
+                      )}
                     </View>
                   ))}
                 </ScrollView>
@@ -569,19 +438,6 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     letterSpacing: 1,
   },
-  trailerButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 20,
-    gap: 6,
-  },
-  trailerButtonText: {
-    fontSize: 12,
-    fontWeight: '600',
-    letterSpacing: 0.3,
-  },
   divider: {
     height: StyleSheet.hairlineWidth,
     marginVertical: 20,
@@ -617,43 +473,23 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
   },
-  castList: {
+  moviesList: {
     paddingTop: 8,
   },
-  castItem: {
-    marginRight: 16,
-    alignItems: 'center',
-    width: 72,
+  movieItem: {
+    marginRight: 12,
   },
-  castAvatar: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    borderWidth: 2,
+  moviePoster: {
+    width: 100,
+    height: 150,
+    borderRadius: 12,
+  },
+  moviePosterPlaceholder: {
+    width: 100,
+    height: 150,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 8,
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    overflow: 'hidden',
-  },
-  castAvatarImage: {
-    width: '100%',
-    height: '100%',
-  },
-  castAvatarInitial: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#FFFFFF',
-  },
-  castName: {
-    fontSize: 12,
-    textAlign: 'center',
-    marginBottom: 2,
-  },
-  castRole: {
-    fontSize: 11,
-    textAlign: 'center',
-    opacity: 0.7,
   },
   footer: {
     position: 'absolute',
