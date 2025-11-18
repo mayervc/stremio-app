@@ -56,28 +56,17 @@ export default function ActorDetailsScreen() {
     return Number.isFinite(parsed) ? parsed : undefined
   }, [params.id])
 
-  const { data: actor, isLoading, isError, error } = useActor(actorId ?? 0)
+  const { data: actor, isLoading, isError, error } = useActor(actorId)
 
   useEffect(() => {
     if (isError && error) {
       Toast.show({
         type: 'error',
         text1: 'Unable to load actor',
-        text2: error instanceof Error ? error.message : 'Unknown error',
+        text2: error instanceof Error ? error.message : undefined,
       })
     }
   }, [isError, error])
-
-  useEffect(() => {
-    if (!actorId) {
-      Toast.show({
-        type: 'error',
-        text1: 'Invalid actor',
-        text2: 'Actor identifier is missing.',
-      })
-      router.back()
-    }
-  }, [actorId])
 
   const backgroundColor = useThemeColor(
     {

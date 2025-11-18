@@ -8,10 +8,10 @@ export const actorQueryKeys = {
 }
 
 // Hook to fetch a specific actor by ID
-export const useActor = (id: number) => {
+export const useActor = (id: number | undefined) => {
   return useQuery({
-    queryKey: actorQueryKeys.detail(id),
-    queryFn: () => actorsApi.getActorById(id),
+    queryKey: actorQueryKeys.detail(id ?? 0),
+    queryFn: () => actorsApi.getActorById(id!),
     enabled: !!id, // Only run query if id is provided
     staleTime: 1000 * 60 * 30, // 30 minutes - actor details rarely change
     gcTime: 1000 * 60 * 60, // 1 hour
