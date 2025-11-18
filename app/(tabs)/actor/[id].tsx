@@ -15,30 +15,7 @@ import { ThemedSafeAreaView } from '@/components/themed-safe-area-view'
 import { ThemedText } from '@/components/themed-text'
 import { Colors } from '@/constants/theme'
 import { useThemeColor } from '@/hooks/use-theme-color'
-
-// Mock data type - will be replaced with real API types later
-type MockActor = {
-  id: number
-  firstName: string
-  lastName: string
-  nickName?: string | null
-  birthdate?: string | null
-  birthPlace?: string | null
-  height?: string | null
-  occupations?: string[] | null
-  partners?: Array<{
-    name: string
-    period: string
-  }> | null
-  biography?: string | null
-  profile_image?: string | null
-  movies?: Array<{
-    id: number
-    title: string
-    image?: string
-    image_url?: string
-  }> | null
-}
+import { Actor } from '@/lib/api/types'
 
 const formatBirthDate = (date?: string | null) => {
   if (!date) {
@@ -80,7 +57,7 @@ export default function ActorDetailsScreen() {
 
   // TODO: Replace with real API call
   const isLoading = false
-  const actor: MockActor | null = useMemo(() => {
+  const actor: Actor | null = useMemo(() => {
     // Mock data for view-only implementation
     if (!actorId) {
       return null

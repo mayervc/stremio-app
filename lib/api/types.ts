@@ -24,6 +24,20 @@ export interface Actor {
   tmdb_id?: number | null
   createdAt?: string
   updatedAt?: string
+  birthPlace?: string | null
+  height?: string | null
+  occupations?: string[] | null
+  partners?: Array<{
+    name: string
+    period: string
+  }> | null
+  biography?: string | null
+  movies?: Array<{
+    id: number
+    title: string
+    image?: string
+    image_url?: string
+  }>
 }
 
 export interface ActorWithCast extends Actor {
