@@ -89,6 +89,7 @@ const CustomTabBar = ({
   const hiddenRoutes = [
     'search',
     'movie/[id]',
+    'movie/[id]/index',
     'actor/[id]',
     'movie/[id]/showtimes',
   ]
