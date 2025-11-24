@@ -160,6 +160,15 @@ export default function MovieDetailsScreen() {
     router.push(`/actor/${actorId}`)
   }
 
+  const handleBookTicketsPress = () => {
+    if (movieId) {
+      router.push({
+        pathname: '/showtimes/[movieId]',
+        params: { movieId: String(movieId) },
+      } as any)
+    }
+  }
+
   const handleWatchTrailer = async () => {
     if (!movie?.trailerUrl) {
       return
@@ -482,14 +491,7 @@ export default function MovieDetailsScreen() {
       <View style={styles.footer}>
         <TouchableOpacity
           style={[styles.bookButton, { backgroundColor: accentColor }]}
-          onPress={() => {
-            if (movieId) {
-              router.push({
-                pathname: '/showtimes/[movieId]',
-                params: { movieId: String(movieId) },
-              } as any)
-            }
-          }}
+          onPress={handleBookTicketsPress}
         >
           <ThemedText
             style={[styles.bookButtonText, { color: buttonTextColor }]}

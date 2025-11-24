@@ -1,6 +1,5 @@
 import { Ionicons } from '@expo/vector-icons'
 import { router, useLocalSearchParams } from 'expo-router'
-import { useMemo } from 'react'
 import { Pressable, StyleSheet, View } from 'react-native'
 
 import { ThemedSafeAreaView } from '@/components/themed-safe-area-view'
@@ -11,12 +10,9 @@ import { useMovie } from '@/hooks/useMovies'
 
 export default function ShowtimesScreen() {
   const params = useLocalSearchParams<{ movieId?: string }>()
-  const movieId = useMemo(() => {
-    const parsed = Number(params.movieId)
-    return Number.isFinite(parsed) ? parsed : undefined
-  }, [params.movieId])
+  const movieId = Number(params.movieId)
 
-  const { data: movie } = useMovie(movieId ?? 0)
+  const { data: movie } = useMovie(movieId)
 
   const backgroundColor = useThemeColor(
     {
