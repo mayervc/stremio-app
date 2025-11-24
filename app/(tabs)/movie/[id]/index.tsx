@@ -160,6 +160,12 @@ export default function MovieDetailsScreen() {
     router.push(`/actor/${actorId}`)
   }
 
+  const handleBookTicketsPress = () => {
+    if (movieId) {
+      router.push(`/movie/${movieId}/showtimes`)
+    }
+  }
+
   const handleWatchTrailer = async () => {
     if (!movie?.trailerUrl) {
       return
@@ -482,7 +488,7 @@ export default function MovieDetailsScreen() {
       <View style={styles.footer}>
         <TouchableOpacity
           style={[styles.bookButton, { backgroundColor: accentColor }]}
-          onPress={() => router.push('/(tabs)/tickets')}
+          onPress={handleBookTicketsPress}
         >
           <ThemedText
             style={[styles.bookButtonText, { color: buttonTextColor }]}
@@ -681,3 +687,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 })
+
