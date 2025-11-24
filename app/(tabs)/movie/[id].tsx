@@ -482,7 +482,14 @@ export default function MovieDetailsScreen() {
       <View style={styles.footer}>
         <TouchableOpacity
           style={[styles.bookButton, { backgroundColor: accentColor }]}
-          onPress={() => router.push('/(tabs)/tickets')}
+          onPress={() => {
+            if (movieId) {
+              router.push({
+                pathname: '/showtimes/[movieId]',
+                params: { movieId: String(movieId) },
+              } as any)
+            }
+          }}
         >
           <ThemedText
             style={[styles.bookButtonText, { color: buttonTextColor }]}

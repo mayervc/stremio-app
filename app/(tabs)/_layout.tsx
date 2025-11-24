@@ -63,6 +63,13 @@ export default function TabLayout() {
           headerShown: false,
         }}
       />
+      <Tabs.Screen
+        name='showtimes/[movieId]'
+        options={{
+          href: null,
+          headerShown: false,
+        }}
+      />
     </Tabs>
   )
 }

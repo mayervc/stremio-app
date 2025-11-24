@@ -86,7 +86,12 @@ const CustomTabBar = ({
 
   // Check if current route should hide tab bar - if so, hide the entire tab bar
   const currentRoute = state.routes[state.index]
-  const hiddenRoutes = ['search', 'movie/[id]', 'actor/[id]']
+  const hiddenRoutes = [
+    'search',
+    'movie/[id]',
+    'actor/[id]',
+    'showtimes/[movieId]',
+  ]
   if (currentRoute && hiddenRoutes.includes(currentRoute.name)) {
     return null
   }
