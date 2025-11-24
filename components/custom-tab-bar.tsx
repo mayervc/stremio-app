@@ -84,9 +84,9 @@ const CustomTabBar = ({
     return <Icon width={width} height={height} color={color} />
   }
 
-  // Check if current route is search - if so, hide the entire tab bar
+  // Check if current route should hide tab bar - if so, hide the entire tab bar
   const currentRoute = state.routes[state.index]
-  const hiddenRoutes = ['search']
+  const hiddenRoutes = ['search', 'movie/[id]', 'actor/[id]']
   if (currentRoute && hiddenRoutes.includes(currentRoute.name)) {
     return null
   }

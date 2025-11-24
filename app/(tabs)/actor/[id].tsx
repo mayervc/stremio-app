@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { Image } from 'expo-image'
 import { LinearGradient } from 'expo-linear-gradient'
 import { router, useLocalSearchParams } from 'expo-router'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import {
   ActivityIndicator,
   ScrollView,
@@ -10,12 +10,13 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
+import Toast from 'react-native-toast-message'
 
 import { ThemedSafeAreaView } from '@/components/themed-safe-area-view'
 import { ThemedText } from '@/components/themed-text'
 import { Colors } from '@/constants/theme'
 import { useThemeColor } from '@/hooks/use-theme-color'
-import { Actor } from '@/lib/api/types'
+import { useActor } from '@/hooks/useActors'
 
 const formatBirthDate = (date?: string | null) => {
   if (!date) {
@@ -55,38 +56,17 @@ export default function ActorDetailsScreen() {
     return Number.isFinite(parsed) ? parsed : undefined
   }, [params.id])
 
-  // TODO: Replace with real API call
-  const isLoading = false
-  const actor: Actor | null = useMemo(() => {
-    // Mock data for view-only implementation
-    if (!actorId) {
-      return null
+  const { data: actor, isLoading, isError, error } = useActor(actorId)
+
+  useEffect(() => {
+    if (isError && error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Unable to load actor',
+        text2: error instanceof Error ? error.message : undefined,
+      })
     }
-    return {
-      id: actorId,
-      firstName: 'Keanu',
-      lastName: 'Reeves',
-      nickName: null,
-      birthdate: '1964-09-02',
-      birthPlace: 'Beirut, Lebanon',
-      height: '1.86 m',
-      occupations: ['Actor', 'Musician'],
-      partners: [
-        { name: 'Jennifer Syme', period: '1998-2000, 2001; her death' },
-        { name: 'Alexandra Grant', period: 'c. 2018-present' },
-      ],
-      biography:
-        'Keanu Charles Reeves is a Canadian actor and musician. The recipient of numerous accolades in a career on screen spanning four decades, he is known for his leading roles in action films, his amiable public image, and his philanthropic efforts.',
-      profile_image: null,
-      movies: [
-        { id: 1, title: 'Movie 1' },
-        { id: 2, title: 'Movie 2' },
-        { id: 3, title: 'Movie 3' },
-        { id: 4, title: 'Movie 4' },
-        { id: 5, title: 'Movie 5' },
-      ],
-    }
-  }, [actorId])
+  }, [isError, error])
 
   const backgroundColor = useThemeColor(
     {
@@ -500,6 +480,7 @@ const styles = StyleSheet.create({
     paddingBottom: 32,
     paddingTop: 16,
     backgroundColor: 'transparent',
+    zIndex: 1000,
   },
   bookButton: {
     borderRadius: 24,
