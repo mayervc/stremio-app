@@ -9,8 +9,8 @@ import { useThemeColor } from '@/hooks/use-theme-color'
 import { useMovie } from '@/hooks/useMovies'
 
 export default function ShowtimesScreen() {
-  const params = useLocalSearchParams<{ movieId?: string }>()
-  const movieId = Number(params.movieId)
+  const params = useLocalSearchParams<{ id?: string }>()
+  const movieId = Number(params.id)
 
   const { data: movie } = useMovie(movieId)
 

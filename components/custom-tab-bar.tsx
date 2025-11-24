@@ -90,7 +90,7 @@ const CustomTabBar = ({
     'search',
     'movie/[id]',
     'actor/[id]',
-    'showtimes/[movieId]',
+    'movie/[id]/showtimes',
   ]
   if (currentRoute && hiddenRoutes.includes(currentRoute.name)) {
     return null

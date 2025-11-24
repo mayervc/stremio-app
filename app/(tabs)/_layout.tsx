@@ -64,7 +64,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name='showtimes/[movieId]'
+        name='movie/[id]/showtimes'
         options={{
           href: null,
           headerShown: false,

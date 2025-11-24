@@ -162,10 +162,7 @@ export default function MovieDetailsScreen() {
 
   const handleBookTicketsPress = () => {
     if (movieId) {
-      router.push({
-        pathname: '/showtimes/[movieId]',
-        params: { movieId: String(movieId) },
-      } as any)
+      router.push(`/movie/${movieId}/showtimes`)
     }
   }
 
