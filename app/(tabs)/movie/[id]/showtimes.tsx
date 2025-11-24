@@ -1,75 +1,14 @@
 import { Ionicons } from '@expo/vector-icons'
 import { router, useLocalSearchParams } from 'expo-router'
-import { useMemo, useState } from 'react'
-import {
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from 'react-native'
+import { useState } from 'react'
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native'
 
+import ChooseDatePicker from '@/components/choose-date-picker'
 import { ThemedSafeAreaView } from '@/components/themed-safe-area-view'
 import { ThemedText } from '@/components/themed-text'
 import { Colors } from '@/constants/theme'
 import { useThemeColor } from '@/hooks/use-theme-color'
 import { useMovie } from '@/hooks/useMovies'
-
-type DateOption = {
-  date: Date
-  label: string
-  isToday: boolean
-}
-
-const formatDateOption = (date: Date, isToday: boolean): DateOption => {
-  const dayNames = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
-  const monthNames = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-  ]
-
-  const dayOfWeek = dayNames[date.getDay()]
-  const day = date.getDate()
-  const month = monthNames[date.getMonth()]
-
-  let label: string
-  if (isToday) {
-    label = `Today ${dayOfWeek}`
-  } else {
-    label = `${day} ${month} ${dayOfWeek}`
-  }
-
-  return {
-    date,
-    label,
-    isToday,
-  }
-}
-
-const generateDateOptions = (): DateOption[] => {
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-
-  const options: DateOption[] = []
-
-  for (let i = 0; i < 8; i++) {
-    const date = new Date(today)
-    date.setDate(today.getDate() + i)
-    options.push(formatDateOption(date, i === 0))
-  }
-
-  return options
-}
 
 export default function ShowtimesScreen() {
   const params = useLocalSearchParams<{ id?: string }>()
@@ -82,8 +21,6 @@ export default function ShowtimesScreen() {
     today.setHours(0, 0, 0, 0)
     return today
   })
-
-  const dateOptions = useMemo(() => generateDateOptions(), [])
 
   const backgroundColor = useThemeColor(
     {
@@ -100,18 +37,6 @@ export default function ShowtimesScreen() {
     { light: '#E5E5E5', dark: '#1E1E1E' },
     'background'
   )
-  const textPrimaryColor = useThemeColor(
-    { light: Colors.light.textPrimary, dark: Colors.dark.textPrimary },
-    'textPrimary'
-  )
-  const accentColor = useThemeColor(
-    { light: Colors.light.buttonPrimary, dark: Colors.dark.buttonPrimary },
-    'buttonPrimary'
-  )
-  const unselectedDateBg = useThemeColor(
-    { light: '#E5E5E5', dark: '#1E1E1E' },
-    'background'
-  )
 
   const handleBackPress = () => {
     router.back()
@@ -119,10 +44,6 @@ export default function ShowtimesScreen() {
 
   const handleDateSelect = (date: Date) => {
     setSelectedDate(date)
-  }
-
-  const isDateSelected = (date: Date): boolean => {
-    return date.getTime() === selectedDate.getTime()
   }
 
   return (
@@ -149,51 +70,10 @@ export default function ShowtimesScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Choose Date Section */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <ThemedText
-              style={[styles.sectionTitle, { color: textPrimaryColor }]}
-            >
-              Choose Date
-            </ThemedText>
-            <Ionicons name='calendar-outline' size={20} color={iconColor} />
-          </View>
-
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.dateButtonsContainer}
-          >
-            {dateOptions.map((option, index) => {
-              const isSelected = isDateSelected(option.date)
-              return (
-                <TouchableOpacity
-                  key={index}
-                  style={[
-                    styles.dateButton,
-                    {
-                      backgroundColor: isSelected
-                        ? accentColor
-                        : unselectedDateBg,
-                    },
-                  ]}
-                  onPress={() => handleDateSelect(option.date)}
-                  activeOpacity={0.7}
-                >
-                  <ThemedText
-                    style={[
-                      styles.dateButtonText,
-                      { color: isSelected ? '#FFFFFF' : textPrimaryColor },
-                    ]}
-                  >
-                    {option.label}
-                  </ThemedText>
-                </TouchableOpacity>
-              )
-            })}
-          </ScrollView>
-        </View>
+        <ChooseDatePicker
+          selectedDate={selectedDate}
+          onDateSelect={handleDateSelect}
+        />
       </ScrollView>
     </ThemedSafeAreaView>
   )
@@ -234,35 +114,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 24,
     paddingBottom: 100,
-  },
-  section: {
-    marginBottom: 32,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 16,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  dateButtonsContainer: {
-    flexDirection: 'row',
-    gap: 12,
-    paddingRight: 20,
-  },
-  dateButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 12,
-    minWidth: 100,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  dateButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
   },
 })
