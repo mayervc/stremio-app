@@ -87,12 +87,6 @@ export interface Cinema {
   countryCode: number
   createdAt: string
   updatedAt: string
-  users?: Array<{
-    id: number
-    email: string
-    firstName?: string
-    lastName?: string
-  }>
 }
 
 export interface CinemaSearchParams {
@@ -102,12 +96,14 @@ export interface CinemaSearchParams {
   city?: string
 }
 
+export interface Pagination {
+  currentPage: number
+  pageSize: number
+  totalItems: number
+  totalPages: number
+}
+
 export interface CinemaSearchResponse {
   cinemas: Cinema[]
-  pagination: {
-    currentPage: number
-    pageSize: number
-    totalItems: number
-    totalPages: number
-  }
+  pagination: Pagination
 }

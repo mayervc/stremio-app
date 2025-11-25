@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Modal,
   Pressable,
@@ -8,26 +8,45 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
+import Toast from 'react-native-toast-message'
 
 import { ThemedText } from '@/components/themed-text'
 import { Colors } from '@/constants/theme'
 import { useThemeColor } from '@/hooks/use-theme-color'
+import { useSearchCinemas } from '@/hooks/useCinemas'
 import { Cinema } from '@/lib/api/types'
 
 interface ChooseCinemaDropdownProps {
-  selectedCinema: Cinema | null
   onCinemaSelect: (cinema: Cinema) => void
-  cinemas: Cinema[]
-  isLoading?: boolean
 }
 
 export default function ChooseCinemaDropdown({
-  selectedCinema,
   onCinemaSelect,
-  cinemas,
-  isLoading = false,
 }: ChooseCinemaDropdownProps) {
   const [isModalVisible, setIsModalVisible] = useState(false)
+  const [selectedCinema, setSelectedCinema] = useState<Cinema | null>(null)
+
+  const {
+    data: cinemasResponse,
+    isLoading: isLoadingCinemas,
+    isError: isCinemasError,
+    error: cinemasError,
+  } = useSearchCinemas()
+  const cinemas = cinemasResponse?.cinemas || []
+
+  // Error handling
+  useEffect(() => {
+    if (isCinemasError && cinemasError) {
+      Toast.show({
+        type: 'error',
+        text1: 'Unable to load cinemas',
+        text2:
+          cinemasError instanceof Error
+            ? cinemasError.message
+            : 'Unknown error',
+      })
+    }
+  }, [isCinemasError, cinemasError])
 
   const textPrimaryColor = useThemeColor(
     { light: Colors.light.textPrimary, dark: Colors.dark.textPrimary },
@@ -54,6 +73,7 @@ export default function ChooseCinemaDropdown({
   )
 
   const handleSelectCinema = (cinema: Cinema) => {
+    setSelectedCinema(cinema)
     onCinemaSelect(cinema)
     setIsModalVisible(false)
   }
@@ -80,7 +100,7 @@ export default function ChooseCinemaDropdown({
           style={[styles.dropdownButtonText, { color: textPrimaryColor }]}
           numberOfLines={1}
         >
-          {isLoading
+          {isLoadingCinemas
             ? 'Loading...'
             : selectedCinema
               ? selectedCinema.name
@@ -121,7 +141,7 @@ export default function ChooseCinemaDropdown({
               style={styles.modalList}
               showsVerticalScrollIndicator={false}
             >
-              {isLoading ? (
+              {isLoadingCinemas ? (
                 <ThemedText
                   style={[styles.modalEmptyText, { color: textPrimaryColor }]}
                 >

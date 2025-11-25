@@ -3,7 +3,9 @@ import { apiClient } from './axios-config'
 import type { CinemaSearchParams, CinemaSearchResponse } from './types'
 
 export const cinemasApi = {
-  async getCinemas(params?: CinemaSearchParams): Promise<CinemaSearchResponse> {
+  async searchCinemas(
+    params?: CinemaSearchParams
+  ): Promise<CinemaSearchResponse> {
     try {
       // Build request body with defaults to get all cinemas
       const requestBody: CinemaSearchParams = {

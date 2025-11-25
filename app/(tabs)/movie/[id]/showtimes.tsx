@@ -1,8 +1,7 @@
 import { Ionicons } from '@expo/vector-icons'
 import { router, useLocalSearchParams } from 'expo-router'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native'
-import Toast from 'react-native-toast-message'
 
 import ChooseCinemaDropdown from '@/components/choose-cinema-dropdown'
 import ChooseDatePicker from '@/components/choose-date-picker'
@@ -10,7 +9,6 @@ import { ThemedSafeAreaView } from '@/components/themed-safe-area-view'
 import { ThemedText } from '@/components/themed-text'
 import { Colors } from '@/constants/theme'
 import { useThemeColor } from '@/hooks/use-theme-color'
-import { useCinemas } from '@/hooks/useCinemas'
 import { useMovie } from '@/hooks/useMovies'
 import { Cinema } from '@/lib/api/types'
 
@@ -19,35 +17,12 @@ export default function ShowtimesScreen() {
   const movieId = Number(params.id)
 
   const { data: movie } = useMovie(movieId)
-  const {
-    data: cinemasResponse,
-    isLoading: isLoadingCinemas,
-    isError: isCinemasError,
-    error: cinemasError,
-  } = useCinemas()
-  const cinemas = cinemasResponse?.cinemas || []
 
   const [selectedDate, setSelectedDate] = useState<Date>(() => {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
     return today
   })
-
-  const [selectedCinema, setSelectedCinema] = useState<Cinema | null>(null)
-
-  // Error handling
-  useEffect(() => {
-    if (isCinemasError && cinemasError) {
-      Toast.show({
-        type: 'error',
-        text1: 'Unable to load cinemas',
-        text2:
-          cinemasError instanceof Error
-            ? cinemasError.message
-            : 'Unknown error',
-      })
-    }
-  }, [isCinemasError, cinemasError])
 
   const backgroundColor = useThemeColor(
     {
@@ -74,7 +49,8 @@ export default function ShowtimesScreen() {
   }
 
   const handleCinemaSelect = (cinema: Cinema) => {
-    setSelectedCinema(cinema)
+    // Cinema selection is now handled internally by ChooseCinemaDropdown
+    // This callback can be used for future functionality (e.g., fetching showtimes)
   }
 
   return (
@@ -106,12 +82,7 @@ export default function ShowtimesScreen() {
           onDateSelect={handleDateSelect}
         />
 
-        <ChooseCinemaDropdown
-          selectedCinema={selectedCinema}
-          onCinemaSelect={handleCinemaSelect}
-          cinemas={cinemas}
-          isLoading={isLoadingCinemas}
-        />
+        <ChooseCinemaDropdown onCinemaSelect={handleCinemaSelect} />
       </ScrollView>
     </ThemedSafeAreaView>
   )
