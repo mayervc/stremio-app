@@ -1,7 +1,9 @@
 import { Ionicons } from '@expo/vector-icons'
 import { router, useLocalSearchParams } from 'expo-router'
-import { Pressable, StyleSheet, View } from 'react-native'
+import { useState } from 'react'
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native'
 
+import ChooseDatePicker from '@/components/choose-date-picker'
 import { ThemedSafeAreaView } from '@/components/themed-safe-area-view'
 import { ThemedText } from '@/components/themed-text'
 import { Colors } from '@/constants/theme'
@@ -13,6 +15,12 @@ export default function ShowtimesScreen() {
   const movieId = Number(params.id)
 
   const { data: movie } = useMovie(movieId)
+
+  const [selectedDate, setSelectedDate] = useState<Date>(() => {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    return today
+  })
 
   const backgroundColor = useThemeColor(
     {
@@ -34,6 +42,10 @@ export default function ShowtimesScreen() {
     router.back()
   }
 
+  const handleDateSelect = (date: Date) => {
+    setSelectedDate(date)
+  }
+
   return (
     <ThemedSafeAreaView style={[styles.container, { backgroundColor }]}>
       {/* Header with back button and movie title */}
@@ -53,12 +65,16 @@ export default function ShowtimesScreen() {
         <View style={styles.placeholder} />
       </View>
 
-      {/* Content will go here in future tickets */}
-      <View style={styles.content}>
-        <ThemedText style={styles.placeholderText}>
-          Showtimes content coming soon...
-        </ThemedText>
-      </View>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <ChooseDatePicker
+          selectedDate={selectedDate}
+          onDateSelect={handleDateSelect}
+        />
+      </ScrollView>
     </ThemedSafeAreaView>
   )
 }
@@ -91,14 +107,12 @@ const styles = StyleSheet.create({
   placeholder: {
     width: 40,
   },
-  content: {
+  scrollView: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
   },
-  placeholderText: {
-    fontSize: 16,
-    opacity: 0.6,
+  scrollContent: {
+    paddingHorizontal: 20,
+    paddingTop: 24,
+    paddingBottom: 100,
   },
 })
