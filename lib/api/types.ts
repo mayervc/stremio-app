@@ -75,3 +75,35 @@ export interface RecommendedMoviesResponse {
   movies: Movie[]
   total: number
 }
+
+// Cinema Types
+export interface Cinema {
+  id: number
+  name: string
+  address: string
+  city: string
+  country: string
+  phoneNumber: number | string // Backend can return as string or number
+  countryCode: number
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CinemaSearchParams {
+  page?: number
+  limit?: number
+  name?: string
+  city?: string
+}
+
+export interface Pagination {
+  currentPage: number
+  pageSize: number
+  totalItems: number
+  totalPages: number
+}
+
+export interface CinemaSearchResponse {
+  cinemas: Cinema[]
+  pagination: Pagination
+}

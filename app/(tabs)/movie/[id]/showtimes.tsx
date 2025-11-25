@@ -3,12 +3,14 @@ import { router, useLocalSearchParams } from 'expo-router'
 import { useState } from 'react'
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native'
 
+import ChooseCinemaDropdown from '@/components/choose-cinema-dropdown'
 import ChooseDatePicker from '@/components/choose-date-picker'
 import { ThemedSafeAreaView } from '@/components/themed-safe-area-view'
 import { ThemedText } from '@/components/themed-text'
 import { Colors } from '@/constants/theme'
 import { useThemeColor } from '@/hooks/use-theme-color'
 import { useMovie } from '@/hooks/useMovies'
+import { Cinema } from '@/lib/api/types'
 
 export default function ShowtimesScreen() {
   const params = useLocalSearchParams<{ id?: string }>()
@@ -46,6 +48,11 @@ export default function ShowtimesScreen() {
     setSelectedDate(date)
   }
 
+  const handleCinemaSelect = (cinema: Cinema) => {
+    // Cinema selection is now handled internally by ChooseCinemaDropdown
+    // This callback can be used for future functionality (e.g., fetching showtimes)
+  }
+
   return (
     <ThemedSafeAreaView style={[styles.container, { backgroundColor }]}>
       {/* Header with back button and movie title */}
@@ -74,6 +81,8 @@ export default function ShowtimesScreen() {
           selectedDate={selectedDate}
           onDateSelect={handleDateSelect}
         />
+
+        <ChooseCinemaDropdown onCinemaSelect={handleCinemaSelect} />
       </ScrollView>
     </ThemedSafeAreaView>
   )
