@@ -107,3 +107,30 @@ export interface CinemaSearchResponse {
   cinemas: Cinema[]
   pagination: Pagination
 }
+
+// Showtime Types
+export interface Showtime {
+  id: number
+  room_id: number
+  start_time: string // Format: "HH:mm" (e.g., "14:30")
+  end_time: string // Format: "HH:mm" (e.g., "16:45")
+  booked_seats: number
+  room_seats: number
+}
+
+export interface ShowtimeRoom {
+  id: number
+  room_id: number
+  room_name: string
+  showtimes: Showtime[]
+}
+
+export interface ShowtimeSearchParams {
+  movie_id?: number
+  cinema_id?: number
+  date?: string // Format: "YYYY-MM-DD" (e.g., "2025-11-20")
+}
+
+export interface ShowtimeSearchResponse {
+  showtimes: ShowtimeRoom[]
+}

@@ -1,15 +1,18 @@
 import { Ionicons } from '@expo/vector-icons'
+import { format } from 'date-fns'
 import { router, useLocalSearchParams } from 'expo-router'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native'
 
 import ChooseCinemaDropdown from '@/components/choose-cinema-dropdown'
 import ChooseDatePicker from '@/components/choose-date-picker'
+import ShowtimeList from '@/components/showtime-list'
 import { ThemedSafeAreaView } from '@/components/themed-safe-area-view'
 import { ThemedText } from '@/components/themed-text'
 import { Colors } from '@/constants/theme'
 import { useThemeColor } from '@/hooks/use-theme-color'
 import { useMovie } from '@/hooks/useMovies'
+import { useShowtimes } from '@/hooks/useShowtimes'
 import { Cinema } from '@/lib/api/types'
 
 export default function ShowtimesScreen() {
@@ -23,6 +26,46 @@ export default function ShowtimesScreen() {
     today.setHours(0, 0, 0, 0)
     return today
   })
+
+  const [selectedCinema, setSelectedCinema] = useState<Cinema | null>(null)
+  const [selectedShowtimeId, setSelectedShowtimeId] = useState<number | null>(
+    null
+  )
+
+  // Format date as YYYY-MM-DD for API
+  const formattedDate = useMemo(() => {
+    return format(selectedDate, 'yyyy-MM-dd')
+  }, [selectedDate])
+
+  // Build search params for showtimes
+  const showtimeParams = useMemo(() => {
+    const params: {
+      movie_id?: number
+      cinema_id?: number
+      date?: string
+    } = {}
+
+    if (movieId) {
+      params.movie_id = movieId
+    }
+    if (selectedCinema?.id) {
+      params.cinema_id = selectedCinema.id
+    }
+    if (formattedDate) {
+      params.date = formattedDate
+    }
+
+    return params
+  }, [movieId, selectedCinema?.id, formattedDate])
+
+  const {
+    data: showtimesResponse,
+    isLoading: isLoadingShowtimes,
+    isError: isShowtimesError,
+    error: showtimesError,
+  } = useShowtimes(showtimeParams)
+
+  const showtimeRooms = showtimesResponse?.showtimes || []
 
   const backgroundColor = useThemeColor(
     {
@@ -49,8 +92,12 @@ export default function ShowtimesScreen() {
   }
 
   const handleCinemaSelect = (cinema: Cinema) => {
-    // Cinema selection is now handled internally by ChooseCinemaDropdown
-    // This callback can be used for future functionality (e.g., fetching showtimes)
+    setSelectedCinema(cinema)
+  }
+
+  const handleShowtimeSelect = (showtimeId: number, roomId: number) => {
+    setSelectedShowtimeId(showtimeId)
+    // TODO: Navigate to seat selection or booking screen
   }
 
   return (
@@ -82,7 +129,20 @@ export default function ShowtimesScreen() {
           onDateSelect={handleDateSelect}
         />
 
-        <ChooseCinemaDropdown onCinemaSelect={handleCinemaSelect} />
+        <ChooseCinemaDropdown
+          selectedCinema={selectedCinema}
+          onCinemaSelect={handleCinemaSelect}
+        />
+
+        <ShowtimeList
+          rooms={showtimeRooms}
+          isLoading={isLoadingShowtimes}
+          isError={isShowtimesError}
+          error={showtimesError}
+          hasCinemaSelected={!!selectedCinema}
+          selectedShowtimeId={selectedShowtimeId}
+          onShowtimeSelect={handleShowtimeSelect}
+        />
       </ScrollView>
     </ThemedSafeAreaView>
   )
