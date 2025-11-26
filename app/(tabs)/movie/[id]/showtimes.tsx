@@ -1,7 +1,13 @@
 import { Ionicons } from '@expo/vector-icons'
 import { router, useLocalSearchParams } from 'expo-router'
-import { useState } from 'react'
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native'
+import { useMemo, useState } from 'react'
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native'
 
 import ChooseCinemaDropdown from '@/components/choose-cinema-dropdown'
 import ChooseDatePicker from '@/components/choose-date-picker'
@@ -12,6 +18,7 @@ import { Colors } from '@/constants/theme'
 import { useThemeColor } from '@/hooks/use-theme-color'
 import { useMovie } from '@/hooks/useMovies'
 import { Cinema } from '@/lib/api/types'
+import { useBookingStore } from '@/store/bookingStore'
 
 export default function ShowtimesScreen() {
   const params = useLocalSearchParams<{ id?: string }>()
@@ -29,6 +36,9 @@ export default function ShowtimesScreen() {
   const [selectedShowtimeId, setSelectedShowtimeId] = useState<number | null>(
     null
   )
+  const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null)
+
+  const { setBookingData } = useBookingStore()
 
   const backgroundColor = useThemeColor(
     {
@@ -60,6 +70,54 @@ export default function ShowtimesScreen() {
 
   const handleShowtimeSelect = (showtimeId: number, roomId: number) => {
     setSelectedShowtimeId(showtimeId)
+    setSelectedRoomId(roomId)
+  }
+
+  // Validate if all required fields are selected
+  const isBookingValid = useMemo(() => {
+    return (
+      !!selectedDate &&
+      !!selectedCinema &&
+      !!selectedShowtimeId &&
+      !!selectedRoomId &&
+      !!movieId
+    )
+  }, [
+    selectedDate,
+    selectedCinema,
+    selectedShowtimeId,
+    selectedRoomId,
+    movieId,
+  ])
+
+  const buttonPrimaryColor = useThemeColor(
+    { light: Colors.light.buttonPrimary, dark: Colors.dark.buttonPrimary },
+    'buttonPrimary'
+  )
+  const borderColor = useThemeColor(
+    { light: Colors.light.borderPrimary, dark: Colors.dark.borderPrimary },
+    'borderPrimary'
+  )
+
+  const handleBookTickets = () => {
+    if (
+      !isBookingValid ||
+      !selectedCinema ||
+      !selectedShowtimeId ||
+      !selectedRoomId
+    ) {
+      return
+    }
+
+    setBookingData({
+      movieId,
+      movieTitle: movie?.title,
+      selectedDate,
+      selectedCinema,
+      selectedShowtimeId,
+      roomId: selectedRoomId,
+    })
+
     // TODO: Navigate to seat selection or booking screen
   }
 
@@ -105,6 +163,23 @@ export default function ShowtimesScreen() {
           onShowtimeSelect={handleShowtimeSelect}
         />
       </ScrollView>
+
+      {/* Book Tickets Button */}
+      <View style={[styles.buttonContainer, { borderTopColor: borderColor }]}>
+        <TouchableOpacity
+          style={[
+            styles.bookButton,
+            {
+              backgroundColor: isBookingValid ? buttonPrimaryColor : '#2B3543',
+            },
+          ]}
+          onPress={handleBookTickets}
+          disabled={!isBookingValid}
+          activeOpacity={0.8}
+        >
+          <ThemedText style={styles.bookButtonText}>Book Tickets</ThemedText>
+        </TouchableOpacity>
+      </View>
     </ThemedSafeAreaView>
   )
 }
@@ -144,5 +219,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 24,
     paddingBottom: 100,
+  },
+  buttonContainer: {
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderTopWidth: 1,
+  },
+  bookButton: {
+    width: '100%',
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  bookButtonText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#FFFFFF',
   },
 })
