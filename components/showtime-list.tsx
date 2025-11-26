@@ -12,7 +12,7 @@ import { ThemedText } from '@/components/themed-text'
 import { Colors } from '@/constants/theme'
 import { useThemeColor } from '@/hooks/use-theme-color'
 import { useShowtimes } from '@/hooks/useShowtimes'
-import { Cinema, ShowtimeRoom } from '@/lib/api/types'
+import { Cinema, ShowtimeRoom, ShowtimeSearchParams } from '@/lib/api/types'
 
 interface ShowtimeListProps {
   movieId: number
@@ -35,12 +35,8 @@ export default function ShowtimeList({
   }, [selectedDate])
 
   // Build search params for showtimes
-  const showtimeParams = useMemo(() => {
-    const params: {
-      movie_id?: number
-      cinema_id?: number
-      date?: string
-    } = {}
+  const showtimeParams = useMemo<ShowtimeSearchParams>(() => {
+    const params: ShowtimeSearchParams = {}
 
     if (movieId) {
       params.movie_id = movieId
@@ -134,13 +130,12 @@ export default function ShowtimeList({
     )
   }
 
-  // Format time from "HH:mm" to "H:MM AM/PM"
+  // Format time from "HH:mm" to "H:MM AM/PM" using date-fns
   const formatTime = (time: string): string => {
     const [hours, minutes] = time.split(':')
-    const hour = parseInt(hours, 10)
-    const ampm = hour >= 12 ? 'PM' : 'AM'
-    const displayHour = hour % 12 || 12
-    return `${displayHour}:${minutes} ${ampm}`
+    const date = new Date()
+    date.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0)
+    return format(date, 'h:mm a')
   }
 
   return (

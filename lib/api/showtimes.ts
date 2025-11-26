@@ -7,22 +7,7 @@ export const showtimesApi = {
     params?: ShowtimeSearchParams
   ): Promise<ShowtimeSearchResponse> {
     try {
-      // Build request body with only provided parameters
-      const requestBody: ShowtimeSearchParams = {}
-      if (params?.movie_id) {
-        requestBody.movie_id = params.movie_id
-      }
-      if (params?.cinema_id) {
-        requestBody.cinema_id = params.cinema_id
-      }
-      if (params?.date) {
-        requestBody.date = params.date
-      }
-
-      const response = await apiClient.post(
-        '/api/showtimes/search',
-        requestBody
-      )
+      const response = await apiClient.post('/api/showtimes/search', params)
       return response.data
     } catch (error: any) {
       const errorMessage = getApiError(error)
