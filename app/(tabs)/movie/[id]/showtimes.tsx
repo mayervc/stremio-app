@@ -5,6 +5,7 @@ import { Pressable, ScrollView, StyleSheet, View } from 'react-native'
 
 import ChooseCinemaDropdown from '@/components/choose-cinema-dropdown'
 import ChooseDatePicker from '@/components/choose-date-picker'
+import ShowtimeList from '@/components/showtime-list'
 import { ThemedSafeAreaView } from '@/components/themed-safe-area-view'
 import { ThemedText } from '@/components/themed-text'
 import { Colors } from '@/constants/theme'
@@ -23,6 +24,11 @@ export default function ShowtimesScreen() {
     today.setHours(0, 0, 0, 0)
     return today
   })
+
+  const [selectedCinema, setSelectedCinema] = useState<Cinema | null>(null)
+  const [selectedShowtimeId, setSelectedShowtimeId] = useState<number | null>(
+    null
+  )
 
   const backgroundColor = useThemeColor(
     {
@@ -49,8 +55,12 @@ export default function ShowtimesScreen() {
   }
 
   const handleCinemaSelect = (cinema: Cinema) => {
-    // Cinema selection is now handled internally by ChooseCinemaDropdown
-    // This callback can be used for future functionality (e.g., fetching showtimes)
+    setSelectedCinema(cinema)
+  }
+
+  const handleShowtimeSelect = (showtimeId: number, roomId: number) => {
+    setSelectedShowtimeId(showtimeId)
+    // TODO: Navigate to seat selection or booking screen
   }
 
   return (
@@ -82,7 +92,18 @@ export default function ShowtimesScreen() {
           onDateSelect={handleDateSelect}
         />
 
-        <ChooseCinemaDropdown onCinemaSelect={handleCinemaSelect} />
+        <ChooseCinemaDropdown
+          selectedCinema={selectedCinema}
+          onCinemaSelect={handleCinemaSelect}
+        />
+
+        <ShowtimeList
+          movieId={movieId}
+          selectedCinema={selectedCinema}
+          selectedDate={selectedDate}
+          selectedShowtimeId={selectedShowtimeId}
+          onShowtimeSelect={handleShowtimeSelect}
+        />
       </ScrollView>
     </ThemedSafeAreaView>
   )

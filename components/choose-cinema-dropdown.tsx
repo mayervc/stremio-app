@@ -17,14 +17,15 @@ import { useSearchCinemas } from '@/hooks/useCinemas'
 import { Cinema } from '@/lib/api/types'
 
 interface ChooseCinemaDropdownProps {
+  selectedCinema: Cinema | null
   onCinemaSelect: (cinema: Cinema) => void
 }
 
 export default function ChooseCinemaDropdown({
+  selectedCinema,
   onCinemaSelect,
 }: ChooseCinemaDropdownProps) {
   const [isModalVisible, setIsModalVisible] = useState(false)
-  const [selectedCinema, setSelectedCinema] = useState<Cinema | null>(null)
 
   const {
     data: cinemasResponse,
@@ -73,7 +74,6 @@ export default function ChooseCinemaDropdown({
   )
 
   const handleSelectCinema = (cinema: Cinema) => {
-    setSelectedCinema(cinema)
     onCinemaSelect(cinema)
     setIsModalVisible(false)
   }
@@ -90,7 +90,7 @@ export default function ChooseCinemaDropdown({
         style={[
           styles.dropdownButton,
           {
-            backgroundColor: cardBackgroundColor,
+            backgroundColor: '#2B3543',
             borderColor: borderPrimaryColor,
           },
         ]}
