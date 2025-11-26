@@ -1,4 +1,6 @@
 import { Ionicons } from '@expo/vector-icons'
+import { format } from 'date-fns'
+import { useMemo } from 'react'
 import {
   ActivityIndicator,
   StyleSheet,
@@ -9,27 +11,59 @@ import {
 import { ThemedText } from '@/components/themed-text'
 import { Colors } from '@/constants/theme'
 import { useThemeColor } from '@/hooks/use-theme-color'
-import { ShowtimeRoom } from '@/lib/api/types'
+import { useShowtimes } from '@/hooks/useShowtimes'
+import { Cinema, ShowtimeRoom } from '@/lib/api/types'
 
 interface ShowtimeListProps {
-  rooms: ShowtimeRoom[]
-  isLoading?: boolean
-  isError?: boolean
-  error?: Error | null
-  hasCinemaSelected?: boolean
+  movieId: number
+  selectedCinema: Cinema | null
+  selectedDate: Date
   selectedShowtimeId?: number | null
   onShowtimeSelect?: (showtimeId: number, roomId: number) => void
 }
 
 export default function ShowtimeList({
-  rooms,
-  isLoading = false,
-  isError = false,
-  error = null,
-  hasCinemaSelected = false,
+  movieId,
+  selectedCinema,
+  selectedDate,
   selectedShowtimeId = null,
   onShowtimeSelect,
 }: ShowtimeListProps) {
+  // Format date as YYYY-MM-DD for API
+  const formattedDate = useMemo(() => {
+    return format(selectedDate, 'yyyy-MM-dd')
+  }, [selectedDate])
+
+  // Build search params for showtimes
+  const showtimeParams = useMemo(() => {
+    const params: {
+      movie_id?: number
+      cinema_id?: number
+      date?: string
+    } = {}
+
+    if (movieId) {
+      params.movie_id = movieId
+    }
+    if (selectedCinema?.id) {
+      params.cinema_id = selectedCinema.id
+    }
+    if (formattedDate) {
+      params.date = formattedDate
+    }
+
+    return params
+  }, [movieId, selectedCinema?.id, formattedDate])
+
+  const {
+    data: showtimesResponse,
+    isLoading: isLoadingShowtimes,
+    isError: isShowtimesError,
+    error: showtimesError,
+  } = useShowtimes(showtimeParams)
+
+  const rooms: ShowtimeRoom[] = showtimesResponse?.showtimes || []
+  const hasCinemaSelected = !!selectedCinema
   const textPrimaryColor = useThemeColor(
     { light: Colors.light.textPrimary, dark: Colors.dark.textPrimary },
     'textPrimary'
@@ -50,7 +84,7 @@ export default function ShowtimeList({
     'buttonPrimary'
   )
 
-  if (isLoading) {
+  if (isLoadingShowtimes) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size='large' color={accentColor} />
@@ -66,7 +100,7 @@ export default function ShowtimeList({
     return null
   }
 
-  if (isError) {
+  if (isShowtimesError) {
     return (
       <View style={styles.emptyContainer}>
         <Ionicons
@@ -78,13 +112,15 @@ export default function ShowtimeList({
           Error loading showtimes
         </ThemedText>
         <ThemedText style={[styles.emptySubtext, { color: textPrimaryColor }]}>
-          {error instanceof Error ? error.message : 'Unknown error occurred'}
+          {showtimesError instanceof Error
+            ? showtimesError.message
+            : 'Unknown error occurred'}
         </ThemedText>
       </View>
     )
   }
 
-  if (rooms.length === 0 && !isLoading) {
+  if (rooms.length === 0 && !isLoadingShowtimes) {
     return (
       <View style={styles.emptyContainer}>
         <Ionicons name='time-outline' size={48} color={textPrimaryColor} />

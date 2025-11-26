@@ -1,7 +1,6 @@
 import { Ionicons } from '@expo/vector-icons'
-import { format } from 'date-fns'
 import { router, useLocalSearchParams } from 'expo-router'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native'
 
 import ChooseCinemaDropdown from '@/components/choose-cinema-dropdown'
@@ -12,7 +11,6 @@ import { ThemedText } from '@/components/themed-text'
 import { Colors } from '@/constants/theme'
 import { useThemeColor } from '@/hooks/use-theme-color'
 import { useMovie } from '@/hooks/useMovies'
-import { useShowtimes } from '@/hooks/useShowtimes'
 import { Cinema } from '@/lib/api/types'
 
 export default function ShowtimesScreen() {
@@ -31,41 +29,6 @@ export default function ShowtimesScreen() {
   const [selectedShowtimeId, setSelectedShowtimeId] = useState<number | null>(
     null
   )
-
-  // Format date as YYYY-MM-DD for API
-  const formattedDate = useMemo(() => {
-    return format(selectedDate, 'yyyy-MM-dd')
-  }, [selectedDate])
-
-  // Build search params for showtimes
-  const showtimeParams = useMemo(() => {
-    const params: {
-      movie_id?: number
-      cinema_id?: number
-      date?: string
-    } = {}
-
-    if (movieId) {
-      params.movie_id = movieId
-    }
-    if (selectedCinema?.id) {
-      params.cinema_id = selectedCinema.id
-    }
-    if (formattedDate) {
-      params.date = formattedDate
-    }
-
-    return params
-  }, [movieId, selectedCinema?.id, formattedDate])
-
-  const {
-    data: showtimesResponse,
-    isLoading: isLoadingShowtimes,
-    isError: isShowtimesError,
-    error: showtimesError,
-  } = useShowtimes(showtimeParams)
-
-  const showtimeRooms = showtimesResponse?.showtimes || []
 
   const backgroundColor = useThemeColor(
     {
@@ -135,11 +98,9 @@ export default function ShowtimesScreen() {
         />
 
         <ShowtimeList
-          rooms={showtimeRooms}
-          isLoading={isLoadingShowtimes}
-          isError={isShowtimesError}
-          error={showtimesError}
-          hasCinemaSelected={!!selectedCinema}
+          movieId={movieId}
+          selectedCinema={selectedCinema}
+          selectedDate={selectedDate}
           selectedShowtimeId={selectedShowtimeId}
           onShowtimeSelect={handleShowtimeSelect}
         />

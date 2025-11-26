@@ -19,24 +19,14 @@ export const apiClient: AxiosInstance = axios.create({
 // Request interceptor to add auth token
 apiClient.interceptors.request.use(
   async config => {
-    // Public endpoints that don't require authentication
-    const publicEndpoints = ['/api/showtimes/search']
+    try {
+      const token = await tokenStorage.getToken()
 
-    const isPublicEndpoint = publicEndpoints.some(endpoint =>
-      config.url?.includes(endpoint)
-    )
-
-    // Only add auth token for protected endpoints
-    if (!isPublicEndpoint) {
-      try {
-        const token = await tokenStorage.getToken()
-
-        if (token) {
-          config.headers.Authorization = `Bearer ${token}`
-        }
-      } catch (error) {
-        console.warn('Failed to get auth token:', error)
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`
       }
+    } catch (error) {
+      console.warn('Failed to get auth token:', error)
     }
 
     return config
