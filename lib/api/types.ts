@@ -114,7 +114,7 @@ export interface Showtime {
   room_id: number
   start_time: string // Format: "HH:mm" (e.g., "14:30")
   end_time: string // Format: "HH:mm" (e.g., "16:45")
-  booked_seats: number
+  booked_seats: number[] // Array of seat IDs that are booked
   room_seats: number
 }
 
@@ -133,4 +133,68 @@ export interface ShowtimeSearchParams {
 
 export interface ShowtimeSearchResponse {
   showtimes: ShowtimeRoom[]
+}
+
+// Seat Types
+export type SeatStatus = 'available' | 'booked' | 'selected'
+
+// Backend Seat Structure (from API)
+export interface RoomSeat {
+  id: number
+  roomId: number
+  roomBlockId: number
+  seatRowLabel: string // e.g., "A", "B", "C"
+  seatRow: number // Row index (starting from 0)
+  seatColumnLabel: number // Seat number (visible label)
+  seatColumn: number // Column index (starting from 0)
+}
+
+// Backend Block Structure (from API)
+export interface RoomBlock {
+  id: number
+  roomId: number
+  rowSeats: number
+  columnsSeats: number
+  blockRow: number // Block row position in room
+  blockColumn: number // Block column position in room
+  seats: RoomSeat[]
+}
+
+// Backend Room Structure (from API)
+export interface Room {
+  id: number
+  name: string
+  rowsBlocks: number
+  columnsBlocks: number
+  details: string | null
+  blocks?: RoomBlock[] // Only when includeSeats=true
+}
+
+// Frontend Seat Structure (with calculated status)
+export interface Seat {
+  id: number
+  row: string // From seatRowLabel
+  number: number // From seatColumnLabel
+  status: SeatStatus
+  roomBlockId: number
+}
+
+// Frontend Block Structure (with seats that have status)
+export interface Block {
+  id: number
+  roomId: number
+  rowSeats: number
+  columnsSeats: number
+  blockRow: number
+  blockColumn: number
+  seats: Seat[]
+}
+
+// Frontend Room Layout Structure
+export interface RoomLayout {
+  room_id: number
+  room_name: string
+  seats: Seat[] // All seats flattened from all blocks
+  rows: string[] // Array of unique row identifiers
+  blocks: Block[] // Blocks with seats that have status
 }
