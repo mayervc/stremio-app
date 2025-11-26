@@ -100,22 +100,18 @@ export default function ShowtimesScreen() {
   )
 
   const handleBookTickets = () => {
-    if (
-      !isBookingValid ||
-      !selectedCinema ||
-      !selectedShowtimeId ||
-      !selectedRoomId
-    ) {
+    if (!isBookingValid) {
       return
     }
 
+    // isBookingValid already validates all required fields are non-null
     setBookingData({
       movieId,
       movieTitle: movie?.title,
       selectedDate,
-      selectedCinema,
-      selectedShowtimeId,
-      roomId: selectedRoomId,
+      selectedCinema: selectedCinema!,
+      selectedShowtimeId: selectedShowtimeId!,
+      roomId: selectedRoomId!,
     })
 
     // TODO: Navigate to seat selection or booking screen
