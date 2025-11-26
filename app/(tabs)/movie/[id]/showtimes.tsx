@@ -114,7 +114,7 @@ export default function ShowtimesScreen() {
       roomId: selectedRoomId!,
     })
 
-    // TODO: Navigate to seat selection or booking screen
+    router.push(`/movie/${movieId}/seats`)
   }
 
   return (
