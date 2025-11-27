@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { format } from 'date-fns'
 import { router } from 'expo-router'
 import { useState } from 'react'
-import { Image, Pressable, ScrollView, StyleSheet, View } from 'react-native'
+import { Image, Pressable, StyleSheet, View } from 'react-native'
 
 import SeatLayout from '@/components/seat-layout'
 import { ThemedSafeAreaView } from '@/components/themed-safe-area-view'
@@ -20,15 +20,7 @@ export default function ChooseSeatScreen() {
   // Get movie data for image
   const { data: movie } = useMovie(bookingData?.movieId || 0)
 
-  const {
-    data: roomLayout,
-    showtimeData,
-    isLoading,
-    error,
-  } = useRoomSeats({
-    roomId: bookingData?.roomId || null,
-    showtimeId: bookingData?.selectedShowtimeId || null,
-  })
+  const { data: roomLayout, showtimeData, isLoading, error } = useRoomSeats()
 
   const handleSeatSelect = (seatId: number) => {
     setSelectedSeats(prev => {
@@ -76,16 +68,15 @@ export default function ChooseSeatScreen() {
     router.back()
   }
 
-  // Format showtime time
+  // Format showtime time using date-fns
   const formatShowtime = () => {
     if (!showtimeData?.start_time || !showtimeData?.end_time) return ''
 
     const formatTime = (time: string) => {
       const [hours, minutes] = time.split(':')
-      const hour = parseInt(hours, 10)
-      const ampm = hour >= 12 ? 'PM' : 'AM'
-      const displayHour = hour % 12 || 12
-      return `${displayHour}:${minutes} ${ampm}`
+      const date = new Date()
+      date.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0)
+      return format(date, 'h:mm a')
     }
 
     return `${formatTime(showtimeData.start_time)} - ${formatTime(showtimeData.end_time)}`
@@ -141,18 +132,12 @@ export default function ChooseSeatScreen() {
       </View>
 
       {/* Seat Layout */}
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        <SeatLayout
-          room={roomLayout || null}
-          selectedSeats={selectedSeats}
-          onSeatSelect={handleSeatSelect}
-          isLoading={isLoading}
-        />
-      </ScrollView>
+      <SeatLayout
+        room={roomLayout || null}
+        selectedSeats={selectedSeats}
+        onSeatSelect={handleSeatSelect}
+        isLoading={isLoading}
+      />
     </ThemedSafeAreaView>
   )
 }
@@ -200,11 +185,5 @@ const styles = StyleSheet.create({
   showtimeInfo: {
     fontSize: 14,
     fontWeight: '400',
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingBottom: 100,
   },
 })

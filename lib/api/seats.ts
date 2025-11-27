@@ -18,18 +18,4 @@ export const seatsApi = {
       throw new Error(errorMessage)
     }
   },
-
-  /**
-   * Get a single seat by ID
-   * Endpoint: GET /api/room-seats/:id
-   */
-  async getSeatById(seatId: number) {
-    try {
-      const response = await apiClient.get(`/api/room-seats/${seatId}`)
-      return response.data
-    } catch (error: any) {
-      const errorMessage = getApiError(error)
-      throw new Error(errorMessage)
-    }
-  },
 }

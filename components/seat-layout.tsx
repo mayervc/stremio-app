@@ -284,6 +284,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 24,
+    paddingBottom: 100,
   },
   screenContainer: {
     alignItems: 'center',

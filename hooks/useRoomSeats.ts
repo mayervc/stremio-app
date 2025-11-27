@@ -1,62 +1,28 @@
-import { seatsApi } from '@/lib/api/seats'
-import { showtimesApi } from '@/lib/api/showtimes'
 import type { Block, RoomLayout, RoomSeat, Seat } from '@/lib/api/types'
 import { useBookingStore } from '@/store/bookingStore'
-import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
+import { useRoom } from './useRoom'
+import { useShowtime } from './useShowtime'
 
-interface UseRoomSeatsParams {
-  roomId: number | null
-  showtimeId: number | null
-  bookedSeats?: number[] // Optional: can pass booked seats directly if already available
-}
-
-export const useRoomSeats = ({
-  roomId,
-  showtimeId,
-  bookedSeats,
-}: UseRoomSeatsParams) => {
+export const useRoomSeats = () => {
   const { bookingData } = useBookingStore()
+
+  const roomId = bookingData?.roomId || null
+  const showtimeId = bookingData?.selectedShowtimeId || null
 
   // Get room with blocks and seats
   const {
     data: roomData,
     isLoading: isLoadingRoom,
     error: roomError,
-  } = useQuery({
-    queryKey: ['room-with-seats', roomId],
-    queryFn: () => seatsApi.getRoomWithSeats(roomId!),
-    enabled: !!roomId,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-  })
+  } = useRoom(roomId)
 
-  // Get showtime to know which seats are booked (if bookedSeats not provided)
-  const { data: showtimeData, isLoading: isLoadingShowtime } = useQuery({
-    queryKey: ['showtime-for-seats', showtimeId],
-    queryFn: async () => {
-      if (!showtimeId || !bookingData) return null
+  // Get showtime to know which seats are booked
+  const { data: showtimeData, isLoading: isLoadingShowtime } =
+    useShowtime(showtimeId)
 
-      // Search showtimes to find the one with matching ID
-      const response = await showtimesApi.searchShowtimes({
-        movie_id: bookingData.movieId,
-        cinema_id: bookingData.selectedCinema.id,
-        date: bookingData.selectedDate.toISOString().split('T')[0],
-      })
-
-      // Find the showtime with matching ID
-      for (const room of response.showtimes) {
-        const showtime = room.showtimes.find(s => s.id === showtimeId)
-        if (showtime) return showtime
-      }
-      return null
-    },
-    enabled: !!showtimeId && !!bookingData && !bookedSeats,
-    staleTime: 2 * 60 * 1000, // 2 minutes
-  })
-
-  // Use provided bookedSeats or from showtime data
+  // Get booked seat IDs from showtime data
   const bookedSeatIds = useMemo(() => {
-    if (bookedSeats) return bookedSeats
     if (showtimeData?.booked_seats) {
       // Ensure booked_seats is an array
       return Array.isArray(showtimeData.booked_seats)
@@ -64,7 +30,7 @@ export const useRoomSeats = ({
         : []
     }
     return []
-  }, [bookedSeats, showtimeData])
+  }, [showtimeData])
 
   // Transform backend room with blocks to frontend format with calculated status
   const roomLayout = useMemo((): RoomLayout | null => {
