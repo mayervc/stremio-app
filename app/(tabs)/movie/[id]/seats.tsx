@@ -1,15 +1,35 @@
 import { Ionicons } from '@expo/vector-icons'
+import { format } from 'date-fns'
 import { router } from 'expo-router'
-import { Pressable, StyleSheet, View } from 'react-native'
+import { useState } from 'react'
+import { Image, Pressable, StyleSheet, View } from 'react-native'
 
+import SeatLayout from '@/components/seat-layout'
 import { ThemedSafeAreaView } from '@/components/themed-safe-area-view'
 import { ThemedText } from '@/components/themed-text'
 import { Colors } from '@/constants/theme'
 import { useThemeColor } from '@/hooks/use-theme-color'
+import { useMovie } from '@/hooks/useMovies'
+import { useRoomSeats } from '@/hooks/useRoomSeats'
 import { useBookingStore } from '@/store/bookingStore'
 
 export default function ChooseSeatScreen() {
   const { bookingData } = useBookingStore()
+  const [selectedSeats, setSelectedSeats] = useState<number[]>([])
+
+  // Get movie data for image
+  const { data: movie } = useMovie(bookingData?.movieId || 0)
+
+  const { data: roomLayout, showtimeData, isLoading, error } = useRoomSeats()
+
+  const handleSeatSelect = (seatId: number) => {
+    setSelectedSeats(prev => {
+      if (prev.includes(seatId)) {
+        return prev.filter(id => id !== seatId)
+      }
+      return [...prev, seatId]
+    })
+  }
 
   const backgroundColor = useThemeColor(
     {
@@ -36,15 +56,44 @@ export default function ChooseSeatScreen() {
     },
     'textPrimary'
   )
+  const textSecondaryColor = useThemeColor(
+    {
+      light: Colors.light.textSecondary,
+      dark: Colors.dark.textSecondary,
+    },
+    'textSecondary'
+  )
 
   const handleBackPress = () => {
     router.back()
   }
 
+  // Format showtime time using date-fns
+  const formatShowtime = () => {
+    if (!showtimeData?.start_time || !showtimeData?.end_time) return ''
+
+    const formatTime = (time: string) => {
+      const [hours, minutes] = time.split(':')
+      const date = new Date()
+      date.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0)
+      return format(date, 'h:mm a')
+    }
+
+    return `${formatTime(showtimeData.start_time)} - ${formatTime(showtimeData.end_time)}`
+  }
+
+  // Format date
+  const formatDate = () => {
+    if (!bookingData?.selectedDate) return ''
+    return format(bookingData.selectedDate, 'd MMM, yyyy')
+  }
+
+  const movieImage = movie?.image || movie?.image_url
+
   return (
     <ThemedSafeAreaView style={[styles.container, { backgroundColor }]}>
-      {/* Header with back button and movie title */}
-      <View style={styles.header}>
+      {/* Header with back button and movie info */}
+      <View style={styles.headerContainer}>
         <Pressable
           style={[
             styles.backButton,
@@ -54,14 +103,41 @@ export default function ChooseSeatScreen() {
         >
           <Ionicons name='arrow-back' size={20} color={iconColor} />
         </Pressable>
-        <ThemedText
-          style={[styles.movieTitle, { color: textPrimaryColor }]}
-          numberOfLines={1}
-        >
-          {bookingData?.movieTitle || 'Movie'}
-        </ThemedText>
-        <View style={styles.placeholder} />
+
+        {/* Movie info section */}
+        <View style={styles.movieInfoContainer}>
+          {movieImage && (
+            <Image
+              source={{ uri: movieImage }}
+              style={styles.movieThumbnail}
+              resizeMode='cover'
+            />
+          )}
+          <View style={styles.movieInfoText}>
+            <ThemedText
+              style={[styles.movieTitle, { color: textPrimaryColor }]}
+              numberOfLines={2}
+            >
+              {bookingData?.movieTitle || movie?.title || 'Movie'}
+            </ThemedText>
+            {showtimeData && (
+              <ThemedText
+                style={[styles.showtimeInfo, { color: textSecondaryColor }]}
+              >
+                {formatShowtime()} in {formatDate()}
+              </ThemedText>
+            )}
+          </View>
+        </View>
       </View>
+
+      {/* Seat Layout */}
+      <SeatLayout
+        room={roomLayout || null}
+        selectedSeats={selectedSeats}
+        onSeatSelect={handleSeatSelect}
+        isLoading={isLoading}
+      />
     </ThemedSafeAreaView>
   )
 }
@@ -70,11 +146,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  header: {
+  headerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingTop: 16,
+    paddingBottom: 16,
+    gap: 12,
   },
   backButton: {
     width: 40,
@@ -83,14 +161,29 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  movieInfoContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  movieThumbnail: {
+    width: 60,
+    height: 80,
+    borderRadius: 8,
+    backgroundColor: '#2B3543',
+  },
+  movieInfoText: {
+    flex: 1,
+    justifyContent: 'center',
+  },
   movieTitle: {
     fontSize: 18,
     fontWeight: '600',
-    flex: 1,
-    marginHorizontal: 16,
-    textAlign: 'center',
+    marginBottom: 4,
   },
-  placeholder: {
-    width: 40,
+  showtimeInfo: {
+    fontSize: 14,
+    fontWeight: '400',
   },
 })
