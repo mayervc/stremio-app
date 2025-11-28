@@ -1,8 +1,11 @@
 import { Ionicons } from '@expo/vector-icons'
+import { useQueryClient } from '@tanstack/react-query'
 import { format } from 'date-fns'
 import { router } from 'expo-router'
 import { useState } from 'react'
 import {
+  ActivityIndicator,
+  Alert,
   Image,
   Pressable,
   StyleSheet,
@@ -17,22 +20,19 @@ import { Colors } from '@/constants/theme'
 import { useThemeColor } from '@/hooks/use-theme-color'
 import { useMovie } from '@/hooks/useMovies'
 import { useRoomSeats } from '@/hooks/useRoomSeats'
+import { ticketsApi } from '@/lib/api/tickets'
 import { useBookingStore } from '@/store/bookingStore'
 
 export default function ChooseSeatScreen() {
   const { bookingData } = useBookingStore()
   const [selectedSeats, setSelectedSeats] = useState<number[]>([])
-  const [bookedSeats, setBookedSeats] = useState<number[]>([])
+  const [isCreatingTickets, setIsCreatingTickets] = useState(false)
+  const queryClient = useQueryClient()
 
   // Get movie data for image
   const { data: movie } = useMovie(bookingData?.movieId || 0)
 
-  const {
-    data: roomLayout,
-    showtimeData,
-    isLoading,
-    error,
-  } = useRoomSeats(bookedSeats)
+  const { data: roomLayout, showtimeData, isLoading, error } = useRoomSeats([])
 
   const handleSeatSelect = (seatId: number) => {
     setSelectedSeats(prev => {
@@ -80,12 +80,39 @@ export default function ChooseSeatScreen() {
     router.back()
   }
 
-  const handleContinue = () => {
-    if (selectedSeats.length > 0) {
-      // Mark selected seats as booked
-      setBookedSeats(prev => [...prev, ...selectedSeats])
+  const handleContinue = async () => {
+    if (selectedSeats.length === 0 || !bookingData?.selectedShowtimeId) {
+      return
+    }
+
+    setIsCreatingTickets(true)
+
+    try {
+      // Create tickets via API
+      await ticketsApi.createTickets({
+        showtime_id: bookingData.selectedShowtimeId,
+        seats: selectedSeats,
+      })
+
+      // Invalidate and refetch showtime to get updated booked_seats
+      await queryClient.invalidateQueries({
+        queryKey: ['showtime', bookingData.selectedShowtimeId],
+      })
+
       // Clear selected seats
       setSelectedSeats([])
+
+      // Show success message (optional)
+      // You can navigate to a confirmation screen here if needed
+    } catch (error: any) {
+      // Show error alert
+      Alert.alert(
+        'Error',
+        error.message || 'Failed to create tickets. Please try again.',
+        [{ text: 'OK' }]
+      )
+    } finally {
+      setIsCreatingTickets(false)
     }
   }
 
@@ -126,6 +153,17 @@ export default function ChooseSeatScreen() {
 
   const movieImage = movie?.image || movie?.image_url
   const hasSelectedSeats = selectedSeats.length > 0
+
+  // Calculate total price
+  const calculateTotalPrice = () => {
+    if (!showtimeData?.ticket_price || selectedSeats.length === 0) {
+      return 0
+    }
+    return selectedSeats.length * showtimeData.ticket_price
+  }
+
+  const totalPrice = calculateTotalPrice()
+  const formattedPrice = totalPrice > 0 ? `$${totalPrice.toFixed(2)}` : ''
 
   return (
     <ThemedSafeAreaView style={[styles.container, { backgroundColor }]}>
@@ -214,27 +252,43 @@ export default function ChooseSeatScreen() {
               >
                 {formatSelectedSeatsLabels()} SELECTED
               </ThemedText>
+              {formattedPrice && (
+                <ThemedText
+                  style={[styles.totalPriceText, { color: '#FFD700' }]}
+                >
+                  {formattedPrice}
+                </ThemedText>
+              )}
             </View>
           )}
           <TouchableOpacity
             style={[
               styles.continueButton,
-              hasSelectedSeats
+              hasSelectedSeats && !isCreatingTickets
                 ? styles.continueButtonEnabled
                 : styles.continueButtonDisabled,
             ]}
             onPress={handleContinue}
-            disabled={!hasSelectedSeats}
+            disabled={!hasSelectedSeats || isCreatingTickets}
             activeOpacity={0.7}
           >
-            <ThemedText
-              style={[
-                styles.continueButtonText,
-                { color: hasSelectedSeats ? '#FFFFFF' : textSecondaryColor },
-              ]}
-            >
-              Continue
-            </ThemedText>
+            {isCreatingTickets ? (
+              <ActivityIndicator color='#FFFFFF' size='small' />
+            ) : (
+              <ThemedText
+                style={[
+                  styles.continueButtonText,
+                  {
+                    color:
+                      hasSelectedSeats && !isCreatingTickets
+                        ? '#FFFFFF'
+                        : textSecondaryColor,
+                  },
+                ]}
+              >
+                Continue
+              </ThemedText>
+            )}
           </TouchableOpacity>
         </View>
       </View>
@@ -343,6 +397,11 @@ const styles = StyleSheet.create({
   selectedSeatsText: {
     fontSize: 14,
     fontWeight: '500',
+    marginBottom: 4,
+  },
+  totalPriceText: {
+    fontSize: 24,
+    fontWeight: '700',
   },
   continueButton: {
     paddingVertical: 14,

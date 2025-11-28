@@ -116,6 +116,7 @@ export interface Showtime {
   end_time: string // Format: "HH:mm" (e.g., "16:45")
   booked_seats: number[] // Array of seat IDs that are booked
   room_seats: number
+  ticket_price?: number // Price per ticket
 }
 
 export interface ShowtimeRoom {
@@ -197,4 +198,34 @@ export interface RoomLayout {
   seats: Seat[] // All seats flattened from all blocks
   rows: string[] // Array of unique row identifiers
   blocks: Block[] // Blocks with seats that have status
+}
+
+// Ticket Types
+export interface TicketSeat {
+  id: number
+  row: string // e.g., "A", "B", "E"
+  column: string // e.g., "1", "2", "4"
+}
+
+export interface Ticket {
+  id: number
+  seat: TicketSeat
+}
+
+export interface CreateTicketsRequest {
+  showtime_id: number
+  seats: number[] // Array of seat IDs
+}
+
+export interface CreateTicketsResponse {
+  showtime_id: number
+  room_id: number
+  room_name: string
+  cinema_id: number
+  cinema_name: string
+  movie_id: number
+  movie_title: string
+  start_time: string // Format: "HH:mm"
+  end_time: string // Format: "HH:mm"
+  tickets: Ticket[]
 }
