@@ -216,7 +216,14 @@ export default function SeatLayout({
         >
           <View style={styles.seatsContainer}>
             {organizedBlockGrid.map((blockRow, rowIndex) => (
-              <View key={`block-row-${rowIndex}`} style={styles.blockRow}>
+              <View
+                key={`block-row-${rowIndex}`}
+                style={[
+                  styles.blockRow,
+                  rowIndex === organizedBlockGrid.length - 1 &&
+                    styles.blockRowLast,
+                ]}
+              >
                 {blockRow.map((block, blockIndex) => (
                   <View
                     key={block.id}
@@ -284,7 +291,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 24,
-    paddingBottom: 100,
+    paddingBottom: 0,
   },
   screenContainer: {
     alignItems: 'center',
@@ -312,7 +319,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   verticalScrollContent: {
-    paddingBottom: 20,
+    paddingBottom: 0,
   },
   seatsContainer: {
     alignItems: 'flex-start',
@@ -322,6 +329,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     marginBottom: 20,
+  },
+  blockRowLast: {
+    marginBottom: 0,
   },
   blockContainer: {
     alignItems: 'flex-start',

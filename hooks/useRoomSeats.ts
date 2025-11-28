@@ -4,7 +4,7 @@ import { useMemo } from 'react'
 import { useRoom } from './useRoom'
 import { useShowtime } from './useShowtime'
 
-export const useRoomSeats = () => {
+export const useRoomSeats = (additionalBookedSeats: number[] = []) => {
   const { bookingData } = useBookingStore()
 
   const roomId = bookingData?.roomId || null
@@ -21,16 +21,18 @@ export const useRoomSeats = () => {
   const { data: showtimeData, isLoading: isLoadingShowtime } =
     useShowtime(showtimeId)
 
-  // Get booked seat IDs from showtime data
+  // Get booked seat IDs from showtime data and merge with additional booked seats
   const bookedSeatIds = useMemo(() => {
+    const showtimeBookedSeats: number[] = []
     if (showtimeData?.booked_seats) {
       // Ensure booked_seats is an array
-      return Array.isArray(showtimeData.booked_seats)
-        ? showtimeData.booked_seats
-        : []
+      if (Array.isArray(showtimeData.booked_seats)) {
+        showtimeBookedSeats.push(...showtimeData.booked_seats)
+      }
     }
-    return []
-  }, [showtimeData])
+    // Merge with additional booked seats (from Continue button)
+    return [...showtimeBookedSeats, ...additionalBookedSeats]
+  }, [showtimeData, additionalBookedSeats])
 
   // Transform backend room with blocks to frontend format with calculated status
   const roomLayout = useMemo((): RoomLayout | null => {
