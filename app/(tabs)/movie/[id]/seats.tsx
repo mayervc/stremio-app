@@ -99,11 +99,16 @@ export default function ChooseSeatScreen() {
         queryKey: ['showtime', bookingData.selectedShowtimeId],
       })
 
+      // Invalidate tickets query to fetch new tickets
+      await queryClient.invalidateQueries({
+        queryKey: ['showtimeTickets', bookingData.selectedShowtimeId],
+      })
+
       // Clear selected seats
       setSelectedSeats([])
 
-      // Show success message (optional)
-      // You can navigate to a confirmation screen here if needed
+      // Navigate to tickets screen
+      router.push(`/movie/${bookingData.movieId}/tickets`)
     } catch (error: any) {
       // Show error alert
       Alert.alert(

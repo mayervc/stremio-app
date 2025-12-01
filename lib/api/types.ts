@@ -229,3 +229,17 @@ export interface CreateTicketsResponse {
   end_time: string // Format: "HH:mm"
   tickets: Ticket[]
 }
+
+// User Ticket Types (from GET /api/showtimes/:id/tickets)
+export interface UserTicket {
+  movie_title: string
+  cinema_name: string
+  room_name: string
+  showtime_date: string // Format: "YYYY-MM-DD"
+  showtime_time: string // Format: "HH:mm"
+  seat_label: string // e.g., "E4", "A1", "B12"
+}
+
+export interface UserTicketsResponse {
+  tickets: UserTicket[]
+}
