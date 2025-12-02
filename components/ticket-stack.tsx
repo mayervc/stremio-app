@@ -132,7 +132,6 @@ function AnimatedTicketItem({
 
   return (
     <Animated.View
-      ref={isCurrent ? ticketRef : undefined}
       style={[
         styles.ticketWrapper,
         {
@@ -148,7 +147,12 @@ function AnimatedTicketItem({
       ]}
       pointerEvents='none'
     >
-      <TicketCard ticket={ticket} index={index} totalTickets={totalTickets} />
+      <TicketCard
+        ref={isCurrent ? ticketRef : undefined}
+        ticket={ticket}
+        index={index}
+        totalTickets={totalTickets}
+      />
     </Animated.View>
   )
 }
