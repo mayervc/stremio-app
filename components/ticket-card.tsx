@@ -16,8 +16,6 @@ export default function TicketCard({
   index,
   totalTickets,
 }: TicketCardProps) {
-  // Use ticket_price from ticket if available
-  const ticketPrice = ticket.ticket_price
   // Format date from "YYYY-MM-DD" to "d MMM, yyyy" (e.g., "24 May, 2025")
   const formatDate = (dateString: string): string => {
     try {
@@ -46,17 +44,12 @@ Movie: ${ticket.movie_title}
 Cinema: ${ticket.cinema_name}
 Room: ${ticket.room_name}
 Date: ${formatDate(ticket.showtime_date)}
-Time: ${formatTime(ticket.showtime_time)}
-Seat: ${ticket.seat_label}${ticketPrice !== undefined ? `\nPrice: $${ticketPrice.toFixed(2)}` : ''}`
-
-  // Create JSON data for systems - include ticket_price if available
-  const ticketData = {
-    ...ticket,
-    ...(ticketPrice !== undefined && { ticket_price: ticketPrice }),
-  }
+Seat: ${ticket.seat_label}
+Price: $${ticket.ticket_price?.toFixed(2)}
+Time: ${formatTime(ticket.showtime_time)}`
 
   // Combine both formats - systems can parse JSON, humans can read text
-  const qrData = `${humanReadableText}\n\n---DATA---\n${JSON.stringify(ticketData)}`
+  const qrData = `${humanReadableText}\n\n---DATA---\n${JSON.stringify(ticket)}`
 
   return (
     <View style={styles.ticketContainer}>
