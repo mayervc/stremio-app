@@ -238,6 +238,7 @@ export interface UserTicket {
   showtime_date: string // Format: "YYYY-MM-DD"
   showtime_time: string // Format: "HH:mm"
   seat_label: string // e.g., "E4", "A1", "B12"
+  ticket_price?: number // Price per ticket (if available from backend)
 }
 
 export interface UserTicketsResponse {

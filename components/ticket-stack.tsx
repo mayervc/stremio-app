@@ -20,14 +20,12 @@ import type { UserTicket } from '@/lib/api/types'
 
 interface TicketStackProps {
   tickets: UserTicket[]
-  ticketPrice?: number
 }
 
 interface AnimatedTicketItemProps {
   ticket: UserTicket
   index: number
   totalTickets: number
-  ticketPrice?: number
   scrollY: SharedValue<number>
 }
 
@@ -44,7 +42,6 @@ function AnimatedTicketItem({
   ticket,
   index,
   totalTickets,
-  ticketPrice,
   scrollY,
 }: AnimatedTicketItemProps) {
   const animatedStyle = useAnimatedStyle(() => {
@@ -144,20 +141,12 @@ function AnimatedTicketItem({
       ]}
       pointerEvents='none'
     >
-      <TicketCard
-        ticket={ticket}
-        ticketPrice={ticketPrice}
-        index={index}
-        totalTickets={totalTickets}
-      />
+      <TicketCard ticket={ticket} index={index} totalTickets={totalTickets} />
     </Animated.View>
   )
 }
 
-export default function TicketStack({
-  tickets,
-  ticketPrice,
-}: TicketStackProps) {
+export default function TicketStack({ tickets }: TicketStackProps) {
   const scrollY = useSharedValue(0)
   const scrollViewRef = useRef<ScrollView>(null)
 
@@ -206,7 +195,6 @@ export default function TicketStack({
             ticket={ticket}
             index={index}
             totalTickets={tickets.length}
-            ticketPrice={ticketPrice}
             scrollY={scrollY}
           />
         ))}

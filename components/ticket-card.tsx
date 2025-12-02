@@ -7,17 +7,17 @@ import type { UserTicket } from '@/lib/api/types'
 
 interface TicketCardProps {
   ticket: UserTicket
-  ticketPrice?: number
   index: number
   totalTickets: number
 }
 
 export default function TicketCard({
   ticket,
-  ticketPrice,
   index,
   totalTickets,
 }: TicketCardProps) {
+  // Use ticket_price from ticket if available
+  const ticketPrice = ticket.ticket_price
   // Format date from "YYYY-MM-DD" to "d MMM, yyyy" (e.g., "24 May, 2025")
   const formatDate = (dateString: string): string => {
     try {
@@ -40,50 +40,23 @@ export default function TicketCard({
     }
   }
 
-  // Generate QR code data with all ticket information
-  // Format: Human-readable text + JSON for systems
-  const formatTimeForQR = (timeString: string): string => {
-    try {
-      const [hours, minutes] = timeString.split(':')
-      const date = new Date()
-      date.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0)
-      return format(date, 'h:mm a')
-    } catch {
-      return timeString
-    }
-  }
-
-  const formatDateForQR = (dateString: string): string => {
-    try {
-      const date = new Date(dateString)
-      return format(date, 'MMM d, yyyy')
-    } catch {
-      return dateString
-    }
-  }
-
   // Create human-readable text
   const humanReadableText = `TICKET
 Movie: ${ticket.movie_title}
 Cinema: ${ticket.cinema_name}
 Room: ${ticket.room_name}
-Date: ${formatDateForQR(ticket.showtime_date)}
-Time: ${formatTimeForQR(ticket.showtime_time)}
+Date: ${formatDate(ticket.showtime_date)}
+Time: ${formatTime(ticket.showtime_time)}
 Seat: ${ticket.seat_label}${ticketPrice !== undefined ? `\nPrice: $${ticketPrice.toFixed(2)}` : ''}`
 
-  // Create JSON data for systems
-  const jsonData = JSON.stringify({
-    movie_title: ticket.movie_title,
-    cinema_name: ticket.cinema_name,
-    room_name: ticket.room_name,
-    showtime_date: ticket.showtime_date,
-    showtime_time: ticket.showtime_time,
-    seat_label: ticket.seat_label,
+  // Create JSON data for systems - include ticket_price if available
+  const ticketData = {
+    ...ticket,
     ...(ticketPrice !== undefined && { ticket_price: ticketPrice }),
-  })
+  }
 
   // Combine both formats - systems can parse JSON, humans can read text
-  const qrData = `${humanReadableText}\n\n---DATA---\n${jsonData}`
+  const qrData = `${humanReadableText}\n\n---DATA---\n${JSON.stringify(ticketData)}`
 
   return (
     <View style={styles.ticketContainer}>
