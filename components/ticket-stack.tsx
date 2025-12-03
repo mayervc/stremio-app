@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef, useState, type RefObject } from 'react'
 import {
   Dimensions,
   NativeScrollEvent,
@@ -20,6 +20,8 @@ import type { UserTicket } from '@/lib/api/types'
 
 interface TicketStackProps {
   tickets: UserTicket[]
+  onCurrentTicketChange?: (ticket: UserTicket | null) => void
+  ticketRef?: RefObject<View | null>
 }
 
 interface AnimatedTicketItemProps {
@@ -27,6 +29,8 @@ interface AnimatedTicketItemProps {
   index: number
   totalTickets: number
   scrollY: SharedValue<number>
+  ticketRef?: RefObject<View | null>
+  isCurrent?: boolean
 }
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window')
@@ -43,6 +47,8 @@ function AnimatedTicketItem({
   index,
   totalTickets,
   scrollY,
+  ticketRef,
+  isCurrent,
 }: AnimatedTicketItemProps) {
   const animatedStyle = useAnimatedStyle(() => {
     const translateY = scrollY.value
@@ -130,7 +136,7 @@ function AnimatedTicketItem({
         styles.ticketWrapper,
         {
           position: 'absolute',
-          top: 40,
+          top: 0, // No top offset to move tickets as high as possible
           alignSelf: 'center',
           width: TICKET_WIDTH + TICKET_SPACING * 2,
           height: TICKET_HEIGHT + TICKET_SPACING * 2,
@@ -141,17 +147,43 @@ function AnimatedTicketItem({
       ]}
       pointerEvents='none'
     >
-      <TicketCard ticket={ticket} index={index} totalTickets={totalTickets} />
+      <TicketCard
+        ref={isCurrent ? ticketRef : undefined}
+        ticket={ticket}
+        index={index}
+        totalTickets={totalTickets}
+      />
     </Animated.View>
   )
 }
 
-export default function TicketStack({ tickets }: TicketStackProps) {
+export default function TicketStack({
+  tickets,
+  onCurrentTicketChange,
+  ticketRef,
+}: TicketStackProps) {
   const scrollY = useSharedValue(0)
   const scrollViewRef = useRef<ScrollView>(null)
+  const [currentIndex, setCurrentIndex] = useState<number>(0)
 
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     scrollY.value = event.nativeEvent.contentOffset.y
+
+    // Calculate current ticket index
+    const itemHeight = TICKET_HEIGHT + TICKET_SPACING * 2
+    const newCurrentIndex = Math.round(
+      event.nativeEvent.contentOffset.y / itemHeight
+    )
+    setCurrentIndex(newCurrentIndex)
+
+    const currentTicket =
+      newCurrentIndex >= 0 && newCurrentIndex < tickets.length
+        ? tickets[newCurrentIndex]
+        : null
+
+    if (onCurrentTicketChange) {
+      onCurrentTicketChange(currentTicket)
+    }
   }
 
   if (tickets.length === 0) {
@@ -196,6 +228,8 @@ export default function TicketStack({ tickets }: TicketStackProps) {
             index={index}
             totalTickets={tickets.length}
             scrollY={scrollY}
+            ticketRef={ticketRef}
+            isCurrent={index === currentIndex}
           />
         ))}
       </View>
@@ -212,7 +246,7 @@ const styles = StyleSheet.create({
   },
   scrollContentContainer: {
     paddingHorizontal: (SCREEN_WIDTH - TICKET_WIDTH) / 2 - TICKET_SPACING,
-    paddingTop: 40,
+    paddingTop: 0, // No top padding to move tickets as high as possible
     paddingBottom: 100, // Extra space at bottom for last ticket
   },
   ticketsStack: {
@@ -223,7 +257,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     justifyContent: 'flex-start',
     alignItems: 'center',
-    paddingTop: 40,
+    paddingTop: 0, // No top padding to move tickets as high as possible
   },
   ticketWrapper: {
     justifyContent: 'center',

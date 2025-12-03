@@ -1,7 +1,13 @@
 import { Ionicons } from '@expo/vector-icons'
 import { router } from 'expo-router'
-import { useEffect } from 'react'
-import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native'
+import { useEffect, useRef, useState } from 'react'
+import {
+  ActivityIndicator,
+  Pressable,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native'
 import Toast from 'react-native-toast-message'
 
 import { ThemedSafeAreaView } from '@/components/themed-safe-area-view'
@@ -10,6 +16,8 @@ import TicketStack from '@/components/ticket-stack'
 import { Colors } from '@/constants/theme'
 import { useThemeColor } from '@/hooks/use-theme-color'
 import { useShowtimeTickets } from '@/hooks/useShowtimeTickets'
+import { useWallet } from '@/hooks/useWallet'
+import type { UserTicket } from '@/lib/api/types'
 import { getApiError } from '@/lib/utils/getApiError'
 import { useBookingStore } from '@/store/bookingStore'
 
@@ -18,6 +26,9 @@ export default function TicketsScreen() {
   const showtimeId = bookingData?.selectedShowtimeId || null
 
   const { data: ticketsData, isLoading, error } = useShowtimeTickets(showtimeId)
+  const { addToWallet } = useWallet()
+  const [currentTicket, setCurrentTicket] = useState<UserTicket | null>(null)
+  const ticketRef = useRef<View>(null)
 
   const backgroundColor = useThemeColor(
     {
@@ -49,6 +60,13 @@ export default function TicketsScreen() {
     router.back()
   }
 
+  // Set first ticket as current when tickets are loaded
+  useEffect(() => {
+    if (ticketsData && ticketsData.tickets.length > 0 && !currentTicket) {
+      setCurrentTicket(ticketsData.tickets[0])
+    }
+  }, [ticketsData, currentTicket])
+
   // Display backend error using toast
   useEffect(() => {
     if (error) {
@@ -60,6 +78,19 @@ export default function TicketsScreen() {
       })
     }
   }, [error])
+
+  const handleAddToWallet = async () => {
+    if (!currentTicket || !ticketRef.current) {
+      Toast.show({
+        type: 'error',
+        text1: 'No Ticket Selected',
+        text2: 'Please select a ticket to add to wallet',
+      })
+      return
+    }
+
+    await addToWallet(currentTicket, ticketRef)
+  }
 
   return (
     <ThemedSafeAreaView style={[styles.container, { backgroundColor }]}>
@@ -133,7 +164,27 @@ export default function TicketsScreen() {
                 </ThemedText>
               </View>
             ) : (
-              <TicketStack tickets={ticketsData.tickets} />
+              <>
+                <View style={styles.ticketRefContainer}>
+                  <TicketStack
+                    tickets={ticketsData.tickets}
+                    onCurrentTicketChange={setCurrentTicket}
+                    ticketRef={ticketRef}
+                  />
+                </View>
+                {/* Add to Wallet Button */}
+                <View style={styles.footerContainer}>
+                  <TouchableOpacity
+                    style={styles.addToWalletButton}
+                    onPress={handleAddToWallet}
+                    activeOpacity={0.8}
+                  >
+                    <ThemedText style={styles.addToWalletText}>
+                      Add to wallet
+                    </ThemedText>
+                  </TouchableOpacity>
+                </View>
+              </>
             )}
           </>
         )}
@@ -206,5 +257,26 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '400',
     textAlign: 'center',
+  },
+  ticketRefContainer: {
+    flex: 1,
+    paddingTop: 0, // No top padding to move tickets as high as possible
+  },
+  footerContainer: {
+    paddingHorizontal: 20,
+    paddingBottom: 30,
+    paddingTop: 10,
+  },
+  addToWalletButton: {
+    backgroundColor: '#E53935', // Red color as shown in the image
+    borderRadius: 12,
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  addToWalletText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '700',
   },
 })
