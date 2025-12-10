@@ -232,6 +232,7 @@ export interface CreateTicketsResponse {
 
 // User Ticket Types (from GET /api/showtimes/:id/tickets)
 export interface UserTicket {
+  id?: number // Ticket ID (if available from backend)
   movie_title: string
   cinema_name: string
   room_name: string
@@ -243,4 +244,10 @@ export interface UserTicket {
 
 export interface UserTicketsResponse {
   tickets: UserTicket[]
+}
+
+// Google Wallet Types
+export interface GoogleWalletTokenResponse {
+  token: string // JWT token for Google Wallet
+  ticket_id: number // ID of the ticket processed
 }
