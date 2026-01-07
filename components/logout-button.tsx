@@ -1,5 +1,6 @@
 import { Colors } from '@/constants/colors'
 import { authApi } from '@/lib/api/auth'
+import { addBreadcrumb, clearUserContext } from '@/lib/sentry'
 import { useAuthStore } from '@/store/authStore'
 import { router } from 'expo-router'
 import React from 'react'
@@ -18,6 +19,14 @@ export function LogoutButton() {
 
       // Clear auth state
       logout()
+
+      // Clear Sentry user context
+      clearUserContext()
+      addBreadcrumb({
+        message: 'User logged out',
+        category: 'auth',
+        level: 'info',
+      })
 
       // Show success toast
       Toast.show({

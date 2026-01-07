@@ -20,7 +20,12 @@ import { useColorScheme } from '@/hooks/use-color-scheme'
 import { AuthInitializer } from '@/lib/auth-initializer'
 import { OnboardingGuard } from '@/lib/onboarding-guard'
 import { queryClient } from '@/lib/query-client'
+import { initSentry } from '@/lib/sentry'
 import { useAuthStore } from '@/store/authStore'
+import * as Sentry from '@sentry/react-native'
+
+// Initialize Sentry as early as possible
+initSentry()
 
 export const unstable_settings = {
   anchor: 'splash',
@@ -43,41 +48,45 @@ export default function RootLayout() {
   }
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <AuthInitializer />
-        <OnboardingGuard />
-        <StatusBar style='auto' />
-        <Stack>
-          <Stack.Screen name='splash' options={{ headerShown: false }} />
-          <Stack.Screen
-            name='signup-success'
-            options={{ headerShown: false }}
-          />
-
-          <Stack.Protected guard={isAuthenticated}>
-            <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
+    <Sentry.TouchEventBoundary>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider
+          value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
+        >
+          <AuthInitializer />
+          <OnboardingGuard />
+          <StatusBar style='auto' />
+          <Stack>
+            <Stack.Screen name='splash' options={{ headerShown: false }} />
             <Stack.Screen
-              name='modal'
-              options={{ presentation: 'modal', title: 'Modal' }}
-            />
-          </Stack.Protected>
-
-          <Stack.Protected guard={!isAuthenticated}>
-            <Stack.Screen name='login' options={{ headerShown: false }} />
-            <Stack.Screen name='signup' options={{ headerShown: false }} />
-            <Stack.Screen
-              name='onboarding-start'
+              name='signup-success'
               options={{ headerShown: false }}
             />
-            <Stack.Screen
-              name='onboarding-pick-genres'
-              options={{ headerShown: false }}
-            />
-          </Stack.Protected>
-        </Stack>
-        <Toast />
-      </ThemeProvider>
-    </QueryClientProvider>
+
+            <Stack.Protected guard={isAuthenticated}>
+              <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
+              <Stack.Screen
+                name='modal'
+                options={{ presentation: 'modal', title: 'Modal' }}
+              />
+            </Stack.Protected>
+
+            <Stack.Protected guard={!isAuthenticated}>
+              <Stack.Screen name='login' options={{ headerShown: false }} />
+              <Stack.Screen name='signup' options={{ headerShown: false }} />
+              <Stack.Screen
+                name='onboarding-start'
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name='onboarding-pick-genres'
+                options={{ headerShown: false }}
+              />
+            </Stack.Protected>
+          </Stack>
+          <Toast />
+        </ThemeProvider>
+      </QueryClientProvider>
+    </Sentry.TouchEventBoundary>
   )
 }
