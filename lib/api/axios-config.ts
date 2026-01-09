@@ -1,5 +1,5 @@
 import { tokenStorage } from '@/lib/secure-store'
-import { addBreadcrumb, logError } from '@/lib/sentry'
+import { addBreadcrumb, clearUserContext, logError } from '@/lib/sentry'
 import axios, {
   AxiosError,
   AxiosInstance,
@@ -111,9 +111,11 @@ apiClient.interceptors.response.use(
     })
 
     if (axiosError.response?.status === 401) {
-      // Token expired or invalid, clear it
+      // Token expired or invalid, clear it and user context
       try {
         await tokenStorage.removeToken()
+        // Clear Sentry user context since user is no longer authenticated
+        clearUserContext()
         addBreadcrumb({
           message: 'Auth token cleared due to 401 error',
           category: 'auth',

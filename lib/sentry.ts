@@ -20,6 +20,7 @@ export function initSentry() {
     debug: __DEV__, // Enable debug mode in development
     environment: __DEV__ ? 'development' : 'production',
     enableAutoSessionTracking: true,
+    enableLogs: true,
     sessionTrackingIntervalMillis: 30000, // 30 seconds
     tracesSampleRate: __DEV__ ? 1.0 : 0.2, // 100% in dev, 20% in production
     beforeSend(event, hint) {
@@ -48,12 +49,52 @@ export function logError(error: Error, context?: Record<string, unknown>) {
 }
 
 /**
- * Log a message to Sentry
+ * Log a message to Sentry using the structured logger API
+ * Falls back to captureMessage if logger is not available
  */
 export function logMessage(
   message: string,
-  level: Sentry.SeverityLevel = 'info'
+  level: Sentry.SeverityLevel = 'info',
+  context?: Record<string, unknown>
 ) {
+  // Use Sentry.logger if available (newer versions)
+  if (Sentry.logger) {
+    try {
+      // Map severity levels to logger methods
+      const levelMap: Record<string, string> = {
+        fatal: 'fatal',
+        error: 'error',
+        warning: 'warn',
+        warn: 'warn',
+        info: 'info',
+        log: 'info',
+        debug: 'debug',
+        trace: 'trace',
+      }
+
+      const loggerMethod = levelMap[level] || 'info'
+      // Type assertion through 'unknown' to handle logger's fmt property
+      const logger = Sentry.logger as unknown as Record<
+        string,
+        (message: string, context?: Record<string, unknown>) => void
+      >
+
+      if (logger[loggerMethod] && typeof logger[loggerMethod] === 'function') {
+        // Use logger with context if provided
+        if (context) {
+          logger[loggerMethod](message, context)
+        } else {
+          logger[loggerMethod](message)
+        }
+        return
+      }
+    } catch (error) {
+      // If logger fails, fall through to captureMessage
+      console.warn('Sentry.logger failed, using captureMessage:', error)
+    }
+  }
+
+  // Fallback to captureMessage for older versions or if logger method not available
   Sentry.captureMessage(message, level)
 }
 
