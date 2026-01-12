@@ -4,6 +4,7 @@ import { ThemedText } from '@/components/themed-text'
 import { Colors } from '@/constants/colors'
 import { commonStyles } from '@/constants/common-styles'
 import { useLogin } from '@/hooks/useAuth'
+import { logMessage } from '@/lib/sentry'
 import { Ionicons } from '@expo/vector-icons'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { router } from 'expo-router'
@@ -46,6 +47,9 @@ export default function LoginScreen() {
   const isFormValid = isValid && watchedValues.email && watchedValues.password
 
   const onSubmit = (data: LoginFormData) => {
+    logMessage('Login form submitted', 'info', {
+      email: data.email,
+    })
     loginMutation.mutate({
       email: data.email,
       password: data.password,

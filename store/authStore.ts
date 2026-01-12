@@ -1,3 +1,4 @@
+import { clearUserContext } from '@/lib/sentry'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
@@ -60,13 +61,16 @@ export const useAuthStore = create<AuthState>()(
           error: null,
         }),
 
-      logout: () =>
+      logout: () => {
+        // Clear Sentry user context when logging out
+        clearUserContext()
         set({
           user: null,
           token: null,
           isAuthenticated: false,
           error: null,
-        }),
+        })
+      },
     }),
     {
       name: 'auth-store',

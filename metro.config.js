@@ -1,7 +1,15 @@
 const { getDefaultConfig } = require('expo/metro-config')
+const { getSentryExpoConfig } = require('@sentry/react-native/metro')
 
-const config = getDefaultConfig(__dirname)
+const defaultConfig = getDefaultConfig(__dirname)
+const sentryConfig = getSentryExpoConfig(__dirname)
 
+const config = {
+  ...defaultConfig,
+  ...sentryConfig,
+}
+
+// Keep SVG transformer configuration
 config.transformer = {
   ...config.transformer,
   babelTransformerPath: require.resolve('react-native-svg-transformer'),
