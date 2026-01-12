@@ -4,7 +4,7 @@ import { ThemedText } from '@/components/themed-text'
 import { Colors } from '@/constants/colors'
 import { commonStyles } from '@/constants/common-styles'
 import { useLogin } from '@/hooks/useAuth'
-import { logError, logMessage } from '@/lib/sentry'
+import { logMessage } from '@/lib/sentry'
 import { Ionicons } from '@expo/vector-icons'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { router } from 'expo-router'
@@ -58,16 +58,6 @@ export default function LoginScreen() {
 
   const handleSignUpPress = () => {
     router.push('/signup')
-  }
-
-  // Función temporal para probar Sentry - ELIMINAR después de probar
-  const handleTestSentry = () => {
-    logError(new Error('🧪 Error de prueba de Sentry desde stremio-app'), {
-      context: 'testing',
-      action: 'test-sentry-integration',
-      screen: 'login',
-    })
-    alert('✅ Error enviado a Sentry! Revisa tu dashboard en unos segundos.')
   }
 
   return (
@@ -179,16 +169,6 @@ export default function LoginScreen() {
             <SocialButton iconName='logo-google' />
             <SocialButton iconName='logo-apple' />
           </View>
-
-          {/* BOTÓN TEMPORAL PARA PROBAR SENTRY - ELIMINAR DESPUÉS */}
-          <TouchableOpacity
-            style={styles.testSentryButton}
-            onPress={handleTestSentry}
-          >
-            <ThemedText style={styles.testSentryButtonText}>
-              🧪 Probar Sentry (Temporal)
-            </ThemedText>
-          </TouchableOpacity>
         </View>
 
         {/* Sign Up Link */}
@@ -306,21 +286,5 @@ const styles = StyleSheet.create({
   signUpLink: {
     fontSize: 16,
     fontFamily: 'Poppins_600SemiBold',
-  },
-  // Estilos temporales para el botón de prueba - ELIMINAR después
-  testSentryButton: {
-    backgroundColor: '#FF6B6B',
-    borderRadius: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    alignItems: 'center',
-    marginTop: 20,
-    borderWidth: 2,
-    borderColor: '#FF4757',
-  },
-  testSentryButtonText: {
-    fontSize: 14,
-    fontFamily: 'Poppins_600SemiBold',
-    color: '#FFFFFF',
   },
 })
