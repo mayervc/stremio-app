@@ -7,16 +7,24 @@ import FeaturedMovies from '@/components/featured-movies'
 import HeaderBar from '@/components/header-bar'
 import { ThemedSafeAreaView } from '@/components/themed-safe-area-view'
 import { ThemedText } from '@/components/themed-text'
+import { useAnalyticsScreenView } from '@/hooks/useAnalyticsScreenView'
 import { useRecommendedMovies } from '@/hooks/useMovies'
+import { AnalyticsEvents, logEvent } from '@/lib/analytics'
 import { useAuthStore } from '@/store/authStore'
 
 export default function HomeScreen() {
   const { user } = useAuthStore()
+  useAnalyticsScreenView('Home')
 
   const handleSearchPress = () => {
     router.push('/search' as any)
   }
-  const navigateToMovieDetails = (movieId: number) => {
+  const navigateToMovieDetails = async (movieId: number) => {
+    // Track movie selection from home
+    await logEvent(AnalyticsEvents.SEARCH_RESULT_CLICKED, {
+      movie_id: movieId.toString(),
+      source: 'home',
+    })
     router.push(`/movie/${movieId}`)
   }
   const { data: recommendedData } = useRecommendedMovies()

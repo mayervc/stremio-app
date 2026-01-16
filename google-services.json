@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "947247608734",
+    "project_id": "stremio-app-3dd4f",
+    "storage_bucket": "stremio-app-3dd4f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:947247608734:android:5f75b67bd483c4617c9c8f",
+        "android_client_info": {
+          "package_name": "com.mobile.stremioapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyADRJQy50eQDBhpMv2xG_VWB3p3rD4Uo6U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

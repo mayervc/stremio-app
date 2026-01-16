@@ -1,4 +1,5 @@
 import { useCurrentUser } from '@/hooks/useAuth'
+import { setUserId, setUserProperties } from '@/lib/analytics'
 import {
   addBreadcrumb,
   clearUserContext,
@@ -21,6 +22,14 @@ export function AuthInitializer() {
         email: user.email,
         username: `${user.firstName} ${user.lastName}`,
       })
+
+      // Set user ID and properties in Analytics
+      setUserId(user.id.toString())
+      setUserProperties({
+        email: user.email,
+        username: `${user.firstName} ${user.lastName}`,
+      })
+
       addBreadcrumb({
         message: 'User authenticated',
         category: 'auth',

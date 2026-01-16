@@ -13,10 +13,12 @@ import {
 import { QueryClientProvider } from '@tanstack/react-query'
 import { Stack } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
+import { useEffect } from 'react'
 import 'react-native-reanimated'
 import Toast from 'react-native-toast-message'
 
 import { useColorScheme } from '@/hooks/use-color-scheme'
+import { initAnalytics } from '@/lib/analytics'
 import { AuthInitializer } from '@/lib/auth-initializer'
 import { OnboardingGuard } from '@/lib/onboarding-guard'
 import { queryClient } from '@/lib/query-client'
@@ -42,6 +44,19 @@ export default function RootLayout() {
     Poppins_600SemiBold,
     Poppins_700Bold,
   })
+
+  // Initialize Analytics after component mounts
+  // This ensures the native module is available before trying to use it
+  useEffect(() => {
+    // Use setTimeout to ensure native modules are fully loaded
+    const timer = setTimeout(() => {
+      initAnalytics().catch(error => {
+        console.warn('Failed to initialize analytics:', error)
+      })
+    }, 100)
+
+    return () => clearTimeout(timer)
+  }, [])
 
   if (!fontsLoaded) {
     return null

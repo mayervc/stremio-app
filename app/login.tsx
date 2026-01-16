@@ -3,6 +3,7 @@ import { ThemedSafeAreaView } from '@/components/themed-safe-area-view'
 import { ThemedText } from '@/components/themed-text'
 import { Colors } from '@/constants/colors'
 import { commonStyles } from '@/constants/common-styles'
+import { useAnalyticsScreenView } from '@/hooks/useAnalyticsScreenView'
 import { useLogin } from '@/hooks/useAuth'
 import { logMessage } from '@/lib/sentry'
 import { Ionicons } from '@expo/vector-icons'
@@ -30,6 +31,7 @@ type LoginFormData = z.infer<typeof loginSchema>
 export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false)
   const loginMutation = useLogin()
+  useAnalyticsScreenView('Login')
   // const insets = useSafeAreaInsets()
 
   const {

@@ -1,4 +1,5 @@
 import { Colors } from '@/constants/colors'
+import { AnalyticsEvents, logEvent, resetAnalytics } from '@/lib/analytics'
 import { authApi } from '@/lib/api/auth'
 import { addBreadcrumb, clearUserContext } from '@/lib/sentry'
 import { useAuthStore } from '@/store/authStore'
@@ -19,6 +20,12 @@ export function LogoutButton() {
 
       // Clear auth state
       logout()
+
+      // Track logout event
+      await logEvent(AnalyticsEvents.LOGOUT)
+
+      // Reset Analytics data
+      await resetAnalytics()
 
       // Clear Sentry user context
       clearUserContext()
