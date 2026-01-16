@@ -10,7 +10,8 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.mayer-vargas.stremioapp",
+      "bundleIdentifier": "com.mobile.stremioapp",
+      "googleServicesFile": "./GoogleService-Info.plist",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -20,9 +21,10 @@
         "backgroundColor": "#000000",
         "foregroundImage": "./assets/images/film_logo.png"
       },
+      "googleServicesFile": "./google-services.json",
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.mayer_vargas.stremioapp"
+      "package": "com.mobile.stremioapp"
     },
     "web": {
       "output": "static",
@@ -40,12 +42,21 @@
       ],
       "expo-web-browser",
       [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          }
+        }
+      ],
+      [
         "@sentry/react-native/expo",
         {
           "organization": "mayers",
           "project": "react-native"
         }
-      ]
+      ],
+      "@react-native-firebase/app"
     ],
     "experiments": {
       "typedRoutes": true,

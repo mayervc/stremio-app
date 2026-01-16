@@ -1,4 +1,10 @@
 import {
+  AnalyticsEvents,
+  logEvent,
+  setUserId,
+  setUserProperties,
+} from '@/lib/analytics'
+import {
   authApi,
   type LoginCredentials,
   type LoginResponse,
@@ -19,6 +25,11 @@ export function useLogin() {
     mutationFn: async (
       credentials: LoginCredentials
     ): Promise<LoginResponse> => {
+      // Track login attempt
+      await logEvent(AnalyticsEvents.LOGIN_ATTEMPT, {
+        email: credentials.email,
+      })
+
       // Login API call
       const response = await authApi.login(credentials)
 
@@ -39,6 +50,19 @@ export function useLogin() {
           username: `${user.firstName} ${user.lastName}`,
         })
 
+        // Set user ID and properties in Analytics
+        await setUserId(user.id.toString())
+        await setUserProperties({
+          email: user.email,
+          username: `${user.firstName} ${user.lastName}`,
+        })
+
+        // Track successful login
+        await logEvent(AnalyticsEvents.LOGIN_SUCCESS, {
+          user_id: user.id.toString(),
+          email: user.email,
+        })
+
         addBreadcrumb({
           message: 'User logged in successfully',
           category: 'auth',
@@ -56,8 +80,13 @@ export function useLogin() {
         throw error
       }
     },
-    onError: (error: Error) => {
+    onError: async (error: Error) => {
       const errorMessage = getApiError(error)
+
+      // Track failed login
+      await logEvent(AnalyticsEvents.LOGIN_FAILED, {
+        error_message: errorMessage,
+      })
 
       // Log login error to Sentry
       logError(error, {
@@ -90,6 +119,11 @@ export function useSignup() {
     mutationFn: async (
       credentials: SignupCredentials
     ): Promise<SignupResponse> => {
+      // Track signup attempt
+      await logEvent(AnalyticsEvents.SIGNUP_ATTEMPT, {
+        email: credentials.email,
+      })
+
       // Signup API call
       const response = await authApi.signup(credentials)
 
@@ -98,6 +132,11 @@ export function useSignup() {
     onSuccess: async response => {
       // Store auth token for subsequent requests but don't mark the user as fully authenticated yet
       setToken(response.token)
+
+      // Track successful signup
+      await logEvent(AnalyticsEvents.SIGNUP_SUCCESS, {
+        email: response.user?.email || 'unknown',
+      })
 
       addBreadcrumb({
         message: 'User signed up successfully',
@@ -108,8 +147,13 @@ export function useSignup() {
       // Navigate to signup success screen
       router.replace('/signup-success')
     },
-    onError: (error: Error) => {
+    onError: async (error: Error) => {
       const errorMessage = getApiError(error)
+
+      // Track failed signup
+      await logEvent(AnalyticsEvents.SIGNUP_FAILED, {
+        error_message: errorMessage,
+      })
 
       // Log signup error to Sentry
       logError(error, {

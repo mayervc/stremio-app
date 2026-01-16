@@ -16,7 +16,9 @@ import { ThemedSafeAreaView } from '@/components/themed-safe-area-view'
 import { ThemedText } from '@/components/themed-text'
 import { Colors } from '@/constants/theme'
 import { useThemeColor } from '@/hooks/use-theme-color'
+import { useAnalyticsScreenView } from '@/hooks/useAnalyticsScreenView'
 import { useSearchMovies } from '@/hooks/useMovies'
+import { AnalyticsEvents, logEvent } from '@/lib/analytics'
 import { Movie } from '@/lib/api/types'
 import {
   RecentSearch,
@@ -26,6 +28,7 @@ import {
 export default function SearchScreen() {
   const [searchQuery, setSearchQuery] = useState('')
   const [debouncedQuery] = useDebounce(searchQuery, 500) // 500ms delay
+  useAnalyticsScreenView('Search')
   const {
     recentSearches,
     addRecentSearch,
@@ -38,6 +41,16 @@ export default function SearchScreen() {
     isLoading,
     error,
   } = useSearchMovies(debouncedQuery, debouncedQuery.length > 0)
+
+  // Track search performed
+  useEffect(() => {
+    if (debouncedQuery && debouncedQuery.length > 0) {
+      logEvent(AnalyticsEvents.SEARCH_PERFORMED, {
+        search_query: debouncedQuery,
+        results_count: searchData?.movies?.length || 0,
+      })
+    }
+  }, [debouncedQuery, searchData])
 
   // Map search results to include image_url and filter properly
   const searchResults = (searchData?.movies || [])
@@ -119,7 +132,13 @@ export default function SearchScreen() {
     router.push(`/movie/${movieId}`)
   }
 
-  const handleMoviePress = (movie: Movie) => {
+  const handleMoviePress = async (movie: Movie) => {
+    // Track search result click
+    await logEvent(AnalyticsEvents.SEARCH_RESULT_CLICKED, {
+      movie_id: movie.id.toString(),
+      movie_title: movie.title || 'Unknown',
+      search_query: debouncedQuery,
+    })
     // Add to recent searches
     addRecentSearch({
       id: movie.id,

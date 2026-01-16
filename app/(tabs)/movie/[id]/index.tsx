@@ -17,7 +17,9 @@ import { ThemedSafeAreaView } from '@/components/themed-safe-area-view'
 import { ThemedText } from '@/components/themed-text'
 import { Colors } from '@/constants/theme'
 import { useThemeColor } from '@/hooks/use-theme-color'
+import { useAnalyticsScreenView } from '@/hooks/useAnalyticsScreenView'
 import { useMovie } from '@/hooks/useMovies'
+import { AnalyticsEvents, logEvent } from '@/lib/analytics'
 
 type NormalizedCastMember = {
   id: string
@@ -84,6 +86,19 @@ export default function MovieDetailsScreen() {
   }, [params.id])
 
   const { data: movie, isLoading, isError, error } = useMovie(movieId ?? 0)
+
+  // Track screen view
+  useAnalyticsScreenView('Movie Details')
+
+  // Track movie view event when movie data is loaded
+  useEffect(() => {
+    if (movie && movieId) {
+      logEvent(AnalyticsEvents.MOVIE_VIEWED, {
+        movie_id: movieId.toString(),
+        movie_title: movie.title || 'Unknown',
+      })
+    }
+  }, [movie, movieId])
 
   const backgroundColor = useThemeColor(
     {
@@ -687,4 +702,3 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 })
-
